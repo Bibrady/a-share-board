@@ -1,0 +1,17 @@
+{
+  "name": "A股看板",
+  "short_name": "A股看板",
+  "description": "A股10日新高突破 + 大盘盘面（自动更新）",
+  "lang": "zh-CN",
+  "id": "/a-share-board/",
+  "start_url": "/a-share-board/",
+  "scope": "/a-share-board/",
+  "display": "standalone",
+  "background_color": "#f5f6f8",
+  "theme_color": "#ffffff",
+  "icons": [
+    {"src": "/a-share-board/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/a-share-board/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/a-share-board/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}
+  ]
+}
