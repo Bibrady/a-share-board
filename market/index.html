@@ -91,8 +91,17 @@ canvas{display:block;width:100%;touch-action:pan-y}
 .rsteps{font-size:11.5px;color:#9aa3b5;margin-top:2px;line-height:1.6}.rsteps b{color:var(--acc);font-weight:600}.rsteps s{text-decoration:none;color:#5a6b8f}
 details{font-size:12.5px;color:#555}details summary{cursor:pointer;color:var(--acc);padding:4px 0}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}footer a{color:var(--mut)}
+.mgk{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.mgt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.mgt .tile b{font-size:17px}
+.mgt .tile small{font-size:11.5px}
+.mgs{font-size:12.5px;color:#555;margin-top:8px;line-height:1.6}
+.mgs b{font-weight:600;color:var(--fg)}
+.mdate{display:inline-block;background:#eef3ff;color:#2a4fb8;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:600}
+.mc{height:140px;margin-top:6px}
 @media (min-width:760px){
  body{font-size:14.5px}
+ .mgw{display:grid;grid-template-columns:1fr 1.2fr;gap:16px;align-items:start}.mc{height:150px}
  header{margin:0 0 12px;border:1px solid var(--bd);border-top:0;border-radius:0 0 14px 14px;padding:16px 18px 12px}
  h1{font-size:21px}
  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
@@ -145,6 +154,25 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
 </section>
 </div>
 
+<section class="card" id="c-mg" hidden>
+ <h2>两融（融资融券） <small><span class="mdate" id="mgdate"></span></small></h2>
+ <div class="mgw"><div>
+  <div class="mgk"><div><div style="font-size:12.5px;color:var(--mut)">两融余额</div><div class="kbig" id="mgtot">—</div></div><div class="cmp" id="mgchg"></div></div>
+  <div class="mgt">
+   <div class="tile"><span>融资余额</span><b id="mgrz">—</b><small id="mgrzc"></small></div>
+   <div class="tile"><span>融券余额</span><b id="mgrq">—</b><small id="mgrqc"></small></div>
+   <div class="tile"><span>融资买入额</span><b id="mgbuy">—</b><small id="mgbr"></small></div>
+  </div>
+  <div class="mgs" id="mgsplit"></div>
+ </div><div>
+  <div class="hsel" id="mgsel" style="margin-top:8px"></div>
+  <div class="ht">两融余额（亿）· 近30个交易日</div><canvas class="mc" id="mg1"></canvas>
+  <div class="ht">融资买入额（亿）· 线＝占当日成交额 %</div><canvas class="mc" id="mg2"></canvas>
+ </div></div>
+ <div class="warn" id="mgwarn" hidden></div>
+ <div class="note" id="mgnote"></div>
+</section>
+
 <div class="grid2">
 <section class="card">
  <h2>涨跌幅分布 <small>单位：只 · 涨跌幅 %</small></h2>
@@ -178,6 +206,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
  <p style="margin:6px 0">成交额：沪市用上证综指成交额（全部沪市股票，含极少量 B 股）、深市用深证综指成交额（全部深市股票）、北交所用北证50指数所报北交所全市场成交额，三者相加；不含基金、债券、回购。“较20日均值”为与此前 20 个交易日（不含当日）平均成交额相比。<br>
  盘中成交额曲线：交易时段每分钟在本机采样一次（09:30–11:30、13:00–15:00）；与前一交易日同一时刻的累计成交额对比。<br>
  涨跌家数：全部沪深京 A 股（按代码去重），以最新价对比昨收；停牌或当日无成交不计入涨跌平。涨停/跌停/炸板来自同花顺 Fuyao 涨停池、跌停池、炸板池；炸板率 = 炸板 ÷（涨停 + 炸板）。<br>
+ 两融：上交所、深交所、北交所官网每日公布的融资融券交易总量（交易所口径，含 ETF 等基金的两融），T 日数据于下一交易日早上约 08:00–09:00 公布；同花顺 Fuyao 接口无两融数据。融资买入额占比 = 融资买入额 ÷ 当日沪深京股票成交额（分子含 ETF，略偏高）。融资余额占流通市值为估算：流通股本（同花顺 Fuyao）× 当日收盘价。<br>
  近30日：成交额来自指数日线；历史涨跌家数由本机缓存的全市场收盘价计算（最新交易日为实时行情）；涨跌停、炸板数为 Fuyao 当日股票池。<br>
  更新：交易日盘中每 10 分钟发布一次，15:05 收盘定稿；“强制刷新”可随时重新拉取（盘中为当时数据）。</p>
  </details>
@@ -270,6 +299,48 @@ function renderInd(){var d=D.ind;if(!d){$("#indt").innerHTML=$("#indb").innerHTM
  $("#indsub").textContent="共 "+d.n+" 个二级行业 · 按涨跌幅";
  function rows(a){return a.map(function(r,i){return '<div class="ir"><span class="r">'+(i+1)+'</span><span class="nm">'+esc(r[0])+'</span><span class="v '+cls(r[1])+'">'+sg(r[1],2)+'%</span></div>'}).join("")}
  $("#indt").innerHTML=rows(d.top);$("#indb").innerHTML=rows(d.bot)}
+// ---------- 两融 ----------
+var MG=null,MS=-1;
+function mgload(){return get("data/margin.json",true).then(function(d){MG=d;mgrender()}).catch(function(){})}
+function wy(v){return v==null?"—":Math.abs(v)>=10000?(v/10000).toFixed(2)+"万亿":(Math.abs(v)>=100?Math.round(v):v.toFixed(1))+"亿"}
+function cy(v){return v==null?"":(v>0?"+":"")+(Math.abs(v)>=100?Math.round(v):v.toFixed(1))+"亿"}
+function mgrender(){var m=MG;if(!m||!m.date)return;$("#c-mg").hidden=false;
+ $("#mgdate").textContent="数据日期 "+md(m.date)+"（交易所次日公布）";
+ $("#mgtot").innerHTML=m.tot>=10000?(m.tot/10000).toFixed(2)+"<small>万亿</small>":Math.round(m.tot)+"<small>亿</small>";
+ var c=m.chg||{};function ch(k){var x=c[k];return x?'<b class="'+cls(x[0])+'">'+cy(x[0])+'（'+sg(x[1],2)+'%）</b>':"—"}
+ $("#mgchg").innerHTML=m.prev_date?'较前一交易日（'+md(m.prev_date)+'）<br>'+ch("tot"):"";
+ $("#mgrz").textContent=wy(m.rz);$("#mgrzc").innerHTML=c.rz?'<span class="'+cls(c.rz[0])+'">'+cy(c.rz[0])+' '+sg(c.rz[1],2)+'%</span>':"";
+ $("#mgrq").textContent=wy(m.rq);$("#mgrqc").innerHTML=c.rq?'<span class="'+cls(c.rq[0])+'">'+cy(c.rq[0])+' '+sg(c.rq[1],2)+'%</span>':"";
+ $("#mgbuy").textContent=wy(m.buy);$("#mgbr").textContent=m.buy_ratio!=null?"占成交额 "+m.buy_ratio.toFixed(1)+"%":"";
+ var sp=m.split||{},nm={sh:"沪",sz:"深",bj:"京"},a=[];["sh","sz","bj"].forEach(function(k){var x=sp[k];if(x)a.push(nm[k]+' <b>'+wy(x.tot)+'</b>'+(x.chg!=null?' <span class="'+cls(x.chg)+'">'+cy(x.chg)+'</span>':""))});
+ $("#mgsplit").innerHTML=a.join(" · ")+(m.nobj?' · 京 暂缺':'')+(m.fin_mcap_ratio!=null?'<br>融资余额占流通市值 约 <b>'+m.fin_mcap_ratio.toFixed(2)+'%</b>（流通市值约 '+wy(m.float_mcap)+'）':"");
+ var w=$("#mgwarn");w.hidden=!m.backup;w.textContent=m.backup?"⚠️ 部分两融数据来自备用源（东方财富），交易所官网当时无法访问":"";
+ $("#mgnote").textContent="两融数据来源："+(m.backup?"上交所/深交所/北交所官网，部分来自东方财富（备用）":"上交所/深交所/北交所官网")+"（同花顺接口无此项）· 交易所口径，含 ETF 等基金两融"+((m.gaps||[]).length?" · 图中“缺”为当日数据暂缺":"");
+ MS=-1;mgdraw()}
+function mgdraw(){var m=MG;if(!m||!m.series)return;var H=m.series,n=H.length;if(!n)return;if(MS<0||MS>=n)MS=n-1;
+ var L=2,R=44,T=8,B=16;
+ function ax(g,lo,hi,fmt){var x=g.x;x.strokeStyle="#eef0f3";x.fillStyle="#8a8f98";x.textBaseline="middle";x.textAlign="left";for(var i=0;i<=3;i++){var v=lo+(hi-lo)*i/3,y=Math.round(T+(g.H-T-B)*(1-i/3))+.5;x.beginPath();x.moveTo(L,y);x.lineTo(g.W-R,y);x.stroke();x.fillText(fmt(v),g.W-R+3,y)}
+  x.textBaseline="alphabetic";var X=hx(n,g.W,L,R);[0,Math.floor((n-1)/2),n-1].forEach(function(i,j){x.textAlign=j===0?"left":j===2?"right":"center";x.fillText(md(H[i].d),j===0?L:j===2?g.W-R:X(i),g.H-3)})}
+ function sel(g){var X=hx(n,g.W,L,R),cx=Math.round(X(MS))+.5,x=g.x;x.strokeStyle="rgba(60,60,70,.35)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,g.H-B);x.stroke();x.setLineDash([])}
+ function gap(g,i){var X=hx(n,g.W,L,R);g.x.fillStyle="#c2c6cf";g.x.textAlign="center";g.x.textBaseline="alphabetic";g.x.fillText("缺",X(i),g.H-B-3)}
+ // 1: balance line (zoomed range, not from zero)
+ var g=setupCv($("#mg1")),x=g.x,lo=1e18,hi=-1e18;H.forEach(function(h){if(h.tot!=null){lo=Math.min(lo,h.tot);hi=Math.max(hi,h.tot)}});
+ var st=nice((hi-lo)/3||100);lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi-lo<st*3)hi=lo+st*3;
+ ax(g,lo,hi,function(v){return v>=10000?+(v/10000).toFixed(2)+"万亿":Math.round(v)});
+ var X=hx(n,g.W,L,R),ph=g.H-T-B,Y=function(v){return T+ph*(1-(v-lo)/(hi-lo))};
+ x.beginPath();var s0=false,first=-1,lastI=-1;H.forEach(function(h,i){if(h.tot==null){gap(g,i);return}if(first<0)first=i;lastI=i;s0?x.lineTo(X(i),Y(h.tot)):x.moveTo(X(i),Y(h.tot));s0=true});
+ x.strokeStyle="#7b4fd6";x.lineWidth=2;x.stroke();
+ if(first>=0){x.lineTo(X(lastI),T+ph);x.lineTo(X(first),T+ph);x.closePath();x.fillStyle="rgba(123,79,214,.08)";x.fill()}
+ H.forEach(function(h,i){if(h.tot==null)return;x.fillStyle="#7b4fd6";x.beginPath();x.arc(X(i),Y(h.tot),i===MS?3.6:1.6,0,7);x.fill()});sel(g);
+ // 2: buy bars + ratio line
+ g=setupCv($("#mg2"));x=g.x;var mx=0,rmx=0;H.forEach(function(h){mx=Math.max(mx,h.buy||0);rmx=Math.max(rmx,h.br||0)});var top=nice(mx*1.02/3)*3,rtop=Math.max(1,Math.ceil(rmx*1.15));
+ ax(g,0,top,function(v){return Math.round(v)});X=hx(n,g.W,L,R);ph=g.H-T-B;var bw=Math.max(2,(g.W-L-R)/n*.62);
+ H.forEach(function(h,i){if(h.buy==null){gap(g,i);return}var y=T+ph*(1-h.buy/top);x.fillStyle=i===MS?"#7b4fd6":"#c7b6ef";x.fillRect(X(i)-bw/2,y,bw,T+ph-y)});
+ x.strokeStyle="#ff8a00";x.lineWidth=1.6;x.beginPath();s0=false;H.forEach(function(h,i){if(h.br==null){s0=false;return}var y=T+ph*(1-h.br/rtop);s0?x.lineTo(X(i),y):x.moveTo(X(i),y);s0=true});x.stroke();
+ x.fillStyle="#ff8a00";x.textAlign="left";x.textBaseline="top";x.fillText("占比轴 0~"+rtop+"%",L+2,T);sel(g);
+ var h=H[MS],f=function(v){return v==null?'<span class="flat">缺</span>':wy(v)};
+ $("#mgsel").innerHTML='<b>'+h.d+'</b>　两融余额 <b>'+f(h.tot)+'</b><br>融资 '+f(h.rz)+'　融券 '+f(h.rq)+'<br>融资买入 <b>'+f(h.buy)+'</b>'+(h.br!=null?'（占成交额 '+h.br.toFixed(1)+'%）':'')+(h.nobj?' · 京暂缺':'')}
+function mgpick(ev){if(!MG||!MG.series)return;var n=MG.series.length,rc=ev.currentTarget.getBoundingClientRect(),i=Math.floor((ev.clientX-rc.left-2)/((rc.width-46)/n));MS=Math.max(0,Math.min(n-1,i));mgdraw()}
 // ---------- 近30日 ----------
 var HS=-1;
 function hx(n,W,L,R){var pw=W-L-R;return function(i){return L+pw*(i+.5)/n}}
@@ -311,14 +382,16 @@ function dates(ds){DV={};ds.forEach(function(x){if(x.v)DV[x.d]=x.v});
  $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+(x.p?'（盘中）':'（收盘）')+'</option>'}).join("")}
 var m=/d=(\d{8})/.exec(location.hash);
 get("data/dates.json",true).then(dates).catch(function(){}).then(function(){load(m?m[1]:"")});
+mgload();
+["#mg1","#mg2"].forEach(function(s){var dn=false,el=$(s);el.addEventListener("pointerdown",function(e){dn=true;mgpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")mgpick(e)});window.addEventListener("pointerup",function(){dn=false})});
 $("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
 var c1d=false;$("#cv1").addEventListener("pointerdown",function(e){c1d=true;pick1(e)});$("#cv1").addEventListener("pointermove",function(e){if(c1d||e.pointerType==="mouse")pick1(e)});
 window.addEventListener("pointerup",function(){c1d=false});
 ["#h1","#h2","#h3"].forEach(function(s){var dn=false,el=$(s);el.addEventListener("pointerdown",function(e){dn=true;hpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")hpick(e)});window.addEventListener("pointerup",function(){dn=false})});
-var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(D){drawCurve();hdraw()}},120)});
+var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(D){drawCurve();hdraw()}mgdraw()},120)});
 // auto-refresh while the market is open (page visible, latest date shown)
 setInterval(function(){if(document.hidden||!D||D.final||R.on)return;if($("#datesel").value&&$("#datesel").selectedIndex>0)return;
- get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
+ mgload();get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
 // ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"market"} -> box re-samples + publishes; progress back via ntfy ----------
 var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-m-zVPIyuWWhWpEGLKuxH8rk84zTNES";
 var STEPS=["收到请求","拉取行情","计算","上传","等待页面生效","完成"];
@@ -353,7 +426,7 @@ function onMsg(ev){if(!ev||ev.event!=="message"||R.seen[ev.id])return;R.seen[ev.
 function fresh(m){if(R.passive&&D&&D.run_at===m.run_at){rfEnd();$("#rfp").hidden=true;return}SHA=m.sha||"";var tries=0;
  function go(){return get("data/dates.json",true).then(dates).catch(function(){}).then(function(){return get("data/latest.json",true)}).then(function(d){
    if(d.run_at!==m.run_at){if(++tries<36){rfUI("等待页面生效",93,"GitHub Pages 部署中…（"+tries*5+" 秒）");return new Promise(function(r){setTimeout(r,5000)}).then(go)}throw new Error("页面数据未更新")}
-   D=d;history.replaceState(null,"",location.pathname);render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
+   D=d;history.replaceState(null,"",location.pathname);render();mgload();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
    rfUI("完成",100,d.status+" · 数据截至 "+bj(d.asof||d.data_ts).t+" · 用时 "+((Date.now()-R.t0)/1000).toFixed(0)+" 秒"+(m.text?" · "+m.text:""),"ok");elapsed();rfEnd();
    setTimeout(function(){if(!R.on)$("#rfp").hidden=true},8000);setTimeout(function(){if(SHA===m.sha)SHA=""},120000)})}
  go().catch(function(e){rfFail("数据已更新但读取失败（"+e.message+"），请下拉刷新页面")})}
