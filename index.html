@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A股10日新高突破看板</title>
+<meta name="description" content="A股每日收盘创10日新高突破筛选（自动更新）">
+<meta name="theme-color" content="#ffffff">
+<style>
+:root{--up:#e0302b;--down:#0a9d4a;--flat:#888;--bd:#e8e8ec;--bg:#f5f6f8;--fg:#1d1d1f;--mut:#8a8f98;--acc:#2f6fed;--hl:#fff4f3}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 10px 24px}
+header{background:#fff;border-bottom:1px solid var(--bd);padding:12px 12px 10px;margin:0 -10px 10px}
+h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .cnt{background:var(--up);color:#fff;border-radius:12px;padding:1px 10px;font-size:14px;font-weight:600}
+.meta{color:var(--mut);font-size:12.5px;display:flex;flex-wrap:wrap;gap:2px 12px}
+.meta b{color:var(--fg);font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,input{font:inherit;font-size:15px;height:40px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:#fff;color:var(--fg);min-width:0}
+select:focus,input:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.datebar{margin-top:8px}
+.datebar label{font-size:13px;color:var(--mut)}
+#datesel{flex:0 1 190px}
+.warn{background:#fff7e0;color:#8a5a00;border-radius:8px;padding:6px 10px;font-size:12.5px;margin-top:8px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:10px}
+.card h2{font-size:14.5px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+.card h2 small{font-weight:400;color:var(--mut);font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;max-height:114px;overflow:hidden;transition:max-height .2s}
+.chips.open{max-height:none}
+.chip{border:1px solid var(--bd);background:#fafafb;border-radius:16px;padding:0 11px;height:34px;line-height:32px;font-size:13.5px;cursor:pointer;white-space:nowrap;user-select:none;color:var(--fg)}
+.chip i{font-style:normal;color:var(--up);font-weight:600;margin-left:3px}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chip.on i{color:#fff}
+.more{border:0;background:none;color:var(--acc);font:inherit;font-size:13px;padding:8px 2px 0;cursor:pointer}
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.ctl input{width:100%}.ctl select{width:100%}
+.stat{font-size:12.5px;color:var(--mut);margin:0 2px 6px;display:flex;justify-content:space-between}
+.stat a{color:var(--acc);cursor:pointer}
+.tbox{background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:auto;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);-webkit-overflow-scrolling:touch}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:0 8px;height:48px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+th{position:sticky;top:0;z-index:2;background:#f8f9fb;font-size:12.5px;font-weight:600;color:#555;cursor:pointer;user-select:none;height:42px;white-space:nowrap;line-height:1.2}
+th.l{text-align:left}
+th.on{color:var(--acc)}
+th .ar{font-size:10px;margin-left:1px}
+td:first-child,th:first-child{position:sticky;left:0;text-align:left;background:#fff;z-index:1;border-right:1px solid var(--bd)}
+th:first-child{z-index:3;background:#f8f9fb}
+tbody tr{cursor:pointer}
+tbody tr:active td{background:#f0f4ff}
+td.nm{min-width:92px;max-width:118px}
+td.nm b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;color:var(--fg)}
+td.nm small{color:var(--mut);font-size:12px}
+td.ind{text-align:left;max-width:170px;overflow:hidden;text-overflow:ellipsis}
+td.ind small{display:block;color:var(--mut);font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--flat)}
+.big{font-weight:600;font-size:15px}
+.stk{display:inline-block;min-width:26px;border-radius:10px;padding:0 6px;background:#f0f0f3;color:#555;text-align:center}
+.stk.h{background:var(--hl);color:var(--up);font-weight:600}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+details{font-size:12.5px;color:#555}
+details summary{cursor:pointer;color:var(--acc);padding:4px 0}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}
+footer a{color:var(--mut)}
+@media (min-width:760px){
+ body{font-size:14.5px}
+ header{margin:0 0 12px;border:1px solid var(--bd);border-top:0;border-radius:0 0 14px 14px;padding:16px 18px 12px}
+ h1{font-size:21px}
+ .ctl{grid-template-columns:2fr 1fr}
+ td.nm{max-width:none}
+ .chips{max-height:none}.more{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>A股10日新高突破 <span class="cnt" id="cnt">…</span></h1>
+ <div class="meta">
+  <span>交易日 <b id="tdate">—</b></span>
+  <span>生成 <b id="gen">—</b>（北京时间）</span>
+  <span>数据来源：同花顺 Fuyao</span>
+ </div>
+ <div class="row datebar"><label for="datesel">查看日期</label><select id="datesel" aria-label="选择日期"></select></div>
+ <div class="warn" id="warn" hidden></div>
+</header>
+
+<section class="card">
+ <h2>行业分布 <small>点按筛选（同花顺二级行业）</small></h2>
+ <div class="chips" id="chips"></div>
+ <button class="more" id="more" hidden>展开全部 ▾</button>
+</section>
+
+<div class="ctl">
+ <input id="q" type="search" placeholder="搜索名称 / 代码" autocomplete="off" enterkeyhint="search">
+ <select id="indsel" aria-label="行业筛选"><option value="">全部行业</option></select>
+</div>
+<div class="stat"><span id="shown"></span><a id="clr" hidden>清除筛选</a></div>
+<div class="tbox"><table><thead><tr id="thr"></tr></thead><tbody id="tb"><tr><td class="empty" colspan="9">加载中…</td></tr></tbody></table></div>
+
+<section class="card" style="margin-top:10px">
+ <details><summary>筛选规则与漏斗</summary>
+  <p style="margin:6px 0">规则：交易日 T 收盘价严格高于前 10 个交易日（前复权）最高收盘价；剔除 ST / *ST / 退市整理、停牌；总市值 &gt; 60 亿；成交额 ≥ 2 亿。<br>
+  相对板块超额 = 个股涨幅 − 所属同花顺行业指数涨幅（未分类显示“—”）。连续上榜天数按本看板历史中连续交易日上榜计算。点按个股打开同花顺行情页。</p>
+  <p id="funnel" style="margin:6px 0;color:var(--mut)"></p>
+ </details>
+</section>
+<footer>每个交易日收盘后自动更新 · 仅供参考，不构成投资建议<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var D=null,S={k:"chg",dir:-1,ind:"",q:""};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function get(u){return fetch(u,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function cls(v){return v==null?"":v>0?"up":v<0?"down":"flat"}
+function fx(v,d){return v==null?"—":Number(v).toFixed(d)}
+function sg(v,d){return v==null?"—":(v>0?"+":"")+Number(v).toFixed(d)}
+function pd(t){return t.slice(0,4)+"-"+t.slice(4,6)+"-"+t.slice(6)}
+function bj(iso){var d=new Date(iso);if(isNaN(d))return iso||"—";d=new Date(d.getTime()+288e5);function p(n){return(n<10?"0":"")+n}
+ return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes())}
+function base(s){return String(s||"").replace(/[（(].*?[）)]\s*$/,"")}
+function url(c){return "https://m.10jqka.com.cn/stockpage/hs_"+c+"/"}
+var COLS=[
+ {k:"n",t:"名称<br>代码",td:function(r){return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small></td>'}},
+ {k:"chg",t:"涨幅%",td:function(r){return '<td class="big '+cls(r.chg)+'">'+sg(r.chg,2)+'</td>'}},
+ {k:"p",t:"收盘",td:function(r){return '<td class="'+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</td>'}},
+ {k:"amt",t:"成交额<br>(亿)",td:function(r){return '<td>'+fx(r.amt,1)+'</td>'}},
+ {k:"to",t:"换手<br>率%",td:function(r){return '<td>'+fx(r.to,2)+'</td>'}},
+ {k:"mc",t:"总市值<br>(亿)",td:function(r){return '<td>'+fx(r.mc,0)+'</td>'}},
+ {k:"g",t:"行业",td:function(r){var b=base(r.ind);return '<td class="ind">'+esc(r.g)+(b&&b!==r.g&&b!=="未分类"?'<small>'+esc(b)+'</small>':'')+'</td>'}},
+ {k:"ex",t:"相对板块<br>超额%",ex:1,td:function(r){return '<td class="'+cls(r.ex)+'">'+sg(r.ex,2)+'</td>'}},
+ {k:"s",t:"连续<br>上榜",td:function(r){return '<td><span class="stk'+(r.s>1?" h":"")+'">'+r.s+'天</span></td>'}}
+];
+function cols(){return COLS.filter(function(c){return !c.ex||(D&&D.has_excess)})}
+function head(){
+ $("#thr").innerHTML=cols().map(function(c){var on=S.k===c.k;return '<th data-k="'+c.k+'" class="'+(on?"on":"")+(c.k==="g"?" l":"")+'">'+c.t+(on?'<span class="ar">'+(S.dir<0?"▼":"▲")+'</span>':"")+'</th>'}).join("");
+}
+function rows(){
+ var q=S.q.trim().toLowerCase(),k=S.k,d=S.dir;
+ var a=D.rows.filter(function(r){return(!S.ind||r.g===S.ind)&&(!q||r.c.indexOf(q)>=0||String(r.n).toLowerCase().indexOf(q)>=0)});
+ a.sort(function(x,y){var u=x[k],v=y[k];
+  if(u==null&&v==null)return 0;if(u==null)return 1;if(v==null)return -1;
+  if(typeof u==="string")return d*u.localeCompare(v,"zh-CN");return d*(u-v)||(y.chg-x.chg)});
+ return a;
+}
+function body(){
+ var a=rows(),cs=cols();
+ $("#tb").innerHTML=a.length?a.map(function(r){return '<tr data-c="'+esc(r.c)+'">'+cs.map(function(c){return c.td(r)}).join("")+'</tr>'}).join("")
+  :'<tr><td class="empty" colspan="'+cs.length+'">'+(D.rows.length?"无匹配结果":"当日无符合条件的股票")+'</td></tr>';
+ $("#shown").textContent="显示 "+a.length+" / "+D.rows.length+" 只"+(S.ind?" · "+S.ind:"");
+ $("#clr").hidden=!(S.ind||S.q);
+}
+function chips(){
+ var h='<span class="chip'+(S.ind?"":" on")+'" data-g="">全部<i>'+D.count+'</i></span>';
+ h+=D.tally.map(function(t){return '<span class="chip'+(S.ind===t[0]?" on":"")+'" data-g="'+esc(t[0])+'">'+esc(t[0])+'<i>'+t[1]+'</i></span>'}).join("");
+ $("#chips").innerHTML=h;
+ var sel=$("#indsel");sel.innerHTML='<option value="">全部行业（'+D.tally.length+'）</option>'+D.tally.map(function(t){return '<option value="'+esc(t[0])+'">'+esc(t[0])+' '+t[1]+'</option>'}).join("");
+ sel.value=S.ind;
+ requestAnimationFrame(function(){var c=$("#chips");$("#more").hidden=c.classList.contains("open")||c.scrollHeight<=c.clientHeight+2});
+}
+function setInd(g){S.ind=(S.ind===g?"":g);chips();body()}
+function render(){
+ $("#cnt").textContent=D.count+" 只";$("#tdate").textContent=D.date;$("#gen").textContent=bj(D.run_at);
+ document.title="A股10日新高 "+D.date+" · "+D.count+"只";
+ var f=D.funnel||{};
+ $("#funnel").textContent=f.universe?("全市场 "+f.universe+"（含北交所 "+f.bse_in_universe+"）→ 剔ST "+f.after_st+" → 剔停牌 "+f.after_suspended+" → 市值>60亿 "+f.after_mcap+" → 成交额≥2亿 "+f.after_amount+" → 上市≥11日 "+f.after_history+" → 创10日新高 "+f.final):"";
+ var w=$("#warn");w.hidden=!D.fallback;w.textContent=D.fallback?"⚠️ 当日部分数据来自备用数据源":"";
+ if(S.ind&&!D.tally.some(function(t){return t[0]===S.ind}))S.ind="";
+ if(S.k==="ex"&&!D.has_excess){S.k="chg";S.dir=-1}
+ head();chips();body();
+}
+function load(tag){
+ return get(tag?"data/"+tag+".json":"data/latest.json").then(function(d){D=d;$("#datesel").value=d.tag;render()})
+  .catch(function(e){if(tag)return load("");$("#tb").innerHTML='<tr><td class="empty" colspan="9">数据加载失败（'+esc(e.message)+'），请稍后刷新</td></tr>'});
+}
+$("#thr").addEventListener("click",function(e){var th=e.target.closest("th");if(!th)return;var k=th.getAttribute("data-k");
+ if(S.k===k)S.dir=-S.dir;else{S.k=k;S.dir=(k==="n"||k==="g")?1:-1}head();body()});
+$("#tb").addEventListener("click",function(e){var tr=e.target.closest("tr[data-c]");if(tr)window.open(url(tr.getAttribute("data-c")),"_blank","noopener")});
+$("#chips").addEventListener("click",function(e){var c=e.target.closest(".chip");if(c)setInd(c.getAttribute("data-g"))});
+$("#more").addEventListener("click",function(){$("#chips").classList.add("open");this.hidden=true});
+$("#indsel").addEventListener("change",function(){S.ind=this.value;chips();body()});
+$("#q").addEventListener("input",function(){S.q=this.value;body()});
+$("#clr").addEventListener("click",function(){S.ind="";S.q="";$("#q").value="";chips();body()});
+$("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
+var m=/d=(\d{8})/.exec(location.hash);
+get("data/dates.json").then(function(ds){
+ $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+'（'+x.n+'只）</option>'}).join("");
+}).catch(function(){}).then(function(){load(m?m[1]:"")});
+})();
+</script>
+</body>
+</html>
