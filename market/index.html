@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A股大盘盘面</title>
+<meta name="description" content="A股大盘盘面：成交额、涨跌家数、涨跌停、涨跌幅分布、主要指数、行业涨跌（自动更新）">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:,">
+<style>
+:root{--up:#e0302b;--down:#0a9d4a;--flat:#888;--bd:#e8e8ec;--bg:#f5f6f8;--fg:#1d1d1f;--mut:#8a8f98;--acc:#2f6fed}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 10px 24px}
+header{background:#fff;border-bottom:1px solid var(--bd);padding:12px 12px 10px;margin:0 -10px 10px}
+h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.st{border-radius:12px;padding:1px 10px;font-size:13px;font-weight:600;color:#fff;background:#8a8f98}
+.st.live{background:#ff9f0a}.st.done{background:var(--acc)}
+.meta{color:var(--mut);font-size:12.5px;display:flex;flex-wrap:wrap;gap:2px 12px}
+.meta b{color:var(--fg);font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select{font:inherit;font-size:15px;height:40px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:#fff;color:var(--fg);min-width:0}
+.datebar{margin-top:8px}.datebar label{font-size:13px;color:var(--mut)}
+#datesel{flex:0 1 190px}
+.warn{background:#fff7e0;color:#8a5a00;border-radius:8px;padding:6px 10px;font-size:12.5px;margin-top:8px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+.card h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card h2 small{font-weight:400;color:var(--mut);font-size:12px;text-align:right}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--flat)}
+.note{font-size:11.5px;color:var(--mut);margin-top:6px;line-height:1.55}
+.kpi{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.kbig{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.5px}
+.kbig small{font-size:16px;font-weight:600;margin-left:2px}
+.cmp{font-size:13.5px;line-height:1.6}.cmp b{font-weight:700}
+.comp{font-size:12.5px;color:#555;margin-top:4px}
+.cvw{position:relative;margin-top:8px}
+canvas{display:block;width:100%;touch-action:pan-y}
+#cv1{height:190px}
+.lg{font-size:11.5px;color:var(--mut);display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+.lg i{display:inline-block;width:14px;height:0;border-top:2px solid var(--acc);vertical-align:3px;margin-right:4px}
+.lg i.p{border-top:2px dashed #b0b6c3}
+.empty{padding:22px 8px;text-align:center;color:var(--mut);font-size:13px;background:#fafafb;border-radius:8px}
+.udn{display:flex;justify-content:space-between;align-items:flex-end;gap:6px}
+.udn div{text-align:center;flex:1}
+.udn b{display:block;font-size:28px;font-weight:700;line-height:1.15}
+.udn span{font-size:12.5px;color:var(--mut)}
+.rbar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:8px 0 10px;background:#eee}
+.rbar i{display:block;height:100%}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:#f7f8fa;border-radius:10px;padding:8px 6px;text-align:center}
+.tile b{display:block;font-size:20px;font-weight:700;line-height:1.2}
+.tile span{font-size:12px;color:var(--mut)}
+.tile small{display:block;font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dist{display:flex;align-items:flex-end;gap:3px;height:170px;padding-top:4px}
+.dist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
+.dist em{font-style:normal;font-size:10.5px;font-weight:600;margin-bottom:2px;white-space:nowrap}
+.dist i{display:block;width:100%;border-radius:3px 3px 0 0;min-height:1px}
+.dlb{display:flex;gap:3px;margin-top:4px}
+.dlb span{flex:1;text-align:center;font-size:10px;line-height:1.15;color:#555;min-width:0;word-break:keep-all}
+.dsum{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px}
+.idxg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ix{background:#f7f8fa;border-radius:10px;padding:8px 10px}
+.ix .n{font-size:13px;color:#444;display:flex;justify-content:space-between}
+.ix .n small{color:var(--mut);font-size:11.5px}
+.ix .p{font-size:19px;font-weight:700;line-height:1.25}
+.ix .c{font-size:14px;font-weight:600}
+.indg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.indg h3{font-size:13px;margin:0 0 4px;color:#555}
+.ir{display:flex;align-items:center;gap:6px;height:28px;font-size:13px;border-bottom:1px solid #f1f2f4}
+.ir .r{width:16px;color:var(--mut);font-size:11px;text-align:right;flex:none}
+.ir .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ir .v{font-weight:700;flex:none}
+.hsel{font-size:12.5px;line-height:1.6;background:#f7f8fa;border-radius:8px;padding:6px 8px;min-height:46px}
+.hsel b{font-weight:700}
+.hc{height:150px;margin-top:8px}
+.ht{font-size:12px;color:#555;margin-top:10px;font-weight:600}
+.rfb{margin-left:auto;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap}
+.rfb:disabled{background:#c9d6f5;border-color:#c9d6f5;color:#fff;cursor:default}
+.rfp{margin-top:8px;background:#f4f7ff;border:1px solid #dbe4fb;border-radius:10px;padding:8px 10px}
+.rfp.err{background:#fff2f1;border-color:#f6d0cd}.rfp.ok{background:#effaf3;border-color:#cdebd8}
+.rfh{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:#2a3b66}
+.rfp.err .rfh{color:#b3261e}.rfp.ok .rfh{color:#146c2e}
+.bar{height:8px;background:#e1e7f6;border-radius:4px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px;transition:width .5s ease}
+.rfp.err .bar i{background:#e0302b}.rfp.ok .bar i{background:#0a9d4a}
+.rfp.run .bar i{background-image:linear-gradient(45deg,rgba(255,255,255,.28) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.28) 75%,transparent 75%);background-size:16px 16px;animation:mv 1s linear infinite}
+@keyframes mv{from{background-position:0 0}to{background-position:16px 0}}
+.rft{font-size:12px;color:var(--mut);display:flex;justify-content:space-between;gap:8px}
+.rsteps{font-size:11.5px;color:#9aa3b5;margin-top:2px;line-height:1.6}.rsteps b{color:var(--acc);font-weight:600}.rsteps s{text-decoration:none;color:#5a6b8f}
+details{font-size:12.5px;color:#555}details summary{cursor:pointer;color:var(--acc);padding:4px 0}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}footer a{color:var(--mut)}
+@media (min-width:760px){
+ body{font-size:14.5px}
+ header{margin:0 0 12px;border:1px solid var(--bd);border-top:0;border-radius:0 0 14px 14px;padding:16px 18px 12px}
+ h1{font-size:21px}
+ .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+ .grid2>.card{margin-bottom:0}.grid2{margin-bottom:10px}
+ .idxg{grid-template-columns:repeat(4,1fr)}
+ #cv1{height:230px}.hc{height:170px}
+}
+</style>
+</head>
+<body>
+<style>.stab{background:#fff;border-bottom:1px solid #e8e8ec;padding:0 max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#6b7280;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#2f6fed;border-bottom-color:#2f6fed}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 6px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/" class="on" aria-current="page">大盘盘面</a></div></nav>
+<div class="wrap">
+<header>
+ <h1>A股大盘盘面 <span class="st" id="st">…</span></h1>
+ <div class="meta">
+  <span>交易日 <b id="tdate">—</b></span>
+  <span>数据截至 <b id="asof">—</b>（北京时间）</span>
+  <span>数据来源：同花顺 Fuyao</span>
+  <span id="upd" hidden>页面更新 <b></b></span>
+ </div>
+ <div class="row datebar"><label for="datesel">查看日期</label><select id="datesel" aria-label="选择日期"></select><button class="rfb" id="rf" type="button">⟳ 强制刷新</button></div>
+ <div class="rfp" id="rfp" hidden><div class="rfh"><span id="rfs"></span><span id="rfpc"></span></div><div class="bar"><i id="rfbar"></i></div>
+  <div class="rft"><span id="rft"></span><span id="rfe"></span></div><div class="rsteps" id="rsteps"></div></div>
+ <div class="warn" id="warn" hidden></div>
+</header>
+
+<div class="grid2">
+<section class="card" id="c-amt">
+ <h2>成交额 <small id="amtsc">沪深京A股全市场</small></h2>
+ <div class="kpi"><div class="kbig" id="amt">—</div><div class="cmp" id="amtcmp"></div></div>
+ <div class="comp" id="amtcomp"></div>
+ <div class="cvw"><canvas id="cv1"></canvas><div class="empty" id="cv1e" hidden></div></div>
+ <div class="lg" id="cv1lg"><span><i></i><b id="lgt">当日</b></span><span><i class="p"></i><b id="lgp">前一交易日</b></span><span id="cv1r"></span></div>
+ <div class="note" id="amtnote"></div>
+</section>
+
+<section class="card" id="c-br">
+ <h2>涨跌家数 <small id="brsub"></small></h2>
+ <div class="udn"><div><b class="up" id="nup">—</b><span>上涨</span></div><div><b class="flat" id="nflat">—</b><span>平盘</span></div><div><b class="down" id="ndn">—</b><span>下跌</span></div></div>
+ <div class="rbar" id="rbar"></div>
+ <div class="tiles">
+  <div class="tile"><b class="up" id="nzt">—</b><span>涨停</span></div>
+  <div class="tile"><b class="down" id="ndt">—</b><span>跌停</span></div>
+  <div class="tile"><b id="nzb">—</b><span>炸板</span></div>
+  <div class="tile"><b id="zbr">—</b><span>炸板率</span></div>
+  <div class="tile"><b id="mlb">—</b><span>最高连板</span><small id="mlbn"></small></div>
+  <div class="tile"><b class="flat" id="nsusp">—</b><span>停牌/无成交</span></div>
+ </div>
+ <div class="note" id="brnote"></div>
+</section>
+</div>
+
+<div class="grid2">
+<section class="card">
+ <h2>涨跌幅分布 <small>单位：只 · 涨跌幅 %</small></h2>
+ <div class="dist" id="dist"></div><div class="dlb" id="dlb"></div>
+ <div class="dsum" id="dsum"></div>
+ <div class="note">涨停/跌停按同花顺 Fuyao 涨停池、跌停池（已按主板 10%、创业板/科创板 20%、北交所 30% 各自涨跌幅限制判定）；区间含右端，如 “1~3” 为 1% ≤ 涨幅 &lt; 3%，“-3~-1” 为 -3% &lt; 跌幅 ≤ -1%。</div>
+</section>
+
+<section class="card">
+ <h2>主要指数 <small>成交额单位：亿</small></h2>
+ <div class="idxg" id="idx"></div>
+</section>
+</div>
+
+<section class="card">
+ <h2>同花顺行业指数 <small id="indsub"></small></h2>
+ <div class="indg"><div><h3 class="up">领涨前10</h3><div id="indt"></div></div><div><h3 class="down">领跌前10</h3><div id="indb"></div></div></div>
+</section>
+
+<section class="card">
+ <h2>近30个交易日 <small>点按/拖动图表查看当日</small></h2>
+ <div class="hsel" id="hsel"></div>
+ <div class="ht">全市场成交额（亿）· 虚线＝前20日均值</div><canvas class="hc" id="h1"></canvas>
+ <div class="ht">上涨 / 下跌家数</div><canvas class="hc" id="h2"></canvas>
+ <div class="ht">涨停 / 跌停 / 炸板家数</div><canvas class="hc" id="h3"></canvas>
+ <div class="note" id="hnote"></div>
+</section>
+
+<section class="card">
+ <details><summary>口径说明</summary>
+ <p style="margin:6px 0">成交额：沪市用上证综指成交额（全部沪市股票，含极少量 B 股）、深市用深证综指成交额（全部深市股票）、北交所用北证50指数所报北交所全市场成交额，三者相加；不含基金、债券、回购。“较20日均值”为与此前 20 个交易日（不含当日）平均成交额相比。<br>
+ 盘中成交额曲线：交易时段每分钟在本机采样一次（09:30–11:30、13:00–15:00）；与前一交易日同一时刻的累计成交额对比。<br>
+ 涨跌家数：全部沪深京 A 股（按代码去重），以最新价对比昨收；停牌或当日无成交不计入涨跌平。涨停/跌停/炸板来自同花顺 Fuyao 涨停池、跌停池、炸板池；炸板率 = 炸板 ÷（涨停 + 炸板）。<br>
+ 近30日：成交额来自指数日线；历史涨跌家数由本机缓存的全市场收盘价计算（最新交易日为实时行情）；涨跌停、炸板数为 Fuyao 当日股票池。<br>
+ 更新：交易日盘中每 10 分钟发布一次，15:05 收盘定稿；“强制刷新”可随时重新拉取（盘中为当时数据）。</p>
+ </details>
+</section>
+<footer>仅供参考，不构成投资建议 · 数据来源：同花顺 Fuyao<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var D=null,DV={},PREFIX="market/",GH="Bibrady/a-share-board";
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function vq(u,v){return v?u+(u.indexOf("?")<0?"?":"&")+"v="+v:u}
+function pget(u,fresh){return fetch(fresh?u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now():u,{cache:fresh?"no-store":"no-cache"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+var SHA="",RAWBAD=0,APIBAD=0;
+function fto(u,o,ms){var c=window.AbortController?new AbortController():null,t=setTimeout(function(){if(c)c.abort()},ms);o=o||{};if(c)o.signal=c.signal;
+ return fetch(u,o).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()},function(e){clearTimeout(t);throw e})}
+// after a forced refresh: read the exact commit from raw.githubusercontent.com, then GitHub API, then Pages (deploy lag)
+function get(u,fresh){var p=u.split("?")[0];if(!SHA||p.indexOf("data/")!==0)return pget(u,fresh);var sha=SHA,rp=PREFIX+p;
+ var raw=function(){if(RAWBAD>1)return Promise.reject(new Error("raw off"));return fto("https://raw.githubusercontent.com/"+GH+"/"+sha+"/"+rp,{},6000).catch(function(e){RAWBAD++;throw e})};
+ var api=function(){if(APIBAD>1)return Promise.reject(new Error("api off"));return fto("https://api.github.com/repos/"+GH+"/contents/"+rp+"?ref="+sha,{headers:{Accept:"application/vnd.github.raw+json"}},8000).catch(function(e){APIBAD++;throw e})};
+ return raw().catch(api).catch(function(){return pget(u,true)})}
+function cls(v){return v==null?"":v>0?"up":v<0?"down":"flat"}
+function sg(v,d){return v==null?"—":(v>0?"+":"")+Number(v).toFixed(d)}
+function pd(t){return t.slice(0,4)+"-"+t.slice(4,6)+"-"+t.slice(6)}
+function md(d){return d.slice(5)}
+function bj(iso){var d=new Date(iso);if(isNaN(d))return iso||"—";d=new Date(d.getTime()+288e5);function p(n){return(n<10?"0":"")+n}
+ return {d:d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()),t:p(d.getUTCHours())+":"+p(d.getUTCMinutes())}}
+function yi(v,dg){if(v==null)return"—";return Math.abs(v)>=10000?(v/10000).toFixed(dg==null?2:dg)+"万亿":Math.round(v)+"亿"}
+function yiH(v){if(v==null)return"—";return Math.abs(v)>=10000?(v/10000).toFixed(2)+"<small>万亿</small>":Math.round(v)+"<small>亿</small>"}
+function hm(m){var t=m<=120?570+m:780+(m-120);var h=Math.floor(t/60),mi=t%60;return h+":"+(mi<10?"0":"")+mi}
+function setupCv(cv){var dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);var x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);x.font="10.5px -apple-system,PingFang SC,Microsoft YaHei,sans-serif";return{x:x,W:W,H:H}}
+function nice(mx){if(mx<=0)return 1;var p=Math.pow(10,Math.floor(Math.log10(mx))),f=mx/p;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+// ---------- 成交额 ----------
+var C1={sel:-1};
+function drawCurve(){var c=D.curve||{},t=c.today||[],p=c.prev||[],cv=$("#cv1"),e=$("#cv1e");
+ var has=t.length>=2||(p.length>=2&&!D.final&&t.length);
+ if(t.length<2){e.hidden=false;cv.style.display="none";$("#cv1lg").style.display="none";
+  e.innerHTML=D.final&&!t.length?"当日未记录盘中成交额曲线（本看板自 2026-09-29 起每分钟采样）。<br>收盘成交额见上方；近30日走势见下方。":(t.length?"盘中采样点不足，稍后更新":"盘中成交额曲线将在开盘后开始记录");return}
+ e.hidden=true;cv.style.display="";$("#cv1lg").style.display="";
+ var g=setupCv(cv),x=g.x,W=g.W,H=g.H,L=4,R=46,T=8,B=18,pw=W-L-R,ph=H-T-B;
+ var mx=0;t.forEach(function(a){mx=Math.max(mx,a[1])});p.forEach(function(a){mx=Math.max(mx,a[1])});var top=nice(mx*1.05);
+ function X(m){return L+m/240*pw}function Y(v){return T+ph-v/top*ph}
+ x.strokeStyle="#eef0f3";x.lineWidth=1;x.fillStyle="#8a8f98";x.textBaseline="middle";x.textAlign="left";
+ for(var i=0;i<=4;i++){var v=top*i/4,yy=Math.round(Y(v))+.5;x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();x.fillText(v>=10000?(v/10000).toFixed(v%10000?1:0)+"万亿":Math.round(v)+"亿",L+pw+3,yy)}
+ x.setLineDash([2,3]);x.beginPath();x.moveTo(Math.round(X(120))+.5,T);x.lineTo(Math.round(X(120))+.5,T+ph);x.stroke();x.setLineDash([]);
+ x.textBaseline="alphabetic";[[0,"9:30","left"],[60,"10:30","center"],[120,"11:30/13:00","center"],[180,"14:00","center"],[240,"15:00","right"]].forEach(function(a){x.textAlign=a[2];x.fillText(a[1],X(a[0]),H-4)});
+ function line(a,col,dash,w){if(a.length<2)return;x.strokeStyle=col;x.lineWidth=w;x.setLineDash(dash||[]);x.beginPath();a.forEach(function(q,i){var px=X(q[0]),py=Y(q[1]);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.setLineDash([])}
+ line(p,"#b0b6c3",[5,4],1.5);
+ if(t.length>=2){x.beginPath();t.forEach(function(q,i){var px=X(q[0]),py=Y(q[1]);i?x.lineTo(px,py):x.moveTo(px,py)});x.lineTo(X(t[t.length-1][0]),T+ph);x.lineTo(X(t[0][0]),T+ph);x.closePath();x.fillStyle="rgba(47,111,237,.08)";x.fill()}
+ line(t,"#2f6fed",null,2);
+ var s=C1.sel>=0?C1.sel:(t.length?t[t.length-1][0]:0),tv=at(t,s),pv=at(p,s),cx=Math.round(X(s))+.5;
+ x.strokeStyle="rgba(60,60,70,.4)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,T+ph);x.stroke();x.setLineDash([]);
+ if(tv!=null){x.fillStyle="#2f6fed";x.beginPath();x.arc(X(s),Y(tv),3.5,0,7);x.fill()}
+ $("#cv1r").innerHTML=hm(s)+" 当日 <b>"+yi(tv)+"</b>"+(p.length?" · 前一日 "+yi(pv)+(tv!=null&&pv?' <b class="'+cls(tv-pv)+'">'+sg((tv/pv-1)*100,1)+"%</b>":""):"")}
+function at(a,m){if(!a||!a.length||m<a[0][0]-1||m>a[a.length-1][0]+1)return null;for(var i=0;i<a.length;i++){if(a[i][0]>=m){if(a[i][0]===m||i===0)return a[i][1];var u=a[i-1],v=a[i];if(v[0]-u[0]>5)return null;return u[1]+(v[1]-u[1])*(m-u[0])/(v[0]-u[0])}}return a[a.length-1][1]}
+function pick1(ev){var t=(D.curve||{}).today||[];if(t.length<2)return;var cv=$("#cv1"),rc=cv.getBoundingClientRect(),pw=rc.width-50,m=Math.round((ev.clientX-rc.left-4)/pw*240);
+ var lo=t[0][0],hi=Math.max(t[t.length-1][0],((D.curve.prev||[]).slice(-1)[0]||[0])[0]);C1.sel=Math.max(lo,Math.min(hi,m));drawCurve()}
+// ---------- render ----------
+function renderAmt(){var a=D.amt||{};$("#amt").innerHTML=yiH(a.total);
+ var h="";if(a.prev!=null)h+='较前一交易日（'+md(a.prev_date)+' '+yi(a.prev)+'）<b class="'+cls(a.total-a.prev)+'">'+sg(a.total-a.prev,0)+'亿（'+sg(a.prev_chg,2)+'%）</b>';
+ if(a.avg20!=null)h+='<br>较前'+a.avg20_n+'日均值（'+yi(a.avg20)+'）<b class="'+cls(a.avg20_chg)+'">'+sg(a.avg20_chg,2)+'%</b>';
+ var s=(D.curve||{}).same;if(s&&!D.final)h+='<br>较前一日同一时刻（'+hm(s.m)+' '+yi(s.prev)+'）<b class="'+cls(s.chg)+'">'+sg(s.chg,2)+'%</b>';
+ $("#amtcmp").innerHTML=h;
+ $("#amtcomp").textContent="沪市 "+Math.round(a.sh)+"亿 · 深市 "+Math.round(a.sz)+"亿 · 北交所 "+Math.round(a.bj)+"亿";
+ var c=D.curve||{};$("#lgp").textContent="前一交易日"+(c.prev_date?"（"+md(c.prev_date)+"）":"");$("#lgt").textContent="当日（"+md(D.date)+"）";
+ var n=[];if(!(c.prev&&c.prev.length>=2))n.push("前一交易日盘中曲线暂无（盘中采样自 2026-09-29 开始，同一时刻对比将从 2026-09-30 起提供）。");
+ $("#amtnote").textContent=n.join("");drawCurve()}
+function renderBr(){var b=D.breadth||{},tot=(b.up||0)+(b.down||0)+(b.flat||0);
+ $("#nup").textContent=b.up;$("#ndn").textContent=b.down;$("#nflat").textContent=b.flat;
+ $("#rbar").innerHTML=tot?'<i style="width:'+(b.up/tot*100)+'%;background:var(--up)"></i><i style="width:'+(b.flat/tot*100)+'%;background:#c7c9ce"></i><i style="width:'+(b.down/tot*100)+'%;background:var(--down)"></i>':"";
+ $("#nzt").textContent=b.zt==null?"—":b.zt;$("#ndt").textContent=b.dt==null?"—":b.dt;$("#nzb").textContent=b.zb==null?"—":b.zb;
+ $("#zbr").textContent=b.zb_rate==null?"—":b.zb_rate+"%";$("#mlb").textContent=b.max_lb?b.max_lb+"板":"—";$("#mlbn").textContent=(b.max_lb_names||[]).join("、");
+ $("#nsusp").textContent=b.susp;$("#brsub").textContent="共 "+b.total+" 只 · 涨跌比 "+(b.down?(b.up/b.down).toFixed(2):"—");
+ var n=["统计沪深京全部 A 股 "+b.total+" 只（按代码去重），其中停牌/无成交 "+b.susp+" 只不计入涨跌平。"];
+ if(!b.pool)n.push("⚠️ 涨跌停池暂不可用，涨停/跌停按收盘价是否达到涨跌停价计算，炸板数缺失。");
+ if(b.x_zt)n.push("另有 "+b.x_zt+" 只收于涨停价但未列入 Fuyao 涨停池（计入 ≥7 档）。");
+ if(b.x_dt)n.push("另有 "+b.x_dt+" 只收于跌停价但未列入 Fuyao 跌停池（计入 ≤-7 档）。");
+ $("#brnote").textContent=n.join("")}
+function renderDist(){var ds=D.dist||[],mx=0;ds.forEach(function(x){mx=Math.max(mx,x[1])});
+ $("#dist").innerHTML=ds.map(function(x,i){var c=x[0]==="平"?"#b9bcc4":i<6?(x[0]==="跌停"?"#067a38":"#0a9d4a"):(x[0]==="涨停"?"#b91d18":"#e0302b");
+  return '<div><em style="color:'+c+'">'+x[1]+'</em><i style="height:'+(mx?Math.max(.6,x[1]/mx*82):0)+'%;background:'+c+'"></i></div>'}).join("");
+ $("#dlb").innerHTML=ds.map(function(x){var l=x[0].indexOf("~")>0?x[0].replace("~","<br>~"):x[0];return "<span>"+l+"</span>"}).join("");
+ var b=D.breadth||{};$("#dsum").innerHTML='<span class="down">下跌 '+b.down+'</span><span>平 '+b.flat+'</span><span class="up">上涨 '+b.up+'</span>'}
+function renderIdx(){$("#idx").innerHTML=(D.idx||[]).map(function(i){return '<div class="ix"><div class="n">'+esc(i.n)+'<small>'+(i.amt!=null?Math.round(i.amt)+"亿":"")+'</small></div><div class="p '+cls(i.chg)+'">'+(i.p==null?"—":Number(i.p).toFixed(2))+'</div><div class="c '+cls(i.chg)+'">'+(i.chg==null?"—":sg(i.chg,2)+"%")+'</div></div>'}).join("")}
+function renderInd(){var d=D.ind;if(!d){$("#indt").innerHTML=$("#indb").innerHTML='<div class="empty">暂无</div>';$("#indsub").textContent="";return}
+ $("#indsub").textContent="共 "+d.n+" 个二级行业 · 按涨跌幅";
+ function rows(a){return a.map(function(r,i){return '<div class="ir"><span class="r">'+(i+1)+'</span><span class="nm">'+esc(r[0])+'</span><span class="v '+cls(r[1])+'">'+sg(r[1],2)+'%</span></div>'}).join("")}
+ $("#indt").innerHTML=rows(d.top);$("#indb").innerHTML=rows(d.bot)}
+// ---------- 近30日 ----------
+var HS=-1;
+function hx(n,W,L,R){var pw=W-L-R;return function(i){return L+pw*(i+.5)/n}}
+function hdraw(){var H=D.hist||[],n=H.length;if(!n)return;if(HS<0||HS>=n)HS=n-1;
+ function axis(g,top,L,R,T,B,fmt){var x=g.x;x.strokeStyle="#eef0f3";x.fillStyle="#8a8f98";x.textBaseline="middle";x.textAlign="left";for(var i=0;i<=3;i++){var v=top*i/3,y=Math.round(T+(g.H-T-B)*(1-i/3))+.5;x.beginPath();x.moveTo(L,y);x.lineTo(g.W-R,y);x.stroke();x.fillText(fmt(v),g.W-R+3,y)}
+  x.textBaseline="alphabetic";var X=hx(n,g.W,L,R);[0,Math.floor((n-1)/2),n-1].forEach(function(i,j){x.textAlign=j===0?"left":j===2?"right":"center";x.fillText(md(H[i].d),j===0?L:j===2?g.W-R:X(i),g.H-3)})}
+ function selLine(g,L,R,T,B){var X=hx(n,g.W,L,R),cx=Math.round(X(HS))+.5,x=g.x;x.strokeStyle="rgba(60,60,70,.35)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,g.H-B);x.stroke();x.setLineDash([])}
+ function gap(g,i,L,R,T,B){var X=hx(n,g.W,L,R),x=g.x;x.fillStyle="#c2c6cf";x.textAlign="center";x.textBaseline="alphabetic";x.fillText("缺",X(i),g.H-B-3)}
+ function lines(g,keys,cols,top,L,R,T,B,dash){var X=hx(n,g.W,L,R),x=g.x,ph=g.H-T-B;keys.forEach(function(k,j){x.strokeStyle=cols[j];x.lineWidth=1.8;x.setLineDash(dash&&dash[j]||[]);x.beginPath();var st=false;
+   H.forEach(function(h,i){var v=h[k];if(v==null){st=false;return}var px=X(i),py=T+ph*(1-v/top);st?x.lineTo(px,py):x.moveTo(px,py);st=true});x.stroke();x.setLineDash([]);
+   H.forEach(function(h,i){if(h[k]==null)return;x.fillStyle=cols[j];x.beginPath();x.arc(X(i),T+ph*(1-h[k]/top),i===HS?3.6:1.8,0,7);x.fill()})})}
+ var L=2,R=40,T=8,B=16;
+ // 1: turnover bars + ma20
+ var g=setupCv($("#h1")),x=g.x,mx=0;H.forEach(function(h){mx=Math.max(mx,h.amt||0,h.ma20||0)});var top=nice(mx*1.05),ph=g.H-T-B,X=hx(n,g.W,L,R),bw=Math.max(2,(g.W-L-R)/n*.66);
+ axis(g,top,L,R,T,B,function(v){return v>=10000?(v/10000).toFixed(1)+"万亿":Math.round(v)});
+ H.forEach(function(h,i){if(h.amt==null){gap(g,i,L,R,T,B);return}var y=T+ph*(1-h.amt/top);x.fillStyle=i===HS?"#2f6fed":h.cur?"#ffb74d":"#9db8f2";x.fillRect(X(i)-bw/2,y,bw,T+ph-y)});
+ lines(g,["ma20"],["#ff8a00"],top,L,R,T,B,[[4,3]]);selLine(g,L,R,T,B);
+ // 2: up/down
+ g=setupCv($("#h2"));mx=0;H.forEach(function(h){mx=Math.max(mx,h.up||0,h.down||0)});top=nice(mx*1.05);axis(g,top,L,R,T,B,function(v){return Math.round(v)});
+ H.forEach(function(h,i){if(h.up==null)gap(g,i,L,R,T,B)});lines(g,["up","down"],["#e0302b","#0a9d4a"],top,L,R,T,B);selLine(g,L,R,T,B);
+ // 3: limit up/down/break
+ g=setupCv($("#h3"));mx=0;H.forEach(function(h){mx=Math.max(mx,h.zt||0,h.dt||0,h.zb||0)});top=nice(mx*1.05);axis(g,top,L,R,T,B,function(v){return Math.round(v)});
+ H.forEach(function(h,i){if(h.zt==null)gap(g,i,L,R,T,B)});lines(g,["zt","dt","zb"],["#e0302b","#0a9d4a","#f5a623"],top,L,R,T,B,[null,null,[4,3]]);selLine(g,L,R,T,B);
+ var h=H[HS],f=function(v){return v==null?'<span class="flat">缺</span>':v};
+ $("#hsel").innerHTML='<b>'+h.d+'</b>'+(h.cur?' <span style="color:#ff9f0a">盘中</span>':'')+'　成交额 <b>'+yi(h.amt)+'</b>'+(h.ma20?'（前20日均 '+yi(h.ma20)+'）':'')+
+  '<br>上涨 <b class="up">'+f(h.up)+'</b>　下跌 <b class="down">'+f(h.down)+'</b>　平 '+f(h.flat)+'<br>涨停 <b class="up">'+f(h.zt)+'</b>　跌停 <b class="down">'+f(h.dt)+'</b>　炸板 <b style="color:#d4880f">'+f(h.zb)+'</b>'+(h.zt!=null&&h.zb!=null&&(h.zt+h.zb)?'（炸板率 '+(h.zb/(h.zt+h.zb)*100).toFixed(1)+'%）':'')}
+function hpick(ev){var H=D.hist||[];if(!H.length)return;var cv=ev.currentTarget,rc=cv.getBoundingClientRect(),i=Math.floor((ev.clientX-rc.left-2)/((rc.width-42)/H.length));HS=Math.max(0,Math.min(H.length-1,i));hdraw()}
+function renderHist(){var H=D.hist||[];HS=H.length-1;hdraw();
+ var n=["柱色：蓝＝选中日，橙＝盘中（未收盘）。红线上涨/涨停，绿线下跌/跌停，橙虚线炸板。"];if((D.hist_gaps||[]).length)n.push("图中“缺”为该日数据暂缺。");
+ $("#hnote").textContent=n.join("")}
+function render(){var st=$("#st");st.textContent=D.status;st.className="st"+(D.final?" done":/盘中|午间/.test(D.status)?" live":"");
+ var a=bj(D.asof||D.data_ts);$("#tdate").textContent=D.date;$("#asof").textContent=(a.d===D.date?"":a.d+" ")+a.t;
+ document.title="大盘盘面 "+D.date+" · "+D.status;
+ var w=$("#warn"),fb=D.fallback||[];w.hidden=!fb.length;w.textContent=fb.length?"⚠️ 部分数据来自备用源："+fb.join("；"):"";
+ renderAmt();renderBr();renderDist();renderIdx();renderInd();renderHist();$("#datesel").value=D.tag}
+function load(t){return (t?get(vq("data/"+t+".json",DV[t])):get("data/latest.json",true)).then(function(d){D=d;render()})
+ .catch(function(e){if(t)return load("");$("#amt").textContent="数据加载失败（"+e.message+"），请稍后刷新"})}
+function dates(ds){DV={};ds.forEach(function(x){if(x.v)DV[x.d]=x.v});
+ $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+(x.p?'（盘中）':'（收盘）')+'</option>'}).join("")}
+var m=/d=(\d{8})/.exec(location.hash);
+get("data/dates.json",true).then(dates).catch(function(){}).then(function(){load(m?m[1]:"")});
+$("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
+var c1d=false;$("#cv1").addEventListener("pointerdown",function(e){c1d=true;pick1(e)});$("#cv1").addEventListener("pointermove",function(e){if(c1d||e.pointerType==="mouse")pick1(e)});
+window.addEventListener("pointerup",function(){c1d=false});
+["#h1","#h2","#h3"].forEach(function(s){var dn=false,el=$(s);el.addEventListener("pointerdown",function(e){dn=true;hpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")hpick(e)});window.addEventListener("pointerup",function(){dn=false})});
+var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(D){drawCurve();hdraw()}},120)});
+// auto-refresh while the market is open (page visible, latest date shown)
+setInterval(function(){if(document.hidden||!D||D.final||R.on)return;if($("#datesel").value&&$("#datesel").selectedIndex>0)return;
+ get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
+// ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"market"} -> box re-samples + publishes; progress back via ntfy ----------
+var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-m-zVPIyuWWhWpEGLKuxH8rk84zTNES";
+var STEPS=["收到请求","拉取行情","计算","上传","等待页面生效","完成"];
+var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,tick:null,passive:false};
+function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
+function hms(d){d=d||new Date();function p(n){return(n<10?"0":"")+n}return p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds())}
+function rfUI(step,pct,text,mode){var P=$("#rfp");P.hidden=false;P.className="rfp "+(mode||"run");
+ $("#rfs").textContent=step;$("#rfpc").textContent=pct!=null?Math.round(pct)+"%":"";if(pct!=null)$("#rfbar").style.width=Math.max(2,Math.min(100,pct))+"%";
+ $("#rft").textContent=text||"";var k=STEPS.indexOf(step);
+ $("#rsteps").innerHTML=STEPS.map(function(x,i){return k<0?x:(i<k?"<s>✓"+x+"</s>":i===k?"<b>"+x+"</b>":x)}).join(" → ")}
+function elapsed(){if(!R.on)return;$("#rfe").textContent=((Date.now()-R.t0)/1000).toFixed(0)+" 秒"}
+function rfEnd(){R.on=false;R.passive=false;clearTimeout(R.wd);clearInterval(R.tick);clearTimeout(R.pt);var b=$("#rf");b.disabled=false;b.textContent="⟳ 强制刷新"}
+function rfFail(msg){rfUI("未完成",null,msg,"err");elapsed();rfEnd()}
+function watchdog(){clearTimeout(R.wd);R.wd=setTimeout(function(){if(!R.on)return;
+ if(!R.rid)rfFail("电脑没有响应（15 秒内未收到回应）。可能电脑离线，或手机无法连接 ntfy.sh（可尝试开 VPN）");
+ else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:15000)}
+function begin(passive){R.on=true;R.passive=!!passive;R.t0=Date.now();var b=$("#rf");b.disabled=true;b.textContent="刷新中…";
+ clearInterval(R.tick);R.tick=setInterval(elapsed,1000);watchdog();stream();schedPoll(1500)}
+function rfStart(){if(R.on)return;R.cid=rcid();R.rid="";begin(false);rfUI("发送请求",1,"正在通知电脑…");
+ fetch(NT+TRIG,{method:"POST",body:JSON.stringify({a:"refresh",cid:R.cid,b:"market"})}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);
+  if(R.on&&!R.rid)rfUI("发送请求",2,"已发出，等待电脑响应…")})
+ .catch(function(e){if(R.on)rfFail("无法连接 ntfy.sh 中转（"+(e.message||e)+"）。国内网络可能需要开 VPN 后再试")})}
+function onMsg(ev){if(!ev||ev.event!=="message"||R.seen[ev.id])return;R.seen[ev.id]=1;R.last=ev.id;var m;try{m=JSON.parse(ev.message)}catch(e){return}
+ if(!m||m.v!==1||(m.b&&m.b!=="market"))return;var age=Date.now()/1000-(m.t||ev.time||0);
+ if(!R.on){if(m.st==="step"&&m.id&&age<150){R.rid=m.id;R.cid="";begin(true)}else return}
+ var mine=(R.cid&&m.cid===R.cid)||(R.rid&&m.id===R.rid);if(!mine)return;
+ if(m.st==="step"){R.rid=m.id;watchdog();rfUI(m.step,m.pct,m.text||"")}
+ else if(m.st==="busy"){R.rid=m.id;watchdog();rfUI("收到请求",5,"已有刷新任务在进行，显示其进度…")}
+ else if(m.st==="cool"||m.st==="limit"){rfUI("未刷新",null,m.text,"err");rfEnd()}
+ else if(m.st==="err"){rfFail(m.text||"刷新失败")}
+ else if(m.st==="done"){clearTimeout(R.wd);rfUI("等待页面生效",93,"从 GitHub 读取新数据…");fresh(m)}}
+function fresh(m){if(R.passive&&D&&D.run_at===m.run_at){rfEnd();$("#rfp").hidden=true;return}SHA=m.sha||"";var tries=0;
+ function go(){return get("data/dates.json",true).then(dates).catch(function(){}).then(function(){return get("data/latest.json",true)}).then(function(d){
+   if(d.run_at!==m.run_at){if(++tries<36){rfUI("等待页面生效",93,"GitHub Pages 部署中…（"+tries*5+" 秒）");return new Promise(function(r){setTimeout(r,5000)}).then(go)}throw new Error("页面数据未更新")}
+   D=d;history.replaceState(null,"",location.pathname);render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
+   rfUI("完成",100,d.status+" · 数据截至 "+bj(d.asof||d.data_ts).t+" · 用时 "+((Date.now()-R.t0)/1000).toFixed(0)+" 秒"+(m.text?" · "+m.text:""),"ok");elapsed();rfEnd();
+   setTimeout(function(){if(!R.on)$("#rfp").hidden=true},8000);setTimeout(function(){if(SHA===m.sha)SHA=""},120000)})}
+ go().catch(function(e){rfFail("数据已更新但读取失败（"+e.message+"），请下拉刷新页面")})}
+function stream(){if(R.es||!window.EventSource)return;try{
+ var es=new EventSource(NT+PROG+"/sse?since="+(R.last||"150s"));R.es=es;
+ es.onmessage=function(e){R.esok=true;try{onMsg(JSON.parse(e.data))}catch(x){}};
+ es.onopen=function(){R.esok=true};es.onerror=function(){R.esok=false}}catch(e){R.es=null}}
+function poll(){if(!R.on)return;fetch(NT+PROG+"/json?poll=1&since="+(R.last||"150s"),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+  t.split("\n").forEach(function(l){if(l.trim())try{onMsg(JSON.parse(l))}catch(e){}})}).catch(function(){}).then(function(){schedPoll(R.esok?5000:2500)})}
+function schedPoll(ms){clearTimeout(R.pt);if(R.on)R.pt=setTimeout(poll,ms)}
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&R.on)schedPoll(100)});
+$("#rf").addEventListener("click",rfStart);
+if(TRIG.indexOf("__")===0||PROG.indexOf("__")===0||!PROG)$("#rf").hidden=true;else setTimeout(stream,800);
+})();
+</script>
+</body>
+</html>
