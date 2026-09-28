@@ -247,7 +247,7 @@ function renderAmt(){var a=D.amt||{};$("#amt").innerHTML=yiH(a.total);
  $("#amtcmp").innerHTML=h;
  $("#amtcomp").textContent="沪市 "+Math.round(a.sh)+"亿 · 深市 "+Math.round(a.sz)+"亿 · 北交所 "+Math.round(a.bj)+"亿";
  var c=D.curve||{};$("#lgp").textContent="前一交易日"+(c.prev_date?"（"+md(c.prev_date)+"）":"");$("#lgt").textContent="当日（"+md(D.date)+"）";
- var n=[];if(!(c.prev&&c.prev.length>=2))n.push("前一交易日盘中曲线暂无（盘中采样自 2026-09-29 开始，同一时刻对比将从 2026-09-30 起提供）。");
+ var n=[];if(!(c.prev&&c.prev.length>=2)&&((c.today||[]).length>=2||!D.final))n.push("前一交易日盘中曲线暂无（盘中采样自 2026-09-29 开始，同一时刻对比将从 2026-09-30 起提供）。");
  $("#amtnote").textContent=n.join("");drawCurve()}
 function renderBr(){var b=D.breadth||{},tot=(b.up||0)+(b.down||0)+(b.flat||0);
  $("#nup").textContent=b.up;$("#ndn").textContent=b.down;$("#nflat").textContent=b.flat;
