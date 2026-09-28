@@ -104,6 +104,20 @@ details summary{cursor:pointer;color:var(--acc);padding:4px 0}
 tr.flash td{animation:fl 1.6s ease-out}
 @keyframes fl{0%,40%{background:#fff3c4}100%{}}
 @media (min-width:760px){.kov{align-items:center}.knav{margin:10px -18px 0;padding:10px 18px}.ksheet{width:860px;max-width:94vw;border-radius:16px;padding:16px 18px}#kcv{height:430px}}
+.prov{background:#ff9f0a;color:#fff;border-radius:12px;padding:1px 9px;font-size:13px;font-weight:600}
+.rfb{margin-left:auto;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap}
+.rfb:disabled{background:#c9d6f5;border-color:#c9d6f5;color:#fff;cursor:default}
+.rfp{margin-top:8px;background:#f4f7ff;border:1px solid #dbe4fb;border-radius:10px;padding:8px 10px}
+.rfp.err{background:#fff2f1;border-color:#f6d0cd}.rfp.ok{background:#effaf3;border-color:#cdebd8}
+.rfh{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:#2a3b66}
+.rfp.err .rfh{color:#b3261e}.rfp.ok .rfh{color:#146c2e}
+.bar{height:8px;background:#e1e7f6;border-radius:4px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px;transition:width .5s ease}
+.rfp.err .bar i{background:#e0302b}.rfp.ok .bar i{background:#0a9d4a}
+.rfp.run .bar i{background-image:linear-gradient(45deg,rgba(255,255,255,.28) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.28) 75%,transparent 75%);background-size:16px 16px;animation:mv 1s linear infinite}
+@keyframes mv{from{background-position:0 0}to{background-position:16px 0}}
+.rft{font-size:12px;color:var(--mut);display:flex;justify-content:space-between;gap:8px}
+.rsteps{font-size:11.5px;color:#9aa3b5;margin-top:2px;line-height:1.6}.rsteps b{color:var(--acc);font-weight:600}.rsteps s{text-decoration:none;color:#5a6b8f}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}
 footer a{color:var(--mut)}
 @media (min-width:760px){
@@ -118,13 +132,16 @@ footer a{color:var(--mut)}
 <body>
 <div class="wrap">
 <header>
- <h1>A股10日新高突破 <span class="cnt" id="cnt">…</span></h1>
+ <h1>A股10日新高突破 <span class="cnt" id="cnt">…</span><span class="prov" id="prov" hidden></span></h1>
  <div class="meta">
   <span>交易日 <b id="tdate">—</b></span>
   <span>生成 <b id="gen">—</b>（北京时间）</span>
   <span>数据来源：同花顺 Fuyao</span>
+  <span id="upd" hidden>页面更新 <b></b></span>
  </div>
- <div class="row datebar"><label for="datesel">查看日期</label><select id="datesel" aria-label="选择日期"></select></div>
+ <div class="row datebar"><label for="datesel">查看日期</label><select id="datesel" aria-label="选择日期"></select><button class="rfb" id="rf" type="button">⟳ 强制刷新</button></div>
+ <div class="rfp" id="rfp" hidden><div class="rfh"><span id="rfs"></span><span id="rfpc"></span></div><div class="bar"><i id="rfbar"></i></div>
+  <div class="rft"><span id="rft"></span><span id="rfe"></span></div><div class="rsteps" id="rsteps"></div></div>
  <div class="warn" id="warn" hidden></div>
 </header>
 
@@ -159,7 +176,7 @@ footer a{color:var(--mut)}
  <div class="knote" id="knote">日K（前复权）· 红涨绿跌 · 虚线＝前10日最高收盘（突破位）· ▲＝突破日 · 点按/拖动查看当日数据</div>
  <div class="knav"><button id="kprev" aria-label="上一只">‹ 上一只</button><span id="kpos"></span><button id="knext" aria-label="下一只">下一只 ›</button></div>
 </div></div>
-<footer>每个交易日收盘后自动更新 · 仅供参考，不构成投资建议<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
+<footer>每个交易日 15:35 后自动更新；“强制刷新”可随时重跑（盘中为临时结果）· 仅供参考，不构成投资建议<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
 </div>
 <script>
 (function(){
@@ -170,7 +187,15 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){retur
 // cache-busting (Pages sends max-age=600): index files fetched fresh (?t=now, no-store); per-date / k files carry ?v=<generated ts>
 var DV={},KV="";
 function vq(u,v){return v?u+(u.indexOf("?")<0?"?":"&")+"v="+v:u}
-function get(u,fresh){return fetch(fresh?u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now():u,{cache:fresh?"no-store":"no-cache"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function pget(u,fresh){return fetch(fresh?u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now():u,{cache:fresh?"no-store":"no-cache"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+// SHA: commit of the last forced refresh -> data read from that exact commit (no Pages deploy lag); falls back to Pages
+var SHA="",RAWBAD=0,APIBAD=0,GH="Bibrady/a-share-board";
+function fto(u,o,ms){var c=window.AbortController?new AbortController():null,t=setTimeout(function(){if(c)c.abort()},ms);o=o||{};if(c)o.signal=c.signal;
+ return fetch(u,o).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()},function(e){clearTimeout(t);throw e})}
+function get(u,fresh){var p=u.split("?")[0];if(!SHA||p.indexOf("data/")!==0)return pget(u,fresh);var sha=SHA;
+ var raw=function(){if(RAWBAD>1)return Promise.reject(new Error("raw off"));return fto("https://raw.githubusercontent.com/"+GH+"/"+sha+"/"+p,{},6000).catch(function(e){RAWBAD++;throw e})};
+ var api=function(){if(APIBAD>1)return Promise.reject(new Error("api off"));return fto("https://api.github.com/repos/"+GH+"/contents/"+p+"?ref="+sha,{headers:{Accept:"application/vnd.github.raw+json"}},8000).catch(function(e){APIBAD++;throw e})};
+ return raw().catch(api).catch(function(){return pget(u,true)})}
 function cls(v){return v==null?"":v>0?"up":v<0?"down":"flat"}
 function fx(v,d){return v==null?"—":Number(v).toFixed(d)}
 function sg(v,d){return v==null?"—":(v>0?"+":"")+Number(v).toFixed(d)}
@@ -237,6 +262,7 @@ function chips(){
 function setInd(g){S.ind=(S.ind===g?"":g);chips();body()}
 function render(){
  $("#cnt").textContent=D.count+" 只";$("#tdate").textContent=D.date;$("#gen").textContent=bj(D.run_at);
+ var pv=$("#prov");pv.hidden=!D.prov;pv.textContent=D.prov?"盘中临时 "+bj(D.run_at).slice(11):"";
  document.title="A股10日新高 "+D.date+" · "+D.count+"只";
  var f=D.funnel||{};
  $("#funnel").textContent=f.universe?("全市场 "+f.universe+"（含北交所 "+f.bse_in_universe+"）→ 剔ST "+f.after_st+" → 剔停牌 "+f.after_suspended+" → 市值>60亿 "+f.after_mcap+" → 成交额≥2亿 "+f.after_amount+" → 上市≥11日 "+f.after_history+" → 创10日新高 "+f.final):"";
@@ -347,10 +373,62 @@ $("#q").addEventListener("input",function(){S.q=this.value;body()});
 $("#clr").addEventListener("click",function(){S.ind="";S.q="";$("#q").value="";chips();body()});
 $("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
 var m=/d=(\d{8})/.exec(location.hash);
-get("data/dates.json",true).then(function(ds){ds.forEach(function(x){if(x.v)DV[x.d]=x.v});if(ds[0]&&ds[0].v)KV=ds[0].v;
- $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+'（'+x.n+'只）</option>'}).join("");
-}).catch(function(){}).then(function(){load(m?m[1]:"")});
+function dates(ds){DV={};ds.forEach(function(x){if(x.v)DV[x.d]=x.v});if(ds[0]&&ds[0].v)KV=ds[0].v;
+ $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+'（'+x.n+'只'+(x.p?' · 盘中临时':'')+'）</option>'}).join("");
+}
+get("data/dates.json",true).then(dates).catch(function(){}).then(function(){load(m?m[1]:"")});
 $("#ktv").addEventListener("click",function(e){e.preventDefault();tvGo(this.getAttribute("data-sym"))});
+// ---------- 强制刷新: trigger via ntfy.sh -> box re-runs screen + publish; progress back via ntfy (SSE + poll fallback) ----------
+var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-p-Eyz8RCmpvy63yhadWdUobHaLG4rm";
+var STEPS=["收到请求","拉取行情","筛选","拉取K线","上传","等待页面生效","完成"];
+var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,lastMsg:0,tick:null,passive:false};
+function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
+function hms(d){d=d||new Date();function p(n){return(n<10?"0":"")+n}return p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds())}
+function rfUI(step,pct,text,mode){var P=$("#rfp");P.hidden=false;P.className="rfp "+(mode||"run");
+ $("#rfs").textContent=step;$("#rfpc").textContent=pct!=null?Math.round(pct)+"%":"";if(pct!=null)$("#rfbar").style.width=Math.max(2,Math.min(100,pct))+"%";
+ $("#rft").textContent=text||"";var k=STEPS.indexOf(step);
+ $("#rsteps").innerHTML=STEPS.map(function(x,i){return k<0?x:(i<k?"<s>✓"+x+"</s>":i===k?"<b>"+x+"</b>":x)}).join(" → ");}
+function elapsed(){if(!R.on)return;$("#rfe").textContent=((Date.now()-R.t0)/1000).toFixed(0)+" 秒"}
+function rfEnd(){R.on=false;R.passive=false;clearTimeout(R.wd);clearInterval(R.tick);clearTimeout(R.pt);var b=$("#rf");b.disabled=false;b.textContent="⟳ 强制刷新"}
+function rfFail(msg){rfUI("未完成",null,msg,"err");elapsed();rfEnd()}
+function watchdog(){clearTimeout(R.wd);R.wd=setTimeout(function(){if(!R.on)return;
+ if(!R.rid)rfFail("电脑没有响应（15 秒内未收到回应）。可能电脑离线，或手机无法连接 ntfy.sh（可尝试开 VPN）");
+ else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:15000)}
+function begin(passive){R.on=true;R.passive=!!passive;R.t0=Date.now();var b=$("#rf");b.disabled=true;b.textContent="刷新中…";
+ clearInterval(R.tick);R.tick=setInterval(elapsed,1000);watchdog();stream();schedPoll(1500)}
+function rfStart(){if(R.on)return;R.cid=rcid();R.rid="";begin(false);rfUI("发送请求",1,"正在通知电脑…");
+ fetch(NT+TRIG,{method:"POST",body:JSON.stringify({a:"refresh",cid:R.cid})}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);
+  if(R.on&&!R.rid)rfUI("发送请求",2,"已发出，等待电脑响应…")})
+ .catch(function(e){if(R.on)rfFail("无法连接 ntfy.sh 中转（"+(e.message||e)+"）。国内网络可能需要开 VPN 后再试")})}
+function onMsg(ev){if(!ev||ev.event!=="message"||R.seen[ev.id])return;R.seen[ev.id]=1;R.last=ev.id;var m;try{m=JSON.parse(ev.message)}catch(e){return}
+ if(!m||m.v!==1)return;var age=Date.now()/1000-(m.t||ev.time||0);
+ if(!R.on){ // someone else's / scheduled run in progress when page opened: follow it
+  if(m.st==="step"&&m.id&&age<150){R.rid=m.id;R.cid="";begin(true)}else return}
+ var mine=(R.cid&&m.cid===R.cid)||(R.rid&&m.id===R.rid);if(!mine)return;
+ R.lastMsg=Date.now();
+ if(m.st==="step"){R.rid=m.id;watchdog();var t=m.text||"";if(m.N)t=(m.n||0)+" / "+m.N+" 只";rfUI(m.step,m.pct,t)}
+ else if(m.st==="busy"){R.rid=m.id;watchdog();rfUI("收到请求",5,"已有刷新任务在进行，显示其进度…")}
+ else if(m.st==="cool"||m.st==="limit"){rfUI("未刷新",null,m.text,"err");rfEnd()}
+ else if(m.st==="err"){rfFail(m.text||"刷新失败")}
+ else if(m.st==="done"){clearTimeout(R.wd);rfUI("等待页面生效",93,"从 GitHub 读取新数据…");fresh(m)}}
+function fresh(m){if(R.passive&&D&&D.run_at===m.run_at){rfEnd();$("#rfp").hidden=true;return}SHA=m.sha||"";KC={};var tries=0;
+ function go(){return get("data/dates.json",true).then(dates).catch(function(){}).then(function(){return get("data/"+m.tag+".json",true)}).then(function(d){
+   if(d.run_at!==m.run_at){if(++tries<36){rfUI("等待页面生效",93,"GitHub Pages 部署中…（"+tries*5+" 秒）");return new Promise(function(r){setTimeout(r,5000)}).then(go)}throw new Error("页面数据未更新")}
+   D=d;KV=String(d.run_at||"").replace(/\D/g,"").slice(0,14);history.replaceState(null,"","#d="+d.tag);$("#datesel").value=d.tag;render();
+   var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
+   rfUI("完成",100,(d.prov?"盘中临时结果 · ":"")+d.count+" 只 · 用时 "+((Date.now()-R.t0)/1000).toFixed(0)+" 秒","ok");elapsed();rfEnd();
+   setTimeout(function(){if(!R.on)$("#rfp").hidden=true},8000)})}
+ go().catch(function(e){rfFail("数据已更新但读取失败（"+e.message+"），请下拉刷新页面")})}
+function stream(){if(R.es||!window.EventSource)return;try{
+ var es=new EventSource(NT+PROG+"/sse?since="+(R.last||"150s"));R.es=es;
+ es.onmessage=function(e){R.esok=true;try{onMsg(JSON.parse(e.data))}catch(x){}};
+ es.onopen=function(){R.esok=true};es.onerror=function(){R.esok=false}}catch(e){R.es=null}}
+function poll(){if(!R.on)return;fetch(NT+PROG+"/json?poll=1&since="+(R.last||"150s"),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+  t.split("\n").forEach(function(l){if(l.trim())try{onMsg(JSON.parse(l))}catch(e){}})}).catch(function(){}).then(function(){schedPoll(R.esok?5000:2500)})}
+function schedPoll(ms){clearTimeout(R.pt);if(R.on)R.pt=setTimeout(poll,ms)}
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&R.on){schedPoll(100)}});
+$("#rf").addEventListener("click",rfStart);
+if(TRIG.indexOf("__")===0)$("#rf").hidden=true;else setTimeout(stream,800);
 })();
 </script>
 </body>
