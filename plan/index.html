@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>10倍计划 · 进度计算器</title>
-<meta name="description" content="10倍计划进度计算器（纯本地计算，数据只保存在本机浏览器）">
+<title>10倍计划 · 自动进度</title>
+<meta name="description" content="10倍计划自动进度（只显示倍数与百分比）">
 <meta name="theme-color" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="icon" href="/a-share-board/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png"><link rel="apple-touch-icon" href="/a-share-board/apple-touch-icon.png"><link rel="manifest" href="/a-share-board/manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="A股看板"><meta name="application-name" content="A股看板"><meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -16,25 +16,20 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;font-variant-numeric:tabular-nums}
 .wrap{max-width:1180px;margin:0 auto;padding:0 10px calc(24px + env(safe-area-inset-bottom))}
 header{background:#fff;border-bottom:1px solid var(--bd);padding:12px 12px 10px;margin:0 -10px 10px}
-h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-size:18px;margin:0 0 6px}
 .meta{color:var(--mut);font-size:12.5px;display:flex;flex-wrap:wrap;gap:2px 12px}
 .meta b{color:var(--fg);font-weight:600}
-.priv{display:inline-block;margin-top:8px;background:#effaf3;color:#146c2e;border:1px solid #cdebd8;border-radius:8px;padding:4px 10px;font-size:12.5px}
-.jump{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-.jump a{flex:none;font-size:13px;color:var(--acc);background:#eef3ff;border-radius:14px;padding:5px 12px;text-decoration:none}
-.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px;scroll-margin-top:8px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
 .card h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .card h2 small{font-weight:400;color:var(--mut);font-size:12px;text-align:right}
-.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--flat)}
-.note{font-size:11.5px;color:var(--mut);margin-top:6px;line-height:1.55}
+.up{color:var(--up)}.down{color:var(--down)}
+.note{font-size:11.5px;color:var(--mut);margin-top:6px;line-height:1.6}
 .warn{background:var(--warnbg);color:var(--warnfg);border-radius:8px;padding:6px 10px;font-size:12.5px;margin-top:8px;line-height:1.5}
-.bad{background:#fff2f1;color:#b3261e}
-.empty{padding:16px 8px;text-align:center;color:var(--mut);font-size:13px;background:#fafafb;border-radius:8px;line-height:1.6}
+.empty{padding:16px 8px;text-align:center;color:var(--mut);font-size:13px;background:#fafafb;border-radius:8px}
 .kpi{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
-.kbig{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.5px}
-.kbig small{font-size:16px;font-weight:600;margin-left:2px}
+.kbig{font-size:38px;font-weight:700;line-height:1.1;letter-spacing:-.5px}
+.kbig small{font-size:18px;font-weight:600;margin-left:1px}
 .klab{font-size:12.5px;color:var(--mut)}
-.cmp{font-size:13.5px;line-height:1.6}.cmp b{font-weight:700}
 .pbar{position:relative;height:12px;background:#e1e7f6;border-radius:6px;overflow:hidden;margin:10px 0 4px}
 .pbar i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);border-radius:6px}
 .pbar em{position:absolute;top:-2px;bottom:-2px;width:2px;background:#ff9f0a}
@@ -42,65 +37,30 @@ h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wr
 .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
 .tile{background:#f7f8fa;border-radius:10px;padding:8px 10px}
 .tile span{display:block;font-size:12px;color:var(--mut)}
-.tile b{display:block;font-size:18px;font-weight:700;line-height:1.3;word-break:break-all}
+.tile b{display:block;font-size:18px;font-weight:700;line-height:1.3}
 .tile small{display:block;font-size:11.5px;color:var(--mut)}
-.frm{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px}
-.frm .full{grid-column:1/-1}
-.fld label{display:block;font-size:12.5px;color:#555;margin-bottom:3px}
-.fld label i{font-style:normal;color:var(--mut)}
-input,select,textarea{font:inherit;font-size:16px;width:100%;min-width:0;border:1px solid var(--bd);border-radius:10px;background:#fff;color:var(--fg);-webkit-appearance:none;appearance:none}
-input,select{height:44px;padding:0 10px}
-input[type=datetime-local],input[type=date]{min-height:44px;line-height:42px}
-textarea{padding:8px 10px;min-height:120px;font-size:13px;font-family:ui-monospace,Menlo,monospace}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,111,237,.15)}
-.btn{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.btn.sec{background:#fff;color:var(--acc)}
-.btn.dng{background:#fff;color:#b3261e;border-color:#f0c4c0}
-.btn.sm{height:34px;padding:0 10px;font-size:13px;font-weight:500}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.btns .btn{flex:1 1 auto}
-.seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;height:44px}
-.seg button{flex:1;border:0;background:#fff;font:inherit;font-size:15px;color:#555;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0 4px}
-.seg button+button{border-left:1px solid var(--bd)}
-.seg button.on{background:var(--acc);color:#fff;font-weight:600}
-.lst{margin-top:10px;border-top:1px solid #f1f2f4}
-.li{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f2f4;font-size:13.5px}
-.li .m{flex:1;min-width:0}
-.li .m b{font-size:15px}
-.li .m small{display:block;color:var(--mut);font-size:12px;overflow:hidden;text-overflow:ellipsis}
-.li .a{display:flex;gap:6px;flex:none}
-.tag{display:inline-block;font-size:11.5px;border-radius:8px;padding:0 6px;margin-left:4px;font-weight:600;vertical-align:1px}
-.tag.in{background:#fdecea;color:var(--up)}.tag.out{background:#e6f6ec;color:var(--down)}.tag.e{background:#fff4dc;color:#8a5a00}
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:7px 5px;text-align:right;border-bottom:1px solid #f1f2f4;white-space:nowrap}
-th{font-weight:600;color:#555;font-size:12px;background:#fafafb;position:sticky;top:0}
+th{font-weight:600;color:#555;font-size:12px;background:#fafafb}
 th:first-child,td:first-child{text-align:left}
 tr.cur td{background:#f4f7ff;font-weight:600}
-.cv{margin-top:6px;position:relative}
-.cv svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.ms{display:inline-block;font-size:11px;border-radius:8px;padding:0 6px;margin-left:4px;background:#fff4dc;color:#8a5a00;font-weight:600}
+.cv svg{display:block;width:100%;height:auto}
 .lg{font-size:11.5px;color:var(--mut);display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;align-items:center}
 .lg i{display:inline-block;width:14px;height:0;border-top:2px dashed #9aa3b5;vertical-align:3px;margin-right:4px}
 .lg i.a{border-top:2px solid var(--acc)}
-.lg .seg{height:32px;margin-left:auto}.lg .seg button{font-size:12.5px;padding:0 12px}
-.der{font-size:13px;line-height:1.75;background:#f7f8fa;border-radius:8px;padding:8px 10px;margin-top:10px}
-.der b{font-weight:700}
-.res{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:10px}
-.res div{background:#f7f8fa;border-radius:8px;padding:6px 10px}
-.res span{display:block;font-size:12px;color:var(--mut)}
-.res b{font-size:16px}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(29,29,31,.92);color:#fff;padding:9px 16px;border-radius:20px;font-size:14px;z-index:9;pointer-events:none;opacity:0;transition:opacity .25s;max-width:90vw;text-align:center}
-.toast.on{opacity:1}
-details{font-size:12.5px;color:#555}details summary{cursor:pointer;color:var(--acc);padding:6px 0}
+.seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;height:32px;margin-left:auto}
+.seg button{border:0;background:#fff;font:inherit;font-size:12.5px;color:#555;padding:0 12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.seg button+button{border-left:1px solid var(--bd)}
+.seg button.on{background:var(--acc);color:#fff;font-weight:600}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}footer a{color:var(--mut)}
 @media (min-width:760px){
- body{font-size:14.5px}
  header{margin:0 0 12px;border:1px solid var(--bd);border-top:0;border-radius:0 0 14px 14px;padding:16px 18px 12px}
  h1{font-size:21px}
  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin-bottom:10px}
  .grid2>.card{margin-bottom:0}
  .tiles{grid-template-columns:repeat(4,1fr)}
- .res{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
@@ -108,423 +68,101 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
 <style>.stab{background:#fff;border-bottom:1px solid #e8e8ec;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#6b7280;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#2f6fed;border-bottom-color:#2f6fed}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 6px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/">大盘盘面</a><a href="../plan/" class="on" aria-current="page">10倍计划</a></div></nav>
 <div class="wrap">
 <header>
- <h1>10倍计划 · 进度</h1>
- <div class="meta" id="hmeta"></div>
- <div class="priv">🔒 数据只保存在本机浏览器，不会上传</div>
- <nav class="jump" aria-label="页内跳转"><a href="#c-prog">进度</a><a href="#c-snap">记录净值</a><a href="#c-flow">出入金</a><a href="#c-chart">曲线</a><a href="#c-ms">里程碑</a><a href="#c-pos">仓位计算</a><a href="#c-tbl">计划表</a><a href="#c-par">计划参数</a><a href="#c-bak">备份</a></nav>
+ <h1>10倍计划 · 自动进度</h1>
+ <div class="meta" id="hmeta"><span>加载中…</span></div>
 </header>
-
+<div id="err"></div>
 <div class="grid2">
-<section class="card" id="c-prog">
- <h2>总进度 <small id="progsub"></small></h2>
- <div id="prog"></div>
-</section>
-<section class="card" id="c-per">
- <h2>本期 <small id="persub"></small></h2>
- <div id="per"></div>
-</section>
+<section class="card"><h2>总进度 <small id="progsub"></small></h2><div id="prog"></div></section>
+<section class="card"><h2>本期 <small id="persub"></small></h2><div id="per"></div></section>
 </div>
-
-<div class="grid2">
-<section class="card" id="c-snap">
- <h2>记录净值 <small>账户总净值（含未实现盈亏）</small></h2>
- <div class="frm">
-  <div class="fld full"><label for="s_eq">当前净值（U）</label><input id="s_eq" type="text" inputmode="decimal" autocomplete="off" placeholder="例如 7,000"></div>
-  <div class="fld full"><label for="s_t">日期时间 <i>北京时间</i></label><input id="s_t" type="datetime-local"></div>
-  <div class="fld full"><label for="s_n">备注 <i>可选</i></label><input id="s_n" type="text" maxlength="60" autocomplete="off"></div>
- </div>
- <div class="btns"><button class="btn" id="s_save" type="button">保存净值记录</button><button class="btn sec" id="s_cancel" type="button" hidden>取消修改</button></div>
- <div class="lst" id="s_list"></div>
-</section>
-<section class="card" id="c-flow">
- <h2>出入金记录 <small>入金不算盈利，提现不算亏损</small></h2>
- <div class="frm">
-  <div class="fld full"><label>类型</label><div class="seg" id="f_type"><button type="button" data-v="in" class="on">入金</button><button type="button" data-v="out">提现（到银行卡）</button></div></div>
-  <div class="fld full"><label for="f_amt">金额（U）</label><input id="f_amt" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld full"><label for="f_t">日期时间 <i>北京时间</i></label><input id="f_t" type="datetime-local"></div>
-  <div class="fld full"><label for="f_b">出入金前的账户净值（U） <i>可选，填了更准</i></label><input id="f_b" type="text" inputmode="decimal" autocomplete="off" placeholder="不填则用最近一次净值记录"></div>
- </div>
- <div class="btns"><button class="btn" id="f_save" type="button">保存出入金</button><button class="btn sec" id="f_cancel" type="button" hidden>取消修改</button></div>
- <div class="lst" id="f_list"></div>
- <div class="note">算法：按“基金份额”处理。起点份额净值 = 1.0；每次出入金按当时的份额净值申购/赎回份额，所以出入金不影响倍数。进度倍数 = 当前份额净值。</div>
-</section>
+<section class="card"><h2>与计划对比 <small>计划曲线按天连续复利</small></h2><div id="cmp"></div></section>
+<section class="card"><h2>倍数曲线 <small>计划 vs 实际</small></h2><div class="cv" id="cv"></div>
+ <div class="lg"><span><i></i>计划</span><span><i class="a"></i>实际</span><div class="seg" id="seg"><button type="button" data-v="near" class="on">近期</button><button type="button" data-v="all">全程</button></div></div></section>
+<section class="card"><h2>计划日期表 <small>每期14天 · 每期目标 +11.25%</small></h2><div class="tw" id="tbl"></div>
+ <div class="note">第22期目标为 10.44x（按每期 +11.25% 复利第22期首次超过 10x），即达成 10 倍目标。</div></section>
+<div class="note" style="padding:0 4px">只显示倍数和百分比，不显示金额；入金/划转已剔除，只算交易收益（按份额净值法，含未实现盈亏）；每 30 分钟自动更新。</div>
+<footer>仅供个人记录参考，不构成投资建议<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
 </div>
-
-<section class="card" id="c-chart">
- <h2>计划 vs 实际 <small>纵轴：份额净值（倍数）</small></h2>
- <div class="cv" id="chart"></div>
- <div class="lg"><span><i></i>计划曲线</span><span><i class="a"></i>实际</span><div class="seg" id="scale"><button type="button" data-v="log">对数</button><button type="button" data-v="lin">线性</button></div></div>
-</section>
-
-<section class="card" id="c-ms">
- <h2>里程碑 <small id="mssub"></small></h2>
- <div class="tw" id="ms"></div>
-</section>
-
-<section class="card" id="c-pos">
- <h2>仓位计算器 <small>全仓（跨仓）粗略估算</small></h2>
- <div class="frm">
-  <div class="fld"><label for="p_eq">账户净值（U）</label><input id="p_eq" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label>杠杆</label><div class="seg" id="p_levs"><button type="button" data-v="5">5x</button><button type="button" data-v="10">10x</button><button type="button" data-v="c">自定义</button></div></div>
-  <div class="fld full" id="p_levc_w" hidden><label for="p_levc">自定义杠杆（倍）</label><input id="p_levc" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld full"><label>本次仓位（保证金占净值）</label><div class="seg" id="p_ratios"><button type="button" data-v="0.25">1/4</button><button type="button" data-v="0.5">1/2</button><button type="button" data-v="0.75">3/4</button></div></div>
-  <div class="fld"><label for="p_pct">或自定义仓位 %</label><input id="p_pct" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="p_m">或直接填保证金（U）</label><input id="p_m" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld full"><label for="p_ex">已有持仓名义价值（U） <i>可选，填当前总敞口</i></label><input id="p_ex" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
-  <div class="fld"><label for="p_en">开仓价 <i>可选</i></label><input id="p_en" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="p_sl">止损价 <i>可选</i></label><input id="p_sl" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld full"><label for="p_rk">单笔风险 % <i>可选参考，非你的规则；默认 2%</i></label><input id="p_rk" type="text" inputmode="decimal" autocomplete="off"></div>
- </div>
- <div id="p_out"></div>
- <div class="btns"><button class="btn sec sm" id="p_clr" type="button">清空计算器</button></div>
-</section>
-
-<section class="card" id="c-tbl">
- <h2>计划表 <small id="tblsub"></small></h2>
- <div class="tw" id="tbl"></div>
- <div class="note">每期按日期结算（14 天），落后也不重排后面的计划；“目标净值”= 当前份额 × 目标倍数（已剔除出入金影响）。“实际”取结算日前最后一条记录。</div>
-</section>
-
-<section class="card" id="c-par">
- <h2>计划参数 <small>可修改，自动保存</small></h2>
- <div class="frm">
-  <div class="fld"><label for="q_start">起点日期</label><input id="q_start" type="date"></div>
-  <div class="fld"><label for="q_eq">起点资金（U）</label><input id="q_eq" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="q_days">每期天数</label><input id="q_days" type="text" inputmode="numeric" autocomplete="off"></div>
-  <div class="fld"><label for="q_mult">目标倍数</label><input id="q_mult" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="q_inv">投入比例 %（每期用几成仓）</label><input id="q_inv" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="q_ret">投入部分目标收益 %</label><input id="q_ret" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="q_lev">默认杠杆（倍）</label><input id="q_lev" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="q_cap">仓位上限 %（保证金/净值）</label><input id="q_cap" type="text" inputmode="decimal" autocomplete="off"></div>
-  <div class="fld"><label for="q_step">分批每次 %</label><input id="q_step" type="text" inputmode="decimal" autocomplete="off"></div>
- </div>
- <div class="der" id="der"></div>
- <div class="btns"><button class="btn sec" id="q_reset" type="button">恢复默认参数</button></div>
-</section>
-
-<section class="card" id="c-bak">
- <h2>备份 / 换设备 <small>JSON</small></h2>
- <div class="btns" style="margin-top:0"><button class="btn sec" id="b_exp" type="button">生成备份</button><button class="btn sec" id="b_copy" type="button">复制</button><button class="btn sec" id="b_dl" type="button">下载文件</button></div>
- <div class="fld" style="margin-top:8px"><label for="b_txt">备份内容（导出后复制保存；导入时把内容粘贴到这里）</label><textarea id="b_txt" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea></div>
- <div class="btns"><button class="btn" id="b_imp" type="button">从上面文本导入</button><label class="btn sec" style="display:flex;align-items:center;justify-content:center">从文件导入<input id="b_file" type="file" accept=".json,application/json,text/plain" hidden></label></div>
- <div class="btns"><button class="btn dng" id="b_wipe" type="button">清除本机全部记录</button></div>
- <div class="note">导入会覆盖本机当前的全部记录与参数。数据只在这台设备的这个浏览器里（主屏幕 App 与 Safari 可能各自独立存储，换用时请用备份迁移）。</div>
-</section>
-
-<footer>仅供个人记录参考，不构成投资建议 · 所有计算在本机完成，本页不收集任何数据<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
-</div>
-<div class="toast" id="toast"></div>
 <script>
-/*CORE-BEGIN*/
-var Core=(function(){
-"use strict";
-var DAY=864e5,TZ=8*36e5;
-var DEF={start:"2026-09-22",equity:6966,days:14,invest:0.75,ret:0.15,mult:10,lev:5,cap:0.75,step:0.25};
-function bjParse(s){var m=/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(s||"");if(!m)return NaN;return Date.UTC(+m[1],m[2]-1,+m[3],+(m[4]||0),+(m[5]||0))-TZ}
-function p2(n){return(n<10?"0":"")+n}
-function bjFmt(t,wt){var d=new Date(t+TZ),s=d.getUTCFullYear()+"-"+p2(d.getUTCMonth()+1)+"-"+p2(d.getUTCDate());if(wt)s+=" "+p2(d.getUTCHours())+":"+p2(d.getUTCMinutes());return s}
-function plan(P){
- var g=P.invest*P.ret,D=P.days*DAY,S=bjParse(P.start),lg=Math.log(1+g);
- var exact=(g>0&&P.mult>1)?Math.log(P.mult)/lg:NaN,N=isFinite(exact)?Math.ceil(exact-1e-9):0,end=S+N*D;
- return{g:g,N:N,S:S,D:D,end:end,exact:exact,
-  nav:function(t){var x=(Math.min(t,end)-S)/D;return Math.pow(1+g,x<0?0:x)},
-  tOf:function(m){return S+D*Math.log(m)/lg},
-  kOf:function(m){return Math.ceil(Math.log(m)/lg-1e-9)}};
-}
-/* Units ledger: NAV/unit starts 1.0 at the start date; each flow buys/sells units at NAV = (equity just before the flow)/units.
-   Equity before a flow = the optional user-entered value, else the running equity after the latest earlier record (flagged est). */
-function ledger(st){
- var P=st.params,pl=plan(P),ev=[];
- (st.snaps||[]).forEach(function(s){ev.push({k:0,t:s.t,s:s})});
- (st.flows||[]).forEach(function(f){ev.push({k:1,t:f.t,f:f})});
- ev.sort(function(a,b){return a.t-b.t||a.k-b.k});
- var units=P.equity,eq=P.equity,pts=[{t:pl.S,nav:1,eq:eq,src:"start"}],dep=0,wd=0,pre=0,est=0,err="",fi={};
- ev.forEach(function(e){
-  if(!(e.t>=pl.S)){pre++;return}
-  if(e.k===0){eq=+e.s.eq;pts.push({t:e.t,nav:eq/units,eq:eq,src:"snap",id:e.s.id})}
-  else{var f=e.f,hb=+f.before>0,b=hb?+f.before:eq,nav=b/units,du=nav>0?f.amt/nav:0;if(!hb)est++;
-   if(f.type==="in"){units+=du;eq=b+f.amt;dep+=f.amt}else{units-=du;eq=b-f.amt;wd+=f.amt}
-   fi[f.id]={nav:nav,est:!hb,du:du,before:b};
-   pts.push({t:e.t,nav:nav,eq:eq,src:"flow",est:!hb,id:f.id});
-   if(units<=1e-9&&!err)err="提现后份额 ≤ 0，请检查出入金金额或出入金前净值"}
- });
- return{pl:pl,pts:pts,units:units,eq:eq,nav:pts[pts.length-1].nav,dep:dep,wd:wd,pre:pre,est:est,err:err,fi:fi};
-}
-function navAt(pts,t){var r=pts[0];for(var i=0;i<pts.length;i++){if(pts[i].t<=t)r=pts[i];else break}return r}
-function compute(st,now){
- var L=ledger(st),pl=L.pl,P=st.params,m=L.nav,g=pl.g,R={L:L,pl:pl,now:now,m:m,has:L.pts.length>1};
- R.planNow=pl.nav(now);R.planEq=L.units*R.planNow;
- R.logP=m>0?Math.log(m)/Math.log(P.mult):NaN;R.linP=(m-1)/(P.mult-1);
- R.planLogP=Math.log(R.planNow)/Math.log(P.mult);
- R.diffU=(m-R.planNow)*L.units;
- R.tAct=m>0?pl.S+pl.D*Math.log(m)/Math.log(1+g):NaN;
- R.leadDays=(R.tAct-Math.min(now,pl.end))/DAY;R.leadPer=R.leadDays/P.days;
- var el=now-pl.S,k=el<0?0:Math.floor(el/pl.D)+1;R.k=k;R.done=k>pl.N;
- var kk=Math.min(Math.max(k,1),pl.N);R.kk=kk;R.ps=pl.S+(kk-1)*pl.D;R.pe=R.ps+pl.D;
- R.day=(k>=1&&k<=pl.N)?Math.floor((now-R.ps)/DAY)+1:null;
- var sp=navAt(L.pts,R.ps);
- if(sp.src==="start"&&kk>1){R.startNav=Math.pow(1+g,kk-1);R.startSrc="plan"}else{R.startNav=sp.nav;R.startSrc=sp.src==="start"?"start":"rec";R.startT=sp.t}
- R.target=Math.pow(1+g,kk);R.targetEq=R.target*L.units;
- R.perRet=m/R.startNav-1;
- R.comp=R.target>R.startNav?(m-R.startNav)/(R.target-R.startNav):1;
- R.gapPct=R.target/m-1;R.gapU=(R.target-m)*L.units;
- R.rows=[];
- for(var i=1;i<=pl.N;i++){
-  var te=pl.S+i*pl.D,tg=Math.pow(1+g,i),row={i:i,te:te,tgt:tg,tgtEq:tg*L.units};
-  if(te<=now){var a=navAt(L.pts,te);if(a.src==="start"){row.st="none"}else{row.act=a.nav;row.actT=a.t;row.st=a.nav>=tg-1e-12?"ok":"behind"}}
-  else row.st=(i===k)?"cur":"fut";
-  R.rows.push(row);
- }
- var lastRec=L.pts.length>1?L.pts[L.pts.length-1]:null,span=lastRec?lastRec.t-pl.S:0;R.lastRec=lastRec;
- R.avg=(lastRec&&span>=pl.D&&m>0)?Math.pow(m,pl.D/span)-1:null;
- var mss=[2,3,5,P.mult].filter(function(x,j,a){return x>1&&x<=P.mult&&a.indexOf(x)===j}).sort(function(a,b){return a-b});
- R.ms=mss.map(function(x){
-  var o={m:x,k:pl.kOf(x)};o.planT=pl.S+o.k*pl.D;o.planTi=pl.tOf(x);
-  for(var j=1;j<L.pts.length;j++)if(L.pts[j].nav>=x){o.hitT=L.pts[j].t;break}
-  if(!o.hitT){o.remK=m>0?Math.ceil(Math.log(x/m)/Math.log(1+g)-1e-9):null;
-   if(R.avg!==null&&R.avg>0)o.projT=lastRec.t+pl.D*Math.log(x/m)/Math.log(1+R.avg)}
-  return o});
- return R;
-}
-function pos(c){
- var r={warn:[]},eq=c.eq,lev=c.lev,mg=c.margin||0,ex=c.exist||0;
- r.notional=mg*lev;r.total=r.notional+ex;r.eff=eq>0?r.total/eq:NaN;r.liq=r.eff>0?1/r.eff:null;r.liqIso=lev>0?1/lev:null;
- r.pnl1=r.total*0.01;r.pnl1Pct=r.eff/100;r.mgRatio=eq>0?mg/eq:NaN;r.exMg=lev>0?ex/lev:0;r.totMg=mg+r.exMg;r.totMgRatio=eq>0?r.totMg/eq:NaN;
- r.capLev=c.planLev*c.cap;
- if(c.entry>0&&c.stop>0&&c.entry!==c.stop){var d=Math.abs(c.entry-c.stop)/c.entry;r.side=c.stop<c.entry?"多":"空";r.stopDist=d;r.loss=r.notional*d;r.lossPct=eq>0?r.loss/eq:NaN;
-  r.lossAll=r.total*d;r.sugN=eq*c.risk/100/d;r.sugM=r.sugN/lev;r.sugRatio=r.sugM/eq}
- if(r.totMgRatio>c.cap+1e-9)r.warn.push("保证金合计占净值 "+(r.totMgRatio*100).toFixed(1)+"%，超过仓位上限 "+(c.cap*100).toFixed(0)+"%");
- if(r.eff>r.capLev+1e-9)r.warn.push("账户实际杠杆 "+r.eff.toFixed(2)+"x，超过计划上限 "+r.capLev.toFixed(2)+"x（"+c.planLev+"x × "+(c.cap*100).toFixed(0)+"%）");
- if(r.mgRatio>c.step+1e-9)r.warn.push("本次保证金占净值 "+(r.mgRatio*100).toFixed(1)+"%，超过分批每次 "+(c.step*100).toFixed(0)+"%");
- return r;
-}
-return{DAY:DAY,DEF:DEF,bjParse:bjParse,bjFmt:bjFmt,plan:plan,ledger:ledger,navAt:navAt,compute:compute,pos:pos};
-})();
-/*CORE-END*/
 (function(){
 "use strict";
-var $=function(s){return document.getElementById(s)},KEY="tenx_plan_v1",DAY=Core.DAY,S;
-function num(v){if(v==null)return NaN;var s=String(v).replace(/[,，\s]/g,"").replace(/[Uu]$/,"");if(s==="")return NaN;return Number(s)}
-function fU(x,d){if(x==null||!isFinite(x))return"—";d=d==null?(Math.abs(x)>=1000?0:2):d;return x.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
-function fS(x,d){return(x>0?"+":"")+fU(x,d)}
-function pc(x,d){if(x==null||!isFinite(x))return"—";return(x*100).toFixed(d==null?1:d)+"%"}
-function pcS(x,d){if(x==null||!isFinite(x))return"—";return(x>0?"+":"")+pc(x,d)}
-function fm(x){return x==null||!isFinite(x)?"—":x.toFixed(x>=10?2:3)+"x"}
-function cls(x){return x>1e-12?"up":(x<-1e-12?"down":"flat")}
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function dt(t){return Core.bjFmt(t,true)}
-function dd(t){return Core.bjFmt(t,false)}
-function md(t){var s=dd(t);return s.slice(5)}
-function nowLocal(){return Core.bjFmt(Date.now(),true).replace(" ","T")}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
-var tt;function toast(m){var e=$("toast");e.textContent=m;e.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){e.classList.remove("on")},2200)}
-function defCalc(){return{ratio:0.25,pct:"",margin:"",mode:"ratio",lev:5,levc:"",eq:"",exist:"",entry:"",stop:"",risk:"2"}}
-function load(){var s=null;try{s=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}return norm(s||{})}
-function norm(s){var o={};o.params={};var D=Core.DEF,p=s.params||{};for(var k in D)o.params[k]=(k==="start"?(/^\d{4}-\d{2}-\d{2}$/.test(p[k])?p[k]:D[k]):(isFinite(+p[k])&&+p[k]>0?+p[k]:D[k]));
- o.snaps=(Array.isArray(s.snaps)?s.snaps:[]).filter(function(x){return x&&isFinite(+x.t)&&isFinite(+x.eq)&&+x.eq>=0}).map(function(x){return{id:String(x.id||uid()),t:+x.t,eq:+x.eq,note:String(x.note||"").slice(0,60)}});
- o.flows=(Array.isArray(s.flows)?s.flows:[]).filter(function(x){return x&&isFinite(+x.t)&&+x.amt>0&&(x.type==="in"||x.type==="out")}).map(function(x){return{id:String(x.id||uid()),t:+x.t,type:x.type,amt:+x.amt,before:+x.before>0?+x.before:null}});
- var c=defCalc(),sc=s.calc||{};for(var k2 in c)if(sc[k2]!=null)c[k2]=sc[k2];o.calc=c;o.ui={scale:(s.ui&&s.ui.scale)==="lin"?"lin":"log"};return o}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("保存失败：浏览器禁止本地存储")}}
-S=load();
-var R;
-/* ---------- render ---------- */
+var $=function(i){return document.getElementById(i)},D=null,VIEW="near",LN10=Math.log(10);
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function x(m,d){return (m==null||!isFinite(m))?"—":m.toFixed(d==null?3:d)+"x"}
+function pc(v,d){return (v>=0?"+":"")+(v*100).toFixed(d==null?2:d)+"%"}
+function cls(v){return v>0?"up":v<0?"down":""}
+function pt(s){var a=s.split(/[- :]/);return Date.UTC(+a[0],a[1]-1,+a[2],(+a[3]||0)-8,+a[4]||0)}  // Beijing time -> epoch ms
+function md(s){return s.slice(5,10)}
+function load(){
+ var u="data.json?t="+Date.now();
+ return fetch(u,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
+  .catch(function(){return fetch("https://raw.githubusercontent.com/Bibrady/a-share-board/main/plan/data.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})});
+}
 function render(){
- R=Core.compute(S,Date.now());var P=S.params,pl=R.pl,L=R.L;
- $("hmeta").innerHTML="<span>起点 <b>"+esc(P.start)+"</b> · <b>"+fU(P.equity)+" U</b></span><span>目标 <b>"+fU(P.mult,0)+" 倍</b>（"+fU(P.equity*P.mult)+" U）</span><span>共 <b>"+pl.N+"</b> 期 · 每期 "+P.days+" 天</span><span>预计完成 <b>"+(pl.N?dd(pl.end):"—")+"</b></span>";
- renderProg();renderPer();renderSnaps();renderFlows();renderChart();renderMs();renderTbl();renderDer();renderPos();
+ var d=D,R=d.rate,P=d.period_days,N=d.n,g=Math.log(1+R),S=pt(d.start),now=pt(d.updated);
+ var el=(now-S)/864e5,m=d.nav,k=d.period,day=d.day;
+ var prog=Math.max(0,Math.log(m)/LN10),planM=Math.pow(1+R,el/P),planProg=Math.log(planM)/LN10;
+ $("hmeta").innerHTML="<span>当前 <b>"+x(m)+"</b></span><span>更新 <b>"+esc(d.updated)+"</b> 北京时间</span><span>起点 "+esc(d.start.slice(0,10))+"</span>";
+ $("progsub").textContent="目标 10x · 共"+N+"期";
+ $("prog").innerHTML='<div class="kpi"><div><div class="klab">当前倍数</div><div class="kbig '+cls(m-1)+'">'+m.toFixed(3)+'<small>x</small></div></div>'+
+  '<div><div class="klab">复利进度</div><div class="kbig" style="font-size:28px">'+(prog*100).toFixed(1)+'<small>%</small></div></div></div>'+
+  '<div class="pbar"><i style="width:'+Math.min(100,prog*100).toFixed(2)+'%"></i><em style="left:'+Math.min(100,Math.max(0,planProg*100)).toFixed(2)+'%"></em></div>'+
+  '<div class="pbl"><span>1x</span><span>橙线 = 今日计划 '+(planProg*100).toFixed(1)+'%</span><span>10x</span></div>'+
+  '<div class="note">复利进度 = ln(当前倍数) / ln(10)，例如 2x ≈ 30.1%，3.16x = 50%。</div>';
+ var s0=Math.pow(1+R,k-1),t1=Math.pow(1+R,k),done=(m/s0-1)/R,need=t1/m-1,pd=d.periods[k-1];
+ $("persub").textContent="结算日 "+pd.end;
+ $("per").innerHTML='<div class="kpi"><div><div class="klab">第 '+k+'/'+N+' 期</div><div class="kbig" style="font-size:28px">第 '+day+'<small>/'+P+' 天</small></div></div>'+
+  '<div><div class="klab">本期已完成</div><div class="kbig '+cls(done)+'" style="font-size:28px">'+(done*100).toFixed(1)+'<small>%</small></div></div></div>'+
+  '<div class="pbar"><i style="width:'+Math.min(100,Math.max(0,done*100)).toFixed(2)+'%"></i><em style="left:'+(Math.min(day,P)/P*100).toFixed(2)+'%"></em></div>'+
+  '<div class="pbl"><span>'+x(s0)+'</span><span>橙线 = 时间进度</span><span>'+x(t1)+'</span></div>'+
+  '<div class="tiles"><div class="tile"><span>本期起点</span><b>'+x(s0)+'</b>'+(d.period_start_actual!=null&&k>1?'<small>实际期初 '+x(d.period_start_actual)+'</small>':'<small>计划倍数</small>')+'</div>'+
+  '<div class="tile"><span>本期目标</span><b>'+x(t1)+'</b><small>+11.25%</small></div>'+
+  '<div class="tile"><span>还差</span><b class="'+(need>0?'':'up')+'">'+(need>0?pc(need):'已达成')+'</b><small>距本期目标</small></div>'+
+  '<div class="tile"><span>剩余天数</span><b>'+Math.max(0,(S+k*P*864e5-now)/864e5).toFixed(1)+' 天</b><small>至 '+md(pd.end)+'</small></div></div>';
+ var tStar=P*Math.log(m)/g,ahead=tStar-el,ad=Math.abs(ahead);
+ var aheadTxt=ad<0.05?'与计划持平':(ahead>0?'领先计划 <b class="up">'+ad.toFixed(1)+' 天</b>':'落后计划 <b class="down">'+ad.toFixed(1)+' 天</b>');
+ var eq=new Date(S+tStar*864e5+8*36e5),eqs=eq.getUTCFullYear()+"-"+("0"+(eq.getUTCMonth()+1)).slice(-2)+"-"+("0"+eq.getUTCDate()).slice(-2);
+ $("cmp").innerHTML='<div class="tiles"><div class="tile"><span>今日计划倍数</span><b>'+x(planM)+'</b><small>第 '+el.toFixed(1)+' 天</small></div>'+
+  '<div class="tile"><span>实际倍数</span><b class="'+cls(m-planM)+'">'+x(m)+'</b><small>差 '+pc(m/planM-1)+'</small></div></div>'+
+  '<div class="warn" style="background:#f4f7ff;color:#1d1d1f">'+aheadTxt+'（当前倍数对应计划曲线上的 '+(tStar>=0?eqs:'起点之前')+'）</div>';
+ // table
+ var MS={2:0,3:0,5:0,10:0},msAt={};[2,3,5,10].forEach(function(v){msAt[Math.ceil(Math.log(v)/g-1e-9)]=v});
+ var h='<table><thead><tr><th>期</th><th>结算日期</th><th>目标倍数</th><th>实际倍数</th><th>状态</th></tr></thead><tbody>';
+ d.periods.forEach(function(p){
+  var st,a=p.actual,cur=p.k===k&&now<S+p.k*P*864e5;
+  if(a!=null)st=a>=p.target?"✅ 达成":"❌ 未达";else if(cur)st="⏳ 进行中";else if(p.k<k)st="…结算中";else st="— 未开始";
+  h+='<tr'+(cur?' class="cur"':'')+'><td>'+p.k+(msAt[p.k]?'<span class="ms">'+msAt[p.k]+'x</span>':'')+'</td><td>'+p.end+'</td><td>'+(p.k===N?'10x <small style="color:#8a8f98">('+p.target.toFixed(2)+')</small>':x(p.target))+'</td><td class="'+(a!=null?cls(a-p.target):'')+'">'+(a!=null?x(a):cur?'<span style="color:#8a8f98">'+x(m)+'</span>':'—')+'</td><td>'+st+'</td></tr>';
+ });
+ $("tbl").innerHTML=h+'</tbody></table>';
+ chart(d,S,now,el,g,P,N);
 }
-function renderProg(){
- var P=S.params,L=R.L,h="",pl=R.pl;
- $("progsub").textContent=R.has?"截至 "+dt(R.lastRec.t):"";
- if(L.err)h+='<div class="warn bad">'+esc(L.err)+"</div>";
- if(!R.has){h+='<div class="empty">还没有记录。<br>在下方「记录净值」输入当前账户净值，即可看到进度。<br>计划参数可在页面底部修改。</div>';
-  h+='<div class="tiles"><div class="tile"><span>今天计划倍数</span><b>'+fm(R.planNow)+'</b></div><div class="tile"><span>今天计划净值</span><b>'+fU(R.planEq)+' U</b><small>起点 '+fU(P.equity)+' U 未计出入金</small></div></div>';
-  $("prog").innerHTML=h;return}
- var lp=Math.max(0,Math.min(1,R.logP)),pp=Math.max(0,Math.min(1,R.planLogP));
- h+='<div class="kpi"><div><div class="klab">复利进度（对数）</div><div class="kbig">'+pc(R.logP)+'</div></div><div class="cmp">倍数 <b>'+fm(R.m)+'</b> / '+fU(P.mult,0)+'x<br>线性进度 <b>'+pc(R.linP)+'</b></div></div>';
- h+='<div class="pbar"><i style="width:'+(lp*100).toFixed(2)+'%"></i><em style="left:calc('+(pp*100).toFixed(2)+'% - 1px)"></em></div><div class="pbl"><span>1x</span><span>▏橙线＝今天计划（'+pc(R.planLogP)+'）</span><span>'+fU(P.mult,0)+'x</span></div>';
- var ld=R.leadDays,ahead=R.diffU>=0;
- h+='<div class="tiles"><div class="tile"><span>当前净值</span><b>'+fU(L.eq)+' U</b><small>份额 '+fU(L.units,2)+'</small></div>'+
-  '<div class="tile"><span>计划应到净值（今天）</span><b>'+fU(R.planEq)+' U</b><small>计划倍数 '+fm(R.planNow)+'</small></div>'+
-  '<div class="tile"><span>'+(ahead?"领先计划":"落后计划")+'</span><b class="'+cls(R.diffU)+'">'+fS(R.diffU)+' U</b><small>'+pcS(R.m/R.planNow-1)+'</small></div>'+
-  '<div class="tile"><span>折合</span><b class="'+cls(ld)+'">'+(isFinite(ld)?(ld>=0?"领先 ":"落后 ")+Math.abs(ld).toFixed(1)+" 天":"—")+'</b><small>'+(isFinite(ld)?Math.abs(R.leadPer).toFixed(2)+" 期":"")+'</small></div></div>';
- var n=[];if(L.dep||L.wd)n.push("累计入金 "+fU(L.dep)+" U，提现 "+fU(L.wd)+" U（已按份额剔除，不计入盈亏）");
- if(L.est)n.push(L.est+" 笔出入金没填“出入金前净值”，按之前最近一条记录估算");
- if(L.pre)n.push(L.pre+" 条记录早于起点日期，已忽略");
- n.push("复利进度 = ln(倍数)/ln("+fU(P.mult,0)+")；线性进度 = (倍数−1)/"+fU(P.mult-1,0)+"。");
- h+='<div class="note">'+n.map(esc).join("<br>")+"</div>";
- $("prog").innerHTML=h;
-}
-function renderPer(){
- var P=S.params,pl=R.pl,h="";
- if(R.k===0){$("persub").textContent="未开始";$("per").innerHTML='<div class="empty">计划 '+esc(P.start)+' 开始</div>';return}
- $("persub").textContent=R.done?"计划期已全部结束":"第 "+R.k+" / "+pl.N+" 期";
- var c=Math.max(0,Math.min(1,R.comp));
- h+='<div class="kpi"><div><div class="klab">'+(R.done?"最后一期":"第 "+R.k+" 期 · 第 "+R.day+" / "+P.days+" 天")+'</div><div class="kbig">'+(R.has?pc(R.comp,0):"—")+'<small>已完成</small></div></div><div class="cmp">'+md(R.ps)+' → '+md(R.pe)+' 结算<br>本期目标 <b>'+pcS(pl.g,2)+'</b></div></div>';
- h+='<div class="pbar"><i style="width:'+(c*100).toFixed(1)+'%"></i></div>';
- h+='<div class="tiles"><div class="tile"><span>本期起点</span><b>'+fm(R.startNav)+'</b><small>'+(R.startSrc==="plan"?"期初无记录，用计划值":R.startSrc==="start"?"计划起点":"取 "+dt(R.startT)+" 记录")+'</small></div>'+
-  '<div class="tile"><span>本期目标</span><b>'+fm(R.target)+'</b><small>'+fU(R.targetEq)+' U</small></div>';
- if(R.has){h+='<div class="tile"><span>本期收益</span><b class="'+cls(R.perRet)+'">'+pcS(R.perRet,2)+'</b><small>自本期起点</small></div>'+
-  '<div class="tile"><span>距本期目标还差</span><b class="'+(R.gapU>0?"down":"up")+'">'+(R.gapU>0?pcS(R.gapPct,2):"已达成")+'</b><small>'+(R.gapU>0?fU(R.gapU)+" U":"超出 "+fU(-R.gapU)+" U")+'</small></div>'}
- h+="</div>";
- if(R.has&&R.gapU>0&&!R.done){var rem=Math.max(0,(R.pe-R.now)/DAY);h+='<div class="warn">要追上计划，本期剩余 '+rem.toFixed(1)+' 天需要 <b>'+pcS(R.gapPct,2)+'</b>（'+fU(R.gapU)+' U）。计划不重排：到期按日期结算。</div>'}
- if(!R.has)h+='<div class="note">记录净值后显示本期完成情况。</div>';
- $("per").innerHTML=h;
-}
-function renderSnaps(){
- var a=S.snaps.slice().sort(function(x,y){return y.t-x.t}),h="";
- if(!a.length){$("s_list").innerHTML='<div class="empty">暂无净值记录</div>';return}
- var L=R.L,units={};L.pts.forEach(function(p){if(p.src==="snap")units[p.id]=p.nav});
- a.forEach(function(s){var nv=units[s.id];h+='<div class="li"><div class="m"><b>'+fU(s.eq)+' U</b>'+(nv!=null?' <span class="klab">'+fm(nv)+"</span>":' <span class="tag e">早于起点</span>')+"<small>"+dt(s.t)+(s.note?" · "+esc(s.note):"")+'</small></div><div class="a"><button class="btn sec sm" data-act="es" data-id="'+esc(s.id)+'">编辑</button><button class="btn dng sm" data-act="ds" data-id="'+esc(s.id)+'">删除</button></div></div>'});
- $("s_list").innerHTML=h;
-}
-function renderFlows(){
- var a=S.flows.slice().sort(function(x,y){return y.t-x.t}),h="";
- if(!a.length){$("f_list").innerHTML='<div class="empty">暂无出入金记录</div>';return}
- a.forEach(function(f){var i=R.L.fi[f.id];h+='<div class="li"><div class="m"><b class="'+(f.type==="in"?"up":"down")+'">'+(f.type==="in"?"+":"−")+fU(f.amt)+' U</b><span class="tag '+f.type+'">'+(f.type==="in"?"入金":"提现")+"</span>"+(i&&i.est?'<span class="tag e">净值估算</span>':"")+"<small>"+dt(f.t)+(i?" · 前净值 "+fU(i.before)+" U · 份额净值 "+fm(i.nav)+" · "+(f.type==="in"?"+":"−")+fU(i.du,2)+" 份":" · 早于起点，已忽略")+'</small></div><div class="a"><button class="btn sec sm" data-act="ef" data-id="'+esc(f.id)+'">编辑</button><button class="btn dng sm" data-act="df" data-id="'+esc(f.id)+'">删除</button></div></div>'});
- $("f_list").innerHTML=h;
-}
-function renderChart(){
- var el=$("chart"),W=Math.max(280,Math.round(el.clientWidth||340)),H=Math.round(Math.min(300,Math.max(200,W*0.58))),pl=R.pl,P=S.params,log=S.ui.scale==="log";
- [].forEach.call($("scale").children,function(b){b.classList.toggle("on",b.getAttribute("data-v")===S.ui.scale)});
- if(!pl.N){el.innerHTML='<div class="empty">参数无效</div>';return}
- var pts=R.L.pts,x0=pl.S,x1=Math.max(pl.end,pts[pts.length-1].t,Math.min(R.now,pl.end+30*DAY));
- var ymax=Math.max(Math.pow(1+pl.g,pl.N),R.m),ymin=1;pts.forEach(function(p){if(p.nav>0){ymin=Math.min(ymin,p.nav);ymax=Math.max(ymax,p.nav)}});ymin=Math.min(ymin,1)*0.95;ymax*=1.04;
- var ml=40,mr=10,mt=10,mb=24,iw=W-ml-mr,ih=H-mt-mb;
- function fy(v){v=Math.max(v,1e-6);return mt+ih-(log?(Math.log(v)-Math.log(ymin))/(Math.log(ymax)-Math.log(ymin)):(v-ymin)/(ymax-ymin))*ih}
- function fx(t){return ml+(t-x0)/(x1-x0)*iw}
- var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+" "+H+'" width="'+W+'" height="'+H+'" font-size="10.5" font-family="-apple-system,PingFang SC,sans-serif">';
- var ticks=log?[1,1.5,2,3,5,7,10,15,20,30,50,100].filter(function(v){return v>=ymin&&v<=ymax}):(function(){var r=[],st=ymax-ymin>8?2:ymax-ymin>3?1:0.5;for(var v=Math.ceil(ymin/st)*st;v<=ymax;v+=st)r.push(+v.toFixed(2));return r})();
- ticks.forEach(function(v){var y=fy(v).toFixed(1),hi=[2,3,5,P.mult].indexOf(v)>=0;s+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+y+'" y2="'+y+'" stroke="'+(hi?"#dfe3ea":"#f0f1f4")+'"/><text x="'+(ml-4)+'" y="'+(+y+3.5)+'" text-anchor="end" fill="#8a8f98">'+v+"x</text>"});
- var months=[],d=new Date(x0+8*36e5);d=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)-8*36e5;var span=(x1-x0)/DAY,stepM=span>500?3:span>250?2:1,mi=0;
- for(var t=d;t<=x1;){var dd2=new Date(t+8*36e5);if(mi%stepM===0){var x=fx(t).toFixed(1);s+='<line x1="'+x+'" x2="'+x+'" y1="'+mt+'" y2="'+(mt+ih)+'" stroke="#f3f4f6"/><text x="'+x+'" y="'+(H-8)+'" text-anchor="middle" fill="#8a8f98">'+(dd2.getUTCMonth()===0?String(dd2.getUTCFullYear()).slice(2)+"/":"")+(dd2.getUTCMonth()+1)+"月</text>"}mi++;t=Date.UTC(dd2.getUTCFullYear(),dd2.getUTCMonth()+1,1)-8*36e5}
- var pp=[];for(var i=0;i<=160;i++){var tt2=x0+(x1-x0)*i/160;pp.push(fx(tt2).toFixed(1)+","+fy(pl.nav(tt2)).toFixed(1))}
+function chart(d,S,now,el,g,P,N){
+ var W=360,H=220,L=38,Rr=8,T=10,B=24,all=VIEW==="all";
+ var hs=d.hist.map(function(p){return[(pt(p[0])-S)/864e5,p[1]]});
+ var x1=all?N*P:Math.max(P,Math.ceil((el+7)/P)*P),x0=0;
+ var planAt=function(t){return Math.pow(1+d.rate,t/P)};
+ var ys=hs.map(function(p){return p[1]}).concat([planAt(x1),1]),y0=Math.min.apply(null,ys),y1=Math.max.apply(null,ys);
+ var logY=all,f=logY?Math.log:function(v){return v};
+ if(!logY){var pad=(y1-y0)*0.08||0.02;y0-=pad;y1+=pad}else{y0=Math.min(y0,1);y1=Math.max(y1,10.5)}
+ var X=function(t){return L+(t-x0)/(x1-x0)*(W-L-Rr)},Y=function(v){return T+(f(y1)-f(v))/(f(y1)-f(y0))*(H-T-B)};
+ var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="计划与实际倍数曲线">';
+ var ticks=logY?[1,2,3,5,10]:(function(){var st=[0.01,0.02,0.05,0.1,0.2,0.5,1].find(function(v){return (y1-y0)/v<=6})||1,a=[];for(var v=Math.ceil(y0/st)*st;v<=y1;v+=st)a.push(+v.toFixed(3));return a})();
+ ticks.forEach(function(v){var y=Y(v);s+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+y+'" y2="'+y+'" stroke="#eef0f3"/><text x="'+(L-4)+'" y="'+(y+3.5)+'" font-size="10" text-anchor="end" fill="#8a8f98">'+(logY?v:v.toFixed(v<2&&!logY?2:1))+'x</text>'});
+ for(var k=0;k<=x1/P;k++){var t=k*P;if(all&&k%4&&k!==N)continue;var dd=new Date(S+t*864e5+8*36e5);
+  s+='<line x1="'+X(t)+'" x2="'+X(t)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="#f3f4f6"/><text x="'+X(t)+'" y="'+(H-8)+'" font-size="10" text-anchor="middle" fill="#8a8f98">'+(dd.getUTCMonth()+1)+'/'+dd.getUTCDate()+'</text>'}
+ var pp=[];for(var i=0;i<=120;i++){var t=x0+(x1-x0)*i/120;pp.push(X(t).toFixed(1)+","+Y(planAt(t)).toFixed(1))}
  s+='<polyline points="'+pp.join(" ")+'" fill="none" stroke="#9aa3b5" stroke-width="1.6" stroke-dasharray="5 4"/>';
- for(var k=1;k<=pl.N;k++){var tk=pl.S+k*pl.D;s+='<circle cx="'+fx(tk).toFixed(1)+'" cy="'+fy(Math.pow(1+pl.g,k)).toFixed(1)+'" r="1.8" fill="#b7bdc9"/>'}
- if(R.now>=x0&&R.now<=x1){var xn=fx(R.now).toFixed(1);s+='<line x1="'+xn+'" x2="'+xn+'" y1="'+mt+'" y2="'+(mt+ih)+'" stroke="#ff9f0a" stroke-dasharray="2 3"/><text x="'+xn+'" y="'+(mt+9)+'" fill="#ff9f0a" text-anchor="'+(fx(R.now)>W-40?"end":"start")+'" dx="3">今天</text>'}
- if(pts.length>1){var ap=pts.map(function(p){return fx(p.t).toFixed(1)+","+fy(p.nav).toFixed(1)});s+='<polyline points="'+ap.join(" ")+'" fill="none" stroke="#2f6fed" stroke-width="2.2" stroke-linejoin="round"/>';
-  pts.forEach(function(p,j){if(j>0)s+='<circle cx="'+fx(p.t).toFixed(1)+'" cy="'+fy(p.nav).toFixed(1)+'" r="'+(j===pts.length-1?3.5:2.3)+'" fill="'+(p.src==="flow"?"#ff9f0a":"#2f6fed")+'"/>'})}
- s+="</svg>";
- el.innerHTML=s+(pts.length>1?"":'<div class="note">还没有实际记录，只显示计划曲线。</div>')+'<div class="note">计划曲线在期内按天复利插值；灰点＝每期结算目标，蓝点＝净值记录，橙点＝出入金时点。</div>';
+ var ap=hs.filter(function(p){return p[0]<=x1}).map(function(p){return X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)});
+ if(ap.length)s+='<polyline points="'+ap.join(" ")+'" fill="none" stroke="#2f6fed" stroke-width="2.2" stroke-linejoin="round"/>';
+ var lp=hs[hs.length-1];if(lp&&lp[0]<=x1)s+='<circle cx="'+X(lp[0])+'" cy="'+Y(lp[1])+'" r="3.5" fill="#2f6fed"/>';
+ s+='<line x1="'+X(el)+'" x2="'+X(el)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="#ff9f0a" stroke-width="1" stroke-dasharray="2 3"/></svg>';
+ $("cv").innerHTML=s+(all?'<div class="note">全程视图为对数纵轴。</div>':'');
 }
-function renderMs(){
- var h='<table><thead><tr><th>里程碑</th><th>计划达成</th><th>实际/预计</th><th>还需</th></tr></thead><tbody>';
- R.ms.forEach(function(o){var a,rem;
-  if(o.hitT){a='<span class="up">✅ '+dd(o.hitT)+"</span>";rem="已达成"}
-  else{a=o.projT?"预计 "+dd(o.projT):(R.has?'<span class="flat">数据不足1期</span>':"—");rem=o.remK!=null?o.remK+" 期":"—"}
-  h+="<tr><td><b>"+o.m+"x</b></td><td>"+dd(o.planT)+'<br><small class="klab">第 '+o.k+" 期末</small></td><td>"+a+"</td><td>"+rem+"</td></tr>"});
- h+="</tbody></table>";
- $("ms").innerHTML=h;
- $("mssub").textContent=R.avg!=null?"实际平均每期 "+pcS(R.avg,2):"满 1 期数据后按实际速度预测";
- var n='<div class="note">“还需”按计划每期 '+pcS(R.pl.g,2)+" 从当前倍数算；“预计”按实际平均每期收益外推"+(R.avg!=null&&R.avg<=0?"（目前平均收益 ≤ 0，无法预测）":"")+"。</div>";
- $("ms").innerHTML+=n;
-}
-function renderTbl(){
- var pl=R.pl,h='<table><thead><tr><th>期</th><th>结算日</th><th>目标倍数</th><th>目标净值 U</th><th>实际</th><th>状态</th></tr></thead><tbody>';
- R.rows.forEach(function(r){var st=r.st==="ok"?'<span class="up">✅</span>':r.st==="behind"?'<span class="down">落后</span>':r.st==="cur"?'<b style="color:#2f6fed">进行中</b>':r.st==="none"?'<span class="flat">无记录</span>':"";
-  h+='<tr class="'+(r.st==="cur"?"cur":"")+'"><td>'+r.i+"</td><td>"+dd(r.te)+"</td><td>"+r.tgt.toFixed(3)+"</td><td>"+fU(r.tgtEq)+"</td><td>"+(r.act!=null?fm(r.act):"")+"</td><td>"+st+"</td></tr>"});
- h+="</tbody></table>";$("tbl").innerHTML=h;
- $("tblsub").textContent="共 "+pl.N+" 期 · 当前份额 "+fU(R.L.units,2);
-}
-function renderDer(){
- var P=S.params,pl=R.pl;
- $("der").innerHTML="账户每期目标 = 投入比例 <b>"+pc(P.invest,0)+"</b> × 仓位收益 <b>"+pc(P.ret,1)+"</b> = <b>"+pcS(pl.g,2)+"</b><br>"+
-  "需要期数 = ⌈ln("+P.mult+") / ln("+(1+pl.g).toFixed(4)+")⌉ = ⌈"+(isFinite(pl.exact)?pl.exact.toFixed(2):"—")+"⌉ = <b>"+pl.N+" 期</b>（"+pl.N*P.days+" 天）<br>"+
-  "第 1 期结算 <b>"+dd(pl.S+pl.D)+"</b>，目标 "+fU(P.equity*(1+pl.g))+" U；全部结束 <b>"+(pl.N?dd(pl.end):"—")+"</b>，终点倍数 "+Math.pow(1+pl.g,pl.N).toFixed(3)+"x<br>"+
-  "仓位规则：默认 "+P.lev+"x，保证金上限 "+pc(P.cap,0)+"，分批每次 "+pc(P.step,0)+" → 账户实际杠杆上限 "+(P.lev*P.cap).toFixed(2)+"x";
-}
-/* ---------- position calculator ---------- */
-function calcEq(){var c=S.calc,v=num(c.eq);return v>0?v:(R.has?R.L.eq:NaN)}
-function calcLev(){var c=S.calc;return c.lev==="c"?num(c.levc):+c.lev}
-function renderPos(){
- var c=S.calc,P=S.params,eq=calcEq(),lev=calcLev();
- $("p_eq").placeholder=R.has?"默认用最新净值 "+fU(R.L.eq):"输入账户净值";
- [].forEach.call($("p_levs").children,function(b){b.classList.toggle("on",String(b.getAttribute("data-v"))===String(c.lev))});
- $("p_levc_w").hidden=c.lev!=="c";
- [].forEach.call($("p_ratios").children,function(b){b.classList.toggle("on",c.mode==="ratio"&&Math.abs(+b.getAttribute("data-v")-c.ratio)<1e-9)});
- var mg=c.mode==="amt"?num(c.margin):(c.mode==="pct"?num(c.pct)/100*eq:c.ratio*eq);
- var out="";
- if(!(eq>0)||!(lev>0)){$("p_out").innerHTML='<div class="empty">填入账户净值（或先记录一次净值）和杠杆后显示计算结果</div>';return}
- var r=Core.pos({eq:eq,lev:lev,margin:mg>0?mg:0,exist:num(c.exist)>0?num(c.exist):0,entry:num(c.entry),stop:num(c.stop),risk:num(c.risk)>0?num(c.risk):2,planLev:P.lev,cap:P.cap,step:P.step});
- out+='<div class="res"><div><span>本次保证金</span><b>'+fU(mg>0?mg:0)+' U</b><br><small class="klab">占净值 '+pc(r.mgRatio)+'</small></div>'+
-  '<div><span>本次名义敞口</span><b>'+fU(r.notional)+' U</b><br><small class="klab">保证金 × '+lev+'x</small></div>'+
-  '<div><span>总名义敞口</span><b>'+fU(r.total)+' U</b><br><small class="klab">含已有 '+fU(r.total-r.notional)+'</small></div>'+
-  '<div><span>账户实际杠杆</span><b class="'+(r.eff>r.capLev+1e-9?"up":"")+'">'+(isFinite(r.eff)?r.eff.toFixed(2)+"x":"—")+'</b><br><small class="klab">计划上限 '+r.capLev.toFixed(2)+'x</small></div>'+
-  '<div><span>粗略爆仓跌幅（全仓）</span><b>'+(r.liq?"≈ "+pc(r.liq):"—")+'</b><br><small class="klab">≈ 1 / 实际杠杆</small></div>'+
-  '<div><span>每波动 1%</span><b>'+fU(r.pnl1)+' U</b><br><small class="klab">= 净值的 '+pc(r.pnl1Pct,2)+'</small></div></div>';
- if(r.stopDist!=null){
-  out+='<div class="res"><div><span>方向 / 止损距离</span><b>'+r.side+" · "+pc(r.stopDist,2)+'</b></div>'+
-   '<div><span>止损亏损（本次仓位）</span><b class="down">−'+fU(r.loss)+' U</b><br><small class="klab">净值的 '+pc(r.lossPct,2)+'</small></div>'+
-   '<div><span>按单笔风险 '+(num(c.risk)>0?num(c.risk):2)+'% 的建议</span><b>'+fU(r.sugM)+' U 保证金</b><br><small class="klab">名义 '+fU(r.sugN)+' U · 仓位 '+pc(r.sugRatio)+'</small></div></div>';
- }else out+='<div class="note">填开仓价和止损价可算止损亏损和建议仓位（止损低于开仓价＝做多，高于＝做空）。</div>';
- r.warn.forEach(function(w){out+='<div class="warn bad">⚠️ '+esc(w)+"</div>"});
- var ex=num(c.exist)>0?num(c.exist):0;
- out+='<div class="tw" style="margin-top:10px"><table><thead><tr><th>仓位 @'+lev+'x</th><th>保证金</th><th>名义</th><th>实际杠杆</th><th>爆仓跌幅</th><th>1% 盈亏</th></tr></thead><tbody>';
- [0.25,0.5,0.75].forEach(function(q){var m2=q*eq,n2=m2*lev+ex,e2=n2/eq;out+="<tr><td>"+(q===0.25?"1/4":q===0.5?"1/2":"3/4")+"</td><td>"+fU(m2)+"</td><td>"+fU(n2)+'</td><td class="'+(e2>r.capLev+1e-9?"up":"")+'">'+e2.toFixed(2)+"x</td><td>≈"+pc(1/e2,0)+"</td><td>"+fU(n2*0.01)+"</td></tr>"});
- out+="</tbody></table></div>";
- out+='<div class="note">爆仓跌幅是全仓粗算（整个账户净值扛亏损）：实际还要扣维持保证金、手续费和资金费，行情跳空/插针时会更早爆仓。逐仓的话单个仓位约在反向波动 '+pc(r.liqIso,0)+' 时爆仓。'+(ex?"表格已包含已有持仓敞口。":"")+"单笔风险 % 只是可选参考，不是你的规则。</div>";
- $("p_out").innerHTML=out;
-}
-/* ---------- inputs ---------- */
-function fillCalc(){var c=S.calc;$("p_eq").value=c.eq;$("p_levc").value=c.levc;$("p_pct").value=c.mode==="pct"?c.pct:"";$("p_m").value=c.mode==="amt"?c.margin:"";$("p_ex").value=c.exist;$("p_en").value=c.entry;$("p_sl").value=c.stop;$("p_rk").value=c.risk}
-function fillParams(){var P=S.params;$("q_start").value=P.start;$("q_eq").value=P.equity;$("q_days").value=P.days;$("q_mult").value=P.mult;$("q_inv").value=+(P.invest*100).toFixed(4);$("q_ret").value=+(P.ret*100).toFixed(4);$("q_lev").value=P.lev;$("q_cap").value=+(P.cap*100).toFixed(4);$("q_step").value=+(P.step*100).toFixed(4)}
-function bindCalc(id,key,after){$(id).addEventListener("input",function(){S.calc[key]=this.value;if(after)after(this.value);save();R=R||Core.compute(S,Date.now());renderPos()})}
-bindCalc("p_eq","eq");bindCalc("p_levc","levc");bindCalc("p_ex","exist");bindCalc("p_en","entry");bindCalc("p_sl","stop");bindCalc("p_rk","risk");
-bindCalc("p_pct","pct",function(v){if(String(v).trim()!==""){S.calc.mode="pct";$("p_m").value=""}});
-bindCalc("p_m","margin",function(v){if(String(v).trim()!==""){S.calc.mode="amt";$("p_pct").value=""}});
-$("p_levs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var v=b.getAttribute("data-v");S.calc.lev=v==="c"?"c":+v;save();renderPos();if(v==="c")$("p_levc").focus()});
-$("p_ratios").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.calc.mode="ratio";S.calc.ratio=+b.getAttribute("data-v");$("p_pct").value="";$("p_m").value="";save();renderPos()});
-$("p_clr").addEventListener("click",function(){S.calc=defCalc();S.calc.lev=S.params.lev===10?10:5;fillCalc();save();renderPos()});
-var pmap={q_start:["start",function(v){return/^\d{4}-\d{2}-\d{2}$/.test(v)?v:null}],q_eq:["equity",1],q_days:["days",1,function(v){return Math.round(v)}],q_mult:["mult",1,function(v){return v>1?v:null}],q_inv:["invest",100],q_ret:["ret",100],q_lev:["lev",1],q_cap:["cap",100],q_step:["step",100]};
-Object.keys(pmap).forEach(function(id){$(id).addEventListener("change",function(){var m=pmap[id],v;
- if(id==="q_start")v=m[1](this.value);else{v=num(this.value);if(!(v>0))v=null;else{v=v/m[1];if(m[2])v=m[2](v)}}
- if(v==null||(typeof v==="number"&&!(v>0))){toast("参数无效，已恢复");fillParams();return}
- S.params[m[0]]=v;save();render();toast("计划参数已保存")})});
-$("q_reset").addEventListener("click",function(){if(!confirm("恢复默认计划参数？（记录不受影响）"))return;S.params=JSON.parse(JSON.stringify(Core.DEF));fillParams();save();render();toast("已恢复默认参数")});
-/* snapshots */
-var editS=null,editF=null,ftype="in";
-function resetS(){editS=null;$("s_eq").value="";$("s_n").value="";$("s_t").value=nowLocal();$("s_save").textContent="保存净值记录";$("s_cancel").hidden=true}
-function resetF(){editF=null;$("f_amt").value="";$("f_b").value="";$("f_t").value=nowLocal();$("f_save").textContent="保存出入金";$("f_cancel").hidden=true;setType("in")}
-function setType(v){ftype=v;[].forEach.call($("f_type").children,function(b){b.classList.toggle("on",b.getAttribute("data-v")===v)})}
-$("f_type").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setType(b.getAttribute("data-v"))});
-function readT(id){var v=$(id).value;if(!v){return Date.now()}var t=Core.bjParse(v);return isFinite(t)?t:NaN}
-$("s_save").addEventListener("click",function(){var eq=num($("s_eq").value),t=readT("s_t");
- if(!(eq>=0)||$("s_eq").value.trim()===""){toast("请填写当前净值");$("s_eq").focus();return}if(!isFinite(t)){toast("日期时间无效");return}
- if(t<Core.bjParse(S.params.start))toast("注意：早于计划起点，不参与计算");
- var o={id:editS||uid(),t:t,eq:eq,note:$("s_n").value.trim().slice(0,60)};
- S.snaps=S.snaps.filter(function(x){return x.id!==o.id});S.snaps.push(o);save();var w=!!editS;resetS();render();toast(w?"已修改":"已保存净值 "+fU(eq)+" U")});
-$("s_cancel").addEventListener("click",resetS);
-$("f_save").addEventListener("click",function(){var a=num($("f_amt").value),b=num($("f_b").value),t=readT("f_t");
- if(!(a>0)){toast("请填写金额");$("f_amt").focus();return}if(!isFinite(t)){toast("日期时间无效");return}
- var o={id:editF||uid(),t:t,type:ftype,amt:a,before:b>0?b:null};
- S.flows=S.flows.filter(function(x){return x.id!==o.id});S.flows.push(o);save();var w=!!editF;resetF();render();toast(w?"已修改":(o.type==="in"?"已记录入金 ":"已记录提现 ")+fU(a)+" U")});
-$("f_cancel").addEventListener("click",resetF);
-document.addEventListener("click",function(e){var b=e.target.closest("button[data-act]");if(!b)return;var id=b.getAttribute("data-id"),act=b.getAttribute("data-act");
- if(act==="ds"){if(confirm("删除这条净值记录？")){S.snaps=S.snaps.filter(function(x){return x.id!==id});save();if(editS===id)resetS();render()}}
- else if(act==="df"){if(confirm("删除这条出入金记录？")){S.flows=S.flows.filter(function(x){return x.id!==id});save();if(editF===id)resetF();render()}}
- else if(act==="es"){var s=S.snaps.filter(function(x){return x.id===id})[0];if(!s)return;editS=id;$("s_eq").value=s.eq;$("s_t").value=dt(s.t).replace(" ","T");$("s_n").value=s.note||"";$("s_save").textContent="保存修改";$("s_cancel").hidden=false;$("c-snap").scrollIntoView({behavior:"smooth"})}
- else if(act==="ef"){var f=S.flows.filter(function(x){return x.id===id})[0];if(!f)return;editF=id;$("f_amt").value=f.amt;$("f_b").value=f.before||"";$("f_t").value=dt(f.t).replace(" ","T");setType(f.type);$("f_save").textContent="保存修改";$("f_cancel").hidden=false;$("c-flow").scrollIntoView({behavior:"smooth"})}
-});
-$("scale").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.ui.scale=b.getAttribute("data-v");save();renderChart()});
-/* backup */
-function expText(){return JSON.stringify({app:"10x-plan",v:1,exported:dt(Date.now())+" 北京时间",params:S.params,snaps:S.snaps,flows:S.flows,calc:S.calc,ui:S.ui},null,1)}
-$("b_exp").addEventListener("click",function(){$("b_txt").value=expText();toast("已生成，可复制或下载保存")});
-$("b_copy").addEventListener("click",function(){var ta=$("b_txt");if(!ta.value)ta.value=expText();var txt=ta.value;
- function fb(){ta.focus();ta.select();ta.setSelectionRange(0,txt.length);var ok=false;try{ok=document.execCommand("copy")}catch(e){}toast(ok?"已复制":"请长按文本框手动复制")}
- if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){toast("已复制到剪贴板")},fb);else fb()});
-$("b_dl").addEventListener("click",function(){var txt=expText();$("b_txt").value=txt;try{var bl=new Blob([txt],{type:"application/json"}),u=URL.createObjectURL(bl),a=document.createElement("a");a.href=u;a.download="10x-plan-"+dd(Date.now())+".json";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1500);toast("已下载")}catch(e){toast("下载失败，请用复制")}});
-function doImport(txt){var o;try{o=JSON.parse(txt)}catch(e){toast("不是有效的备份 JSON");return}
- if(!o||typeof o!=="object"||(!o.params&&!o.snaps&&!o.flows)){toast("备份内容不完整");return}
- var n=norm(o);if(!confirm("导入将覆盖本机当前数据：\n净值记录 "+n.snaps.length+" 条，出入金 "+n.flows.length+" 条。继续？"))return;
- S=n;save();fillParams();fillCalc();resetS();resetF();render();toast("导入成功")}
-$("b_imp").addEventListener("click",function(){var t=$("b_txt").value.trim();if(!t){toast("请先把备份内容粘贴到文本框");return}doImport(t)});
-$("b_file").addEventListener("change",function(){var f=this.files&&this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){$("b_txt").value=rd.result;doImport(String(rd.result))};rd.readAsText(f);this.value=""});
-$("b_wipe").addEventListener("click",function(){if(!confirm("清除本机全部记录（净值、出入金、计算器和参数）？建议先导出备份。"))return;if(!confirm("再次确认：清除后无法恢复"))return;try{localStorage.removeItem(KEY)}catch(e){}S=load();fillParams();fillCalc();resetS();resetF();render();toast("已清除")});
-/* init */
-fillParams();fillCalc();resetS();resetF();render();
-var rw;window.addEventListener("resize",function(){clearTimeout(rw);rw=setTimeout(renderChart,150)});
-document.addEventListener("visibilitychange",function(){if(!document.hidden){if($("s_eq").value===""&&!editS)$("s_t").value=nowLocal();if($("f_amt").value===""&&!editF)$("f_t").value=nowLocal();render()}});
-window.addEventListener("storage",function(e){if(e.key===KEY){S=load();fillParams();fillCalc();render()}});
+$("seg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;VIEW=b.getAttribute("data-v");[].forEach.call(this.children,function(c){c.classList.toggle("on",c===b)});if(D)render()});
+function go(){load().then(function(d){D=d;$("err").innerHTML="";render()}).catch(function(e){if(!D)$("err").innerHTML='<div class="card"><div class="empty">数据加载失败（'+esc(e.message)+'），稍后自动重试</div></div>'})}
+go();setInterval(function(){if(!document.hidden)go()},5*60*1000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)go()});
 })();
 </script>
 </body>
