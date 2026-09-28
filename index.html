@@ -130,6 +130,7 @@ footer a{color:var(--mut)}
 </style>
 </head>
 <body>
+<style>.stab{background:#fff;border-bottom:1px solid #e8e8ec;padding:0 max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#6b7280;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#2f6fed;border-bottom-color:#2f6fed}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 6px}}</style><nav class="stab" aria-label="看板切换"><div><a href="" class="on" aria-current="page">10日新高</a><a href="market/">大盘盘面</a></div></nav>
 <div class="wrap">
 <header>
  <h1>A股10日新高突破 <span class="cnt" id="cnt">…</span><span class="prov" id="prov" hidden></span></h1>
@@ -402,7 +403,7 @@ function rfStart(){if(R.on)return;R.cid=rcid();R.rid="";begin(false);rfUI("发�
   if(R.on&&!R.rid)rfUI("发送请求",2,"已发出，等待电脑响应…")})
  .catch(function(e){if(R.on)rfFail("无法连接 ntfy.sh 中转（"+(e.message||e)+"）。国内网络可能需要开 VPN 后再试")})}
 function onMsg(ev){if(!ev||ev.event!=="message"||R.seen[ev.id])return;R.seen[ev.id]=1;R.last=ev.id;var m;try{m=JSON.parse(ev.message)}catch(e){return}
- if(!m||m.v!==1)return;var age=Date.now()/1000-(m.t||ev.time||0);
+ if(!m||m.v!==1||(m.b&&m.b!=="breakout"))return;var age=Date.now()/1000-(m.t||ev.time||0);
  if(!R.on){ // someone else's / scheduled run in progress when page opened: follow it
   if(m.st==="step"&&m.id&&age<150){R.rid=m.id;R.cid="";begin(true)}else return}
  var mine=(R.cid&&m.cid===R.cid)||(R.rid&&m.id===R.rid);if(!mine)return;
