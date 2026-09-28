@@ -195,6 +195,7 @@ function fto(u,o,ms){var c=window.AbortController?new AbortController():null,t=s
 function get(u,fresh){var p=u.split("?")[0];if(!SHA||p.indexOf("data/")!==0)return pget(u,fresh);var sha=SHA;
  var raw=function(){if(RAWBAD>1)return Promise.reject(new Error("raw off"));return fto("https://raw.githubusercontent.com/"+GH+"/"+sha+"/"+p,{},6000).catch(function(e){RAWBAD++;throw e})};
  var api=function(){if(APIBAD>1)return Promise.reject(new Error("api off"));return fto("https://api.github.com/repos/"+GH+"/contents/"+p+"?ref="+sha,{headers:{Accept:"application/vnd.github.raw+json"}},8000).catch(function(e){APIBAD++;throw e})};
+ if(p.indexOf("data/k/")===0)return raw().catch(function(){return pget(u)}).catch(api);   // K files: spare the 60/h GitHub API quota
  return raw().catch(api).catch(function(){return pget(u,true)})}
 function cls(v){return v==null?"":v>0?"up":v<0?"down":"flat"}
 function fx(v,d){return v==null?"—":Number(v).toFixed(d)}
@@ -417,7 +418,7 @@ function fresh(m){if(R.passive&&D&&D.run_at===m.run_at){rfEnd();$("#rfp").hidden
    D=d;KV=String(d.run_at||"").replace(/\D/g,"").slice(0,14);history.replaceState(null,"","#d="+d.tag);$("#datesel").value=d.tag;render();
    var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
    rfUI("完成",100,(d.prov?"盘中临时结果 · ":"")+d.count+" 只 · 用时 "+((Date.now()-R.t0)/1000).toFixed(0)+" 秒","ok");elapsed();rfEnd();
-   setTimeout(function(){if(!R.on)$("#rfp").hidden=true},8000)})}
+   setTimeout(function(){if(!R.on)$("#rfp").hidden=true},8000);setTimeout(function(){if(SHA===m.sha)SHA=""},120000)})}
  go().catch(function(e){rfFail("数据已更新但读取失败（"+e.message+"），请下拉刷新页面")})}
 function stream(){if(R.es||!window.EventSource)return;try{
  var es=new EventSource(NT+PROG+"/sse?since="+(R.last||"150s"));R.es=es;
