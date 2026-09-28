@@ -6,6 +6,7 @@
 <title>A股10日新高突破看板</title>
 <meta name="description" content="A股每日收盘创10日新高突破筛选（自动更新）">
 <meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:,">
 <style>
 :root{--up:#e0302b;--down:#0a9d4a;--flat:#888;--bd:#e8e8ec;--bg:#f5f6f8;--fg:#1d1d1f;--mut:#8a8f98;--acc:#2f6fed;--hl:#fff4f3}
 *{box-sizing:border-box}
@@ -72,6 +73,28 @@ tr.grp td small{font-weight:400;color:var(--mut);margin-left:6px}
 .empty{padding:28px;text-align:center;color:var(--mut)}
 details{font-size:12.5px;color:#555}
 details summary{cursor:pointer;color:var(--acc);padding:4px 0}
+.tv{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;line-height:18px;height:20px;padding:0 5px;border:1px solid #c9d3e8;border-radius:5px;color:#2962ff;background:#f4f7ff;text-decoration:none;vertical-align:1px}
+.kov{position:fixed;inset:0;background:rgba(20,22,30,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.kov[hidden]{display:none}
+.ksheet{background:#fff;width:100%;max-height:94vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 12px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 30px rgba(0,0,0,.18);animation:up .18s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.khd{display:flex;align-items:flex-start;gap:8px}
+.khd .t{flex:1;min-width:0}
+.khd .t b{font-size:18px}.khd .t span{color:var(--mut);margin-left:6px;font-size:13px}
+.kx{border:0;background:#f1f2f5;border-radius:50%;width:36px;height:36px;font-size:18px;color:#555;cursor:pointer;flex:none}
+.kmeta{font-size:13px;color:#555;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline}
+.kmeta .px{font-size:20px;font-weight:700}
+.kbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.kbtns a,.kbtns button{display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--bd);background:#fff;color:var(--fg);text-decoration:none;font:inherit;font-size:13.5px;cursor:pointer}
+.kbtns a.pri{background:#2962ff;border-color:#2962ff;color:#fff;font-weight:600}
+.kbtns .rg{margin-left:auto;display:inline-flex;border:1px solid var(--bd);border-radius:9px;overflow:hidden}
+.kbtns .rg button{border:0;border-radius:0;height:34px}
+.kbtns .rg button.on{background:#eef3ff;color:var(--acc);font-weight:600}
+.kinfo{font-size:12.5px;min-height:38px;color:#333;background:#f8f9fb;border-radius:8px;padding:4px 8px;font-variant-numeric:tabular-nums;line-height:1.5}
+.kinfo b{font-weight:600}
+#kcv{display:block;width:100%;height:320px;touch-action:pan-y;margin-top:6px}
+.knote{font-size:11.5px;color:var(--mut);margin-top:6px;line-height:1.5}
+@media (min-width:760px){.kov{align-items:center}.ksheet{width:860px;max-width:94vw;border-radius:16px;padding:16px 18px}#kcv{height:430px}}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}
 footer a{color:var(--mut)}
 @media (min-width:760px){
@@ -113,10 +136,19 @@ footer a{color:var(--mut)}
 <section class="card" style="margin-top:10px">
  <details><summary>筛选规则与漏斗</summary>
   <p style="margin:6px 0">规则：交易日 T 收盘价严格高于前 10 个交易日（前复权）最高收盘价；剔除 ST / *ST / 退市整理、停牌；总市值 &gt; 60 亿；成交额 ≥ 2 亿。<br>
-  相对板块超额 = 个股涨幅 − 所属同花顺行业指数涨幅（未分类显示“—”）。默认排序：按“行业”列分组，组按当日上榜只数降序（同数按组成交额），未分类置后，组内按总市值降序。连续上榜天数按本看板历史中连续交易日上榜计算。点按个股打开同花顺行情页。</p>
+  相对板块超额 = 个股涨幅 − 所属同花顺行业指数涨幅（未分类显示“—”）。默认排序：按“行业”列分组，组按当日上榜只数降序（同数按组成交额），未分类置后，组内按总市值降序。连续上榜天数按本看板历史中连续交易日上榜计算。点按个股查看近 6 个月日K（前复权，数据来源同花顺 Fuyao）；TV 按钮打开 TradingView App（北交所个股 TradingView 暂无行情，不显示）。</p>
   <p id="funnel" style="margin:6px 0;color:var(--mut)"></p>
  </details>
 </section>
+<div class="kov" id="kov" hidden><div class="ksheet" role="dialog" aria-modal="true">
+ <div class="khd"><div class="t"><b id="kname"></b><span id="kcode"></span></div><button class="kx" id="kx" aria-label="关闭">✕</button></div>
+ <div class="kmeta" id="kmeta"></div>
+ <div class="kbtns"><a class="pri" id="ktv">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
+  <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120" class="on">6个月</button></span></div>
+ <div class="kinfo" id="kinfo">加载中…</div>
+ <canvas id="kcv"></canvas>
+ <div class="knote" id="knote">日K（前复权）· 红涨绿跌 · 虚线＝前10日最高收盘（突破位）· ▲＝突破日 · 点按/拖动查看当日数据</div>
+</div></div>
 <footer>每个交易日收盘后自动更新 · 仅供参考，不构成投资建议<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
 </div>
 <script>
@@ -134,8 +166,14 @@ function bj(iso){var d=new Date(iso);if(isNaN(d))return iso||"—";d=new Date(d.
  return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes())}
 function base(s){return String(s||"").replace(/[（(].*?[）)]\s*$/,"")}
 function url(c){return "https://m.10jqka.com.cn/stockpage/hs_"+c+"/"}
+// TradingView: 60/68->SSE, 00/30->SZSE; Beijing SE (4/8/92) not listed on TradingView -> no button
+function tvsym(c){c=String(c);if(/^(60|68)/.test(c))return "SSE:"+c;if(/^(00|30)/.test(c))return "SZSE:"+c;return ""}
+var FINE=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches;
+function tvapp(t){return "tradingview://chart?symbol="+t}
+function tvweb(t){return "https://www.tradingview.com/chart/?symbol="+encodeURIComponent(t)}
+function tvhref(t){return FINE?tvweb(t):tvapp(t)}
 var COLS=[
- {k:"n",t:"名称<br>代码",td:function(r){return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small></td>'}},
+ {k:"n",t:"名称<br>代码",td:function(r){var t=tvsym(r.c);return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small>'+(t?'<a class="tv" href="'+tvhref(t)+'" data-tv="1" title="TradingView '+t+'">TV</a>':'')+'</td>'}},
  {k:"chg",t:"涨幅%",td:function(r){return '<td class="big '+cls(r.chg)+'">'+sg(r.chg,2)+'</td>'}},
  {k:"p",t:"收盘",td:function(r){return '<td class="'+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</td>'}},
  {k:"amt",t:"成交额<br>(亿)",td:function(r){return '<td>'+fx(r.amt,1)+'</td>'}},
@@ -147,7 +185,7 @@ var COLS=[
 ];
 function cols(){return COLS.filter(function(c){return !c.ex||(D&&D.has_excess)})}
 function head(){
- $("#thr").innerHTML=cols().map(function(c){var on=S.k===c.k;return '<th data-k="'+c.k+'" class="'+(on?"on":"")+(c.k==="g"?" l":"")+'">'+c.t+(on?'<span class="ar">'+(S.dir<0?"▼":"▲")+'</span>':"")+'</th>'}).join("");
+ $("#thr").innerHTML=cols().map(function(c){var on=S.k===c.k;return '<th data-k="'+c.k+'" class="'+(on?"on":"")+(c.k==="ind"?" l":"")+'">'+c.t+(on?'<span class="ar">'+(S.dir<0?"▼":"▲")+'</span>':"")+'</th>'}).join("");
 }
 function rows(){
  var q=S.q.trim().toLowerCase(),k=S.k,d=S.dir;
@@ -199,7 +237,79 @@ $("#thr").addEventListener("click",function(e){var th=e.target.closest("th");if(
  if(S.k===k)S.dir=-S.dir;else{S.k=k;S.dir=(k==="n"||k==="ind")?1:-1}head();body()});
 $("#defsort").addEventListener("click",function(){S.k="o";S.dir=1;head();body();$(".tbox").scrollTop=0});
 $("#lvtabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.lv=b.getAttribute("data-lv");S.ind="";$("#chips").classList.remove("open");chips();body()});
-$("#tb").addEventListener("click",function(e){var tr=e.target.closest("tr[data-c]");if(tr)window.open(url(tr.getAttribute("data-c")),"_blank","noopener")});
+$("#tb").addEventListener("click",function(e){if(e.target.closest("a.tv")){e.stopPropagation();if(FINE){e.preventDefault();window.open(e.target.closest("a").href,"_blank","noopener")}return}
+ var tr=e.target.closest("tr[data-c]");if(tr)openK(tr.getAttribute("data-c"))});
+// ---------- K-line sheet (own canvas renderer, no external libs) ----------
+var K={r:null,bars:null,n:120,sel:-1,open:false,src:""};
+function openK(c){var r=null;D.rows.forEach(function(x){if(x.c===c)r=x});if(!r)return;
+ K.r=r;K.bars=null;K.sel=-1;K.open=true;var t=tvsym(c);
+ $("#kname").textContent=r.n;$("#kcode").textContent=c+" · "+(r.b||"");
+ $("#kmeta").innerHTML='<span class="px '+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</span><span class="'+cls(r.chg)+'">'+sg(r.chg,2)+'%</span><span>'+esc(r.ind)+(r.g&&r.g!==base(r.ind)?" · "+esc(r.g):"")+'</span>'+(r.ex!=null?'<span>超额 <b class="'+cls(r.ex)+'">'+sg(r.ex,2)+'</b></span>':"")+'<span>交易日 '+esc(D.date)+'</span>';
+ var a=$("#ktv"),w=$("#ktvw");a.hidden=w.hidden=!t;if(t){a.href=tvapp(t);w.href=tvweb(t)}
+ $("#kths").href=url(c);$("#kinfo").textContent="加载中…";
+ $("#kov").hidden=false;document.body.style.overflow="hidden";
+ if(!(history.state&&history.state.k))history.pushState({k:1},"");
+ clearCv();
+ get("data/k/"+c+".json").then(function(d){if(K.r!==r)return;K.bars=d.d;K.src=d.src;
+  $("#knote").innerHTML="日K（前复权）· 红涨绿跌 · 虚线＝前10日最高收盘（突破位）· ▲＝突破日 · 点按/拖动查看当日数据<br>数据来源："+(d.src==="fuyao"?"同花顺 Fuyao":"⚠️备用数据源（腾讯）")+" · 截至 "+pd(d.asof);
+  var bi=idxOf(D.tag);K.sel=bi>=0?bi:K.bars.length-1;drawK()})
+ .catch(function(e){$("#kinfo").textContent="K线数据暂不可用（"+e.message+"），可点“同花顺”查看"});
+}
+function closeK(fromPop){if(!K.open)return;K.open=false;$("#kov").hidden=true;document.body.style.overflow="";if(!fromPop&&history.state&&history.state.k)history.back()}
+function idxOf(tag){if(!K.bars)return -1;for(var i=K.bars.length-1;i>=0;i--)if(K.bars[i][0]===tag)return i;return -1}
+function clearCv(){var cv=$("#kcv"),x=cv.getContext("2d");x.clearRect(0,0,cv.width,cv.height)}
+function view(){var b=K.bars,st=Math.max(0,b.length-K.n);return{st:st,b:b.slice(st)}}
+function drawK(){
+ if(!K.bars||!K.bars.length){$("#kinfo").textContent="无K线数据";return}
+ var cv=$("#kcv"),dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;
+ var x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+ var V=view(),b=V.b,n=b.length,R=48,L=2,top=10,pH=Math.round((H-28)*0.72),vT=top+pH+8,vH=H-vT-18,pw=W-L-R,cw=pw/n;
+ var hi=K.r.hi,lo=1e18,mx=-1e18,vm=0;b.forEach(function(k){lo=Math.min(lo,k[3]);mx=Math.max(mx,k[2]);vm=Math.max(vm,k[5])});
+ if(hi!=null){lo=Math.min(lo,hi);mx=Math.max(mx,hi)}var pad=(mx-lo)*0.06||1;lo-=pad;mx+=pad;
+ function Y(v){return top+(mx-v)/(mx-lo)*pH}function X(i){return L+cw*(i+0.5)}
+ x.font="11px -apple-system,PingFang SC,Microsoft YaHei,sans-serif";x.textBaseline="middle";
+ // grid + price axis
+ x.strokeStyle="#eef0f3";x.lineWidth=1;x.fillStyle="#8a8f98";x.textAlign="left";
+ for(var g=0;g<=4;g++){var yv=mx-(mx-lo)*g/4,yy=Math.round(Y(yv))+.5;x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();x.fillText(yv.toFixed(mx<100?2:1),L+pw+4,yy)}
+ x.beginPath();x.moveTo(L,vT-.5);x.lineTo(L+pw,vT-.5);x.stroke();
+ // breakout day band
+ var bi=idxOf(D.tag)-V.st;
+ if(bi>=0&&bi<n){x.fillStyle="rgba(224,48,43,.07)";x.fillRect(L+cw*bi,top,cw,H-top-18)}
+ var bw=Math.max(1,Math.min(cw*0.72,14));
+ for(var i=0;i<n;i++){var k=b[i],pc=i>0?b[i-1][4]:(V.st>0?K.bars[V.st-1][4]:k[1]);
+  var up=k[4]>k[1]||(k[4]===k[1]&&k[4]>=pc),col=up?"#e0302b":"#0a9d4a",cx=X(i);
+  x.strokeStyle=col;x.fillStyle=col;x.beginPath();x.moveTo(Math.round(cx)+.5,Y(k[2]));x.lineTo(Math.round(cx)+.5,Y(k[3]));x.stroke();
+  var y1=Y(Math.max(k[1],k[4])),y2=Y(Math.min(k[1],k[4]));x.fillRect(cx-bw/2,y1,bw,Math.max(1,y2-y1));
+  var vh=vm?k[5]/vm*vH:0;x.globalAlpha=.55;x.fillRect(cx-bw/2,vT+vH-vh,bw,vh);x.globalAlpha=1}
+ // breakout level dashed line
+ if(hi!=null){var yh=Math.round(Y(hi))+.5;x.setLineDash([5,4]);x.strokeStyle="#ff8a00";x.lineWidth=1.2;x.beginPath();x.moveTo(L,yh);x.lineTo(L+pw,yh);x.stroke();x.setLineDash([]);
+  x.fillStyle="#ff8a00";x.fillRect(L+pw+1,yh-8,R-2,16);x.fillStyle="#fff";x.fillText(hi.toFixed(2),L+pw+4,yh)}
+ // breakout marker
+ if(bi>=0&&bi<n){var cx2=X(bi),yl=top+pH-12;x.fillStyle="#e0302b";x.beginPath();x.moveTo(cx2,yl);x.lineTo(cx2-6,yl+10);x.lineTo(cx2+6,yl+10);x.closePath();x.fill();
+  x.font="bold 11px -apple-system,PingFang SC,Microsoft YaHei,sans-serif";x.textAlign=cx2>W-90?"right":"left";x.fillText("突破日",cx2>W-90?cx2-9:cx2+9,yl+5);x.textAlign="left";x.font="11px -apple-system,PingFang SC,Microsoft YaHei,sans-serif"}
+ // dates
+ x.fillStyle="#8a8f98";x.textBaseline="alphabetic";[0,Math.floor(n/2),n-1].forEach(function(i,j){var d=b[i][0];x.textAlign=j===0?"left":j===2?"right":"center";x.fillText(d.slice(4,6)+"-"+d.slice(6),j===0?L:j===2?L+pw:X(i),H-4)});
+ x.textAlign="left";x.fillText("量",L+2,vT+10);
+ // crosshair
+ var s=K.sel-V.st;if(s<0||s>=n)s=n-1;var k=b[s],cx=Math.round(X(s))+.5;
+ x.strokeStyle="rgba(60,60,70,.45)";x.lineWidth=1;x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,top);x.lineTo(cx,H-18);x.stroke();
+ var yc=Math.round(Y(k[4]))+.5;x.beginPath();x.moveTo(L,yc);x.lineTo(L+pw,yc);x.stroke();x.setLineDash([]);
+ var pc=s>0?b[s-1][4]:(V.st>0?K.bars[V.st-1][4]:null),chg=pc?(k[4]/pc-1)*100:null;
+ $("#kinfo").innerHTML='<b>'+pd(k[0])+'</b>'+(k[0]===D.tag?' <b class="up">突破日</b>':'')+'　开 '+k[1]+'　高 '+k[2]+'　低 '+k[3]+'　收 <b class="'+cls(chg)+'">'+k[4]+'</b>'+
+  '<br>涨跌 <b class="'+cls(chg)+'">'+(chg==null?"—":sg(chg,2)+"%")+'</b>　成交量 '+(k[5]/1e6).toFixed(2)+'万手'+(hi!=null?'　突破位 '+hi:'');
+}
+function pick(ev){if(!K.bars)return;var cv=$("#kcv"),rc=cv.getBoundingClientRect(),V=view(),n=V.b.length,pw=rc.width-50,
+ i=Math.floor((ev.clientX-rc.left-2)/(pw/n));i=Math.max(0,Math.min(n-1,i));K.sel=V.st+i;drawK()}
+var kd=false;$("#kcv").addEventListener("pointerdown",function(e){kd=true;pick(e)});
+$("#kcv").addEventListener("pointermove",function(e){if(kd||e.pointerType==="mouse")pick(e)});
+window.addEventListener("pointerup",function(){kd=false});
+$("#krg").addEventListener("click",function(e){var bt=e.target.closest("button");if(!bt)return;K.n=+bt.getAttribute("data-n");
+ [].forEach.call(this.querySelectorAll("button"),function(x){x.className=x===bt?"on":""});drawK()});
+$("#kx").addEventListener("click",function(){closeK()});
+$("#kov").addEventListener("click",function(e){if(e.target===this)closeK()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeK()});
+window.addEventListener("popstate",function(){if(K.open)closeK(true)});
+window.addEventListener("resize",function(){if(K.open&&K.bars)drawK()});
 $("#chips").addEventListener("click",function(e){var c=e.target.closest(".chip");if(c)setInd(c.getAttribute("data-g"))});
 $("#more").addEventListener("click",function(){$("#chips").classList.add("open");this.hidden=true});
 $("#indsel").addEventListener("change",function(){S.ind=this.value;chips();body()});
