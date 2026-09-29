@@ -75,6 +75,11 @@ canvas{display:block;width:100%;touch-action:pan-y}
 .hsel{font-size:12.5px;line-height:1.6;background:#f7f8fa;border-radius:8px;padding:6px 8px;min-height:46px}
 .hsel b{font-weight:700}
 .hc{height:150px;margin-top:8px}
+.hc.emo{height:270px}.hc.lc{height:200px}
+.seg{display:inline-flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;flex:none;align-self:center}
+.seg button{font:inherit;font-size:13px;border:0;background:#fff;color:#555;padding:0 13px;height:30px;touch-action:manipulation;-webkit-appearance:none;cursor:pointer}
+.seg button+button{border-left:1px solid var(--bd)}
+.seg button.on{background:var(--acc);color:#fff;font-weight:600}
 .ht{font-size:12px;color:#555;margin-top:10px;font-weight:600}
 .rfb{margin-left:auto;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap}
 .rfb:disabled{background:#c9d6f5;border-color:#c9d6f5;color:#fff;cursor:default}
@@ -107,7 +112,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
  .grid2>.card{margin-bottom:0}.grid2{margin-bottom:10px}
  .idxg{grid-template-columns:repeat(4,1fr)}
- #cv1{height:230px}.hc{height:170px}
+ #cv1{height:230px}.hc{height:170px}.hc.emo{height:300px}.hc.lc{height:240px}
 }
 </style>
 </head>
@@ -192,12 +197,17 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
  <div class="indg"><div><h3 class="up">领涨前10</h3><div id="indt"></div></div><div><h3 class="down">领跌前10</h3><div id="indb"></div></div></div>
 </section>
 
+<section class="card" id="c-amtl">
+ <h2>全市场成交额走势 <span class="seg" id="rng"><button type="button" data-n="125">半年</button><button type="button" data-n="250" class="on">1年</button></span></h2>
+ <div class="hsel" id="lsel"></div>
+ <canvas class="hc lc" id="h1"></canvas>
+ <div class="note" id="lnote"></div>
+</section>
+
 <section class="card">
- <h2>近30个交易日 <small>点按/拖动图表查看当日</small></h2>
+ <h2>近30个交易日 · 情绪 <small>点按/拖动图表查看当日</small></h2>
  <div class="hsel" id="hsel"></div>
- <div class="ht">全市场成交额（亿）· 虚线＝前20日均值</div><canvas class="hc" id="h1"></canvas>
- <div class="ht">上涨 / 下跌家数</div><canvas class="hc" id="h2"></canvas>
- <div class="ht">涨停 / 跌停 / 炸板家数</div><canvas class="hc" id="h3"></canvas>
+ <div class="ht">情绪图 · 上：上涨家数占比 %　下：涨停 − 跌停 家数</div><canvas class="hc emo" id="h2"></canvas>
  <div class="note" id="hnote"></div>
 </section>
 
@@ -207,7 +217,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
  盘中成交额曲线：交易时段每分钟在本机采样一次（09:30–11:30、13:00–15:00）；与前一交易日同一时刻的累计成交额对比。<br>
  涨跌家数：全部沪深京 A 股（按代码去重），以最新价对比昨收；停牌或当日无成交不计入涨跌平。涨停/跌停/炸板来自同花顺 Fuyao 涨停池、跌停池、炸板池；炸板率 = 炸板 ÷（涨停 + 炸板）。<br>
  两融：上交所、深交所、北交所官网每日公布的融资融券交易总量（交易所口径，含 ETF 等基金的两融），T 日数据于下一交易日早上约 08:00–09:00 公布；同花顺 Fuyao 接口无两融数据。融资买入额占比 = 融资买入额 ÷ 当日沪深京股票成交额（分子含 ETF，略偏高）。融资余额占流通市值为估算：流通股本（同花顺 Fuyao）× 当日收盘价。<br>
- 近30日：成交额来自指数日线；历史涨跌家数由本机缓存的全市场收盘价计算（最新交易日为实时行情）；涨跌停、炸板数为 Fuyao 当日股票池。<br>
+ 成交额走势（半年/1年）：同花顺 Fuyao 指数日线，上证综指＋深证综指＋北证50 成交额相加（与上方口径一致），本机缓存约 1 年，每日收盘后追加。<br>近30日：成交额来自指数日线；历史涨跌家数由本机缓存的全市场收盘价计算（最新交易日为实时行情）；涨跌停、炸板数为 Fuyao 当日股票池。情绪图：上涨占比 = 上涨家数 ÷（上涨 + 下跌），不含平盘/停牌；柱子 = 涨停家数 − 跌停家数。<br>
  更新：交易日盘中每 10 分钟发布一次，15:05 收盘定稿；“强制刷新”可随时重新拉取（盘中为当时数据）。</p>
  </details>
 </section>
@@ -343,6 +353,7 @@ function mgdraw(){var m=MG;if(!m||!m.series)return;var H=m.series,n=H.length;if(
 function mgpick(ev){if(!MG||!MG.series)return;var n=MG.series.length,rc=ev.currentTarget.getBoundingClientRect(),i=Math.floor((ev.clientX-rc.left-2)/((rc.width-46)/n));MS=Math.max(0,Math.min(n-1,i));mgdraw()}
 // ---------- 近30日 ----------
 var HS=-1;
+function pr(h){return h.up!=null&&h.down!=null&&(h.up+h.down)?h.up/(h.up+h.down)*100:null}
 function hx(n,W,L,R){var pw=W-L-R;return function(i){return L+pw*(i+.5)/n}}
 function hdraw(){var H=D.hist||[],n=H.length;if(!n)return;if(HS<0||HS>=n)HS=n-1;
  function axis(g,top,L,R,T,B,fmt){var x=g.x;x.strokeStyle="#eef0f3";x.fillStyle="#8a8f98";x.textBaseline="middle";x.textAlign="left";for(var i=0;i<=3;i++){var v=top*i/3,y=Math.round(T+(g.H-T-B)*(1-i/3))+.5;x.beginPath();x.moveTo(L,y);x.lineTo(g.W-R,y);x.stroke();x.fillText(fmt(v),g.W-R+3,y)}
@@ -353,29 +364,79 @@ function hdraw(){var H=D.hist||[],n=H.length;if(!n)return;if(HS<0||HS>=n)HS=n-1;
    H.forEach(function(h,i){var v=h[k];if(v==null){st=false;return}var px=X(i),py=T+ph*(1-v/top);st?x.lineTo(px,py):x.moveTo(px,py);st=true});x.stroke();x.setLineDash([]);
    H.forEach(function(h,i){if(h[k]==null)return;x.fillStyle=cols[j];x.beginPath();x.arc(X(i),T+ph*(1-h[k]/top),i===HS?3.6:1.8,0,7);x.fill()})})}
  var L=2,R=40,T=8,B=16;
- // 1: turnover bars + ma20
- var g=setupCv($("#h1")),x=g.x,mx=0;H.forEach(function(h){mx=Math.max(mx,h.amt||0,h.ma20||0)});var top=nice(mx*1.02/3)*3,ph=g.H-T-B,X=hx(n,g.W,L,R),bw=Math.max(2,(g.W-L-R)/n*.66);
- axis(g,top,L,R,T,B,function(v){return v>=10000?+(v/10000).toFixed(2)+"万亿":Math.round(v)});
- H.forEach(function(h,i){if(h.amt==null){gap(g,i,L,R,T,B);return}var y=T+ph*(1-h.amt/top);x.fillStyle=i===HS?"#2f6fed":h.cur?"#ffb74d":"#9db8f2";x.fillRect(X(i)-bw/2,y,bw,T+ph-y)});
- lines(g,["ma20"],["#ff8a00"],top,L,R,T,B,[[4,3]]);selLine(g,L,R,T,B);
- // 2: up/down
- g=setupCv($("#h2"));mx=0;H.forEach(function(h){mx=Math.max(mx,h.up||0,h.down||0)});top=nice(mx*1.02/3)*3;axis(g,top,L,R,T,B,function(v){return Math.round(v)});
- H.forEach(function(h,i){if(h.up==null)gap(g,i,L,R,T,B)});lines(g,["up","down"],["#e0302b","#0a9d4a"],top,L,R,T,B);selLine(g,L,R,T,B);
- // 3: limit up/down/break
- g=setupCv($("#h3"));mx=0;H.forEach(function(h){mx=Math.max(mx,h.zt||0,h.dt||0,h.zb||0)});top=nice(mx*1.02/3)*3;axis(g,top,L,R,T,B,function(v){return Math.round(v)});
- H.forEach(function(h,i){if(h.zt==null)gap(g,i,L,R,T,B)});lines(g,["zt","dt","zb"],["#e0302b","#0a9d4a","#f5a623"],top,L,R,T,B,[null,null,[4,3]]);selLine(g,L,R,T,B);
+ // 情绪图 — top: 上涨占比 up/(up+down) %, bottom: 涨停−跌停 bars (shared x-axis)
+ var g=setupCv($("#h2")),x=g.x,X=hx(n,g.W,L,R),UPC="#e0302b",DNC="#0a9d4a",CURC="#ff9f0a",GAP=18,XB=16;
+ var ah=g.H-T-XB-GAP,t1=T,h1=Math.round(ah*.6),t2=t1+h1+GAP,h2=ah-h1;
+ var Y1=function(v){return t1+h1*(1-v/100)};
+ x.lineWidth=1;x.strokeStyle="#eef0f3";x.beginPath();[0,100].forEach(function(v){var y=Math.round(Y1(v))+.5;x.moveTo(L,y);x.lineTo(g.W-R,y)});x.stroke();
+ x.strokeStyle="#d5d8de";x.beginPath();var y50=Math.round(Y1(50))+.5;x.moveTo(L,y50);x.lineTo(g.W-R,y50);x.stroke();
+ x.setLineDash([4,3]);[[20,DNC,"恐慌 20%"],[80,UPC,"过热 80%"]].forEach(function(q){var y=Math.round(Y1(q[0]))+.5;x.strokeStyle=q[1];x.globalAlpha=.55;x.beginPath();x.moveTo(L,y);x.lineTo(g.W-R,y);x.stroke();x.globalAlpha=1;
+  var ty=q[0]>50?y-2:y+2,tw=x.measureText(q[2]).width;x.fillStyle="rgba(255,255,255,.85)";x.fillRect(L+1,q[0]>50?ty-13:ty,tw+4,13);
+  x.fillStyle=q[1];x.textAlign="left";x.textBaseline=q[0]>50?"bottom":"top";x.fillText(q[2],L+3,ty)});x.setLineDash([]);
+ x.fillStyle="#8a8f98";x.textAlign="left";x.textBaseline="middle";[0,20,50,80,100].forEach(function(v){x.fillText(v+"%",g.W-R+3,Y1(v))});
+ // line: red above 50, green below (split exactly at the 50% crossing)
+ var P=H.map(pr);x.lineWidth=1.9;
+ function seg(x0,y0,x1,y1,c){x.strokeStyle=c;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.stroke()}
+ for(var i=0;i<n-1;i++){var p0=P[i],p1=P[i+1];if(p0==null||p1==null)continue;var xa=X(i),xb=X(i+1);
+  if((p0-50)*(p1-50)>=0)seg(xa,Y1(p0),xb,Y1(p1),(p0+p1)/2>=50?UPC:DNC);
+  else{var xm=xa+(xb-xa)*(50-p0)/(p1-p0);seg(xa,Y1(p0),xm,Y1(50),p0>50?UPC:DNC);seg(xm,Y1(50),xb,Y1(p1),p1>50?UPC:DNC)}}
+ P.forEach(function(v,i){if(v==null){x.fillStyle="#c2c6cf";x.textAlign="center";x.textBaseline="alphabetic";x.fillText("缺",X(i),t1+h1-3);return}
+  var c=H[i].cur?CURC:v>=50?UPC:DNC,r=i===HS?3.8:H[i].cur?3.2:1.9;x.fillStyle=c;x.beginPath();x.arc(X(i),Y1(v),r,0,7);x.fill();
+  if(H[i].cur||i===HS){x.strokeStyle="#fff";x.lineWidth=1.2;x.stroke()}});
+ // bottom: 涨停−跌停 bars
+ var DF=H.map(function(h){return h.zt!=null&&h.dt!=null?h.zt-h.dt:null}),dmx=0,dmn=0;DF.forEach(function(v){if(v!=null){dmx=Math.max(dmx,v);dmn=Math.min(dmn,v)}});
+ var st2=nice(Math.max(dmx-dmn,8)/4),hi2=Math.max(st2,Math.ceil(dmx/st2)*st2),lo2=dmn<0?Math.floor(dmn/st2)*st2:0;
+ var Y2=function(v){return t2+h2*(hi2-v)/(hi2-lo2)},y0=Math.round(Y2(0))+.5;
+ x.lineWidth=1;x.strokeStyle="#eef0f3";x.beginPath();[hi2,lo2].forEach(function(v){var y=Math.round(Y2(v))+.5;x.moveTo(L,y);x.lineTo(g.W-R,y)});x.stroke();
+ x.fillStyle="#8a8f98";x.textAlign="left";x.textBaseline="middle";(lo2<0?[hi2,0,lo2]:[hi2,0]).forEach(function(v){x.fillText((v>0?"+":"")+v,g.W-R+3,Y2(v))});
+ var bw2=Math.max(2,(g.W-L-R)/n*.62);
+ DF.forEach(function(v,i){if(v==null){x.fillStyle="#c2c6cf";x.textAlign="center";x.textBaseline="alphabetic";x.fillText("缺",X(i),y0-2);return}
+  var yv=Y2(v),c=H[i].cur?CURC:v>=0?UPC:DNC;x.globalAlpha=i===HS||H[i].cur?1:.6;x.fillStyle=c;x.fillRect(X(i)-bw2/2,Math.min(yv,y0),bw2,Math.max(1,Math.abs(yv-y0)));x.globalAlpha=1});
+ x.strokeStyle="#9aa0aa";x.beginPath();x.moveTo(L,y0);x.lineTo(g.W-R,y0);x.stroke();
+ x.fillStyle="#555";x.textAlign="left";x.textBaseline="top";x.fillText("涨停−跌停",L+2,t2);
+ x.fillStyle="#8a8f98";x.textBaseline="alphabetic";[0,Math.floor((n-1)/2),n-1].forEach(function(i,j){x.textAlign=j===0?"left":j===2?"right":"center";x.fillText(md(H[i].d),j===0?L:j===2?g.W-R:X(i),g.H-3)});
+ var cx2=Math.round(X(HS))+.5;x.strokeStyle="rgba(60,60,70,.35)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx2,T);x.lineTo(cx2,g.H-XB);x.stroke();x.setLineDash([]);
  var h=H[HS],f=function(v){return v==null?'<span class="flat">缺</span>':v};
  $("#hsel").innerHTML='<b>'+h.d+'</b>'+(h.cur?' <span style="color:#ff9f0a">盘中</span>':'')+'　成交额 <b>'+yi(h.amt)+'</b>'+(h.ma20?'（前20日均 '+yi(h.ma20)+'）':'')+
-  '<br>上涨 <b class="up">'+f(h.up)+'</b>　下跌 <b class="down">'+f(h.down)+'</b>　平 '+f(h.flat)+'<br>涨停 <b class="up">'+f(h.zt)+'</b>　跌停 <b class="down">'+f(h.dt)+'</b>　炸板 <b style="color:#d4880f">'+f(h.zb)+'</b>'+(h.zt!=null&&h.zb!=null&&(h.zt+h.zb)?'（炸板率 '+(h.zb/(h.zt+h.zb)*100).toFixed(1)+'%）':'')}
+  '<br>上涨 <b class="up">'+f(h.up)+'</b>　下跌 <b class="down">'+f(h.down)+'</b>　平 '+f(h.flat)+'<br>涨停 <b class="up">'+f(h.zt)+'</b>　跌停 <b class="down">'+f(h.dt)+'</b>　炸板 <b style="color:#d4880f">'+f(h.zb)+'</b>'+(h.zt!=null&&h.zb!=null&&(h.zt+h.zb)?'（炸板率 '+(h.zb/(h.zt+h.zb)*100).toFixed(1)+'%）':'')+
+  '<br>上涨占比 <b class="'+(pr(h)==null?'':pr(h)>=50?'up':'down')+'">'+(pr(h)==null?'缺':pr(h).toFixed(1)+'%')+'</b>　涨停−跌停 <b class="'+(h.zt!=null&&h.dt!=null?cls(h.zt-h.dt):'')+'">'+(h.zt!=null&&h.dt!=null?sg(h.zt-h.dt,0):'缺')+'</b>'}
 function hpick(ev){var H=D.hist||[];if(!H.length)return;var cv=ev.currentTarget,rc=cv.getBoundingClientRect(),i=Math.floor((ev.clientX-rc.left-2)/((rc.width-42)/H.length));HS=Math.max(0,Math.min(H.length-1,i));hdraw()}
+// ---------- 成交额走势（半年/1年） ----------
+var LN=250,LS=-1;
+function lser(){var a=D.amtL;if(a&&a.length>30)return a;return(D.hist||[]).map(function(h){return[h.d,h.amt]})}
+function wyi(v){return v==null?"—":v>=10000?(v/10000).toFixed(2)+"万亿":Math.round(v)+"亿"}
+function ldraw(){if(!D)return;var A=lser(),N=A.length;if(!N)return;
+ var MA=A.map(function(_,i){var s=0,c=0;for(var j=Math.max(0,i-20);j<i;j++)if(A[j][1]!=null){s+=A[j][1];c++}return i>=20&&c>=15?s/c:null});
+ var n=Math.min(LN,N),o=N-n,S=A.slice(o),M=MA.slice(o),cur=!D.final;if(LS<0||LS>=n)LS=n-1;
+ var g=setupCv($("#h1")),x=g.x,L=2,R=46,T=8,B=18,ph=g.H-T-B,pw=g.W-L-R,X=hx(n,g.W,L,R);
+ var mx=0;S.forEach(function(s,i){mx=Math.max(mx,s[1]||0,M[i]||0)});var stp=nice(mx*1.05/5),top=Math.ceil(mx*1.05/stp)*stp,Y=function(v){return T+ph*(1-v/top)};
+ x.lineWidth=1;x.strokeStyle="#eef0f3";x.fillStyle="#8a8f98";x.textBaseline="middle";x.textAlign="left";
+ for(var v=0;v<=top+1e-6;v+=stp){var y=Math.round(Y(v))+.5;x.beginPath();x.moveTo(L,y);x.lineTo(L+pw,y);x.stroke();x.fillText(v?(v>=10000?+(v/10000).toFixed(2)+"万亿":Math.round(v)+"亿"):"0",L+pw+3,y)}
+ var bw=Math.max(1,pw/n*.7);
+ S.forEach(function(s,i){if(s[1]==null)return;var y=Y(s[1]),last=i===n-1;x.fillStyle=i===LS?"#2f6fed":last&&cur?"#ffb74d":"#9db8f2";var w=i===LS||last&&cur?Math.max(bw,2.2):bw;x.fillRect(X(i)-w/2,y,w,T+ph-y)});
+ x.strokeStyle="#ff8a00";x.lineWidth=1.5;x.setLineDash([4,3]);x.beginPath();var st=false;M.forEach(function(v,i){if(v==null){st=false;return}st?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v));st=true});x.stroke();x.setLineDash([]);
+ // month labels (year at January); skip when crowded
+ x.fillStyle="#8a8f98";x.strokeStyle="#c9ccd3";x.textBaseline="alphabetic";x.textAlign="center";var lx=-99,lw=0;
+ for(var i=1;i<n;i++){if(S[i][0].slice(0,7)===S[i-1][0].slice(0,7))continue;var px=X(i)-pw/n/2,mo=+S[i][0].slice(5,7),t=mo+"月";
+  x.beginPath();x.moveTo(Math.round(px)+.5,T+ph);x.lineTo(Math.round(px)+.5,T+ph+3);x.stroke();
+  var tw=x.measureText(t).width;if(px-lx<(lw+tw)/2+5||px<tw/2||px>L+pw-tw/2+4)continue;x.fillText(t,px,g.H-4);lx=px;lw=tw}
+ var cx=Math.round(X(LS))+.5;x.strokeStyle="rgba(60,60,70,.35)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,T+ph);x.stroke();x.setLineDash([]);
+ var hiI=-1,loI=-1,sm=0,c=0;S.forEach(function(s,i){if(s[1]==null)return;if(hiI<0||s[1]>S[hiI][1])hiI=i;if(loI<0||s[1]<S[loI][1])loI=i;if(!(cur&&i===n-1)){sm+=s[1];c++}});
+ var q=S[LS],m=M[LS],isc=cur&&LS===n-1,rl=n>=200?"近1年":n>=100?"近半年":"近"+n+"日";
+ $("#lsel").innerHTML='<b>'+q[0]+'</b>'+(isc?' <span style="color:#ff9f0a">盘中</span>':'')+'　成交额 <b>'+wyi(q[1])+'</b>'+(m?'（前20日均 '+wyi(m)+(q[1]!=null&&!isc?' <b class="'+cls(q[1]-m)+'">'+sg((q[1]/m-1)*100,1)+'%</b>':'')+'）':'')+
+  '<br>'+rl+'（'+n+'个交易日）<span style="white-space:nowrap">日均 <b>'+wyi(c?sm/c:null)+'</b></span><br><span style="white-space:nowrap">最高 <b class="up">'+wyi(S[hiI][1])+'</b>（'+S[hiI][0]+'）</span>　<span style="white-space:nowrap">最低 <b class="down">'+wyi(S[loI][1])+'</b>（'+S[loI][0]+'）</span>';
+ $("#rng").style.display=N>130?"":"none"}
+function lpick(ev){if(!D)return;var n=Math.min(LN,lser().length),rc=ev.currentTarget.getBoundingClientRect(),i=Math.floor((ev.clientX-rc.left-2)/((rc.width-48)/n));LS=Math.max(0,Math.min(n-1,i));ldraw()}
+function renderL(){LS=-1;ldraw();var A=lser();
+ $("#lnote").textContent=(D.amtL&&D.amtL.length>30?"":"该日期的数据文件只含近30个交易日。")+"柱＝每日沪深京 A 股全市场成交额，橙虚线＝前20个交易日均值；蓝柱＝选中日，橙柱＝盘中（未收盘）。点按/拖动图表查看某日。数据来源：同花顺 Fuyao 指数日线（上证综指＋深证综指＋北证50 成交额）。"}
 function renderHist(){var H=D.hist||[];HS=H.length-1;hdraw();
- var n=["柱色：蓝＝选中日，橙＝盘中（未收盘）。红线上涨/涨停，绿线下跌/跌停，橙虚线炸板。"];if((D.hist_gaps||[]).length)n.push("图中“缺”为该日数据暂缺。");
+ var n=["情绪图上半部分是上涨家数占比（上涨 ÷（上涨＋下跌）），高于 50% 为红、低于 50% 为绿：跌近 20% 常是恐慌区，升近 80% 说明情绪过热。下半部分柱子为涨停家数减跌停家数，红柱＝涨停多，绿柱＝跌停多。橙色点/柱＝盘中（未收盘）。"];if((D.hist_gaps||[]).length)n.push("图中“缺”为该日数据暂缺。");
  $("#hnote").textContent=n.join("")}
 function render(){var st=$("#st");st.textContent=D.status;st.className="st"+(D.final?" done":/盘中|午间/.test(D.status)?" live":"");
  var a=bj(D.asof||D.data_ts);$("#tdate").textContent=D.date;$("#asof").textContent=(a.d===D.date?"":a.d+" ")+a.t;
  document.title="大盘盘面 "+D.date+" · "+D.status;
  var w=$("#warn"),fb=D.fallback||[];w.hidden=!fb.length;w.textContent=fb.length?"⚠️ 部分数据来自备用源："+fb.join("；"):"";
- renderAmt();renderBr();renderDist();renderIdx();renderInd();renderHist();$("#datesel").value=D.tag}
+ renderAmt();renderBr();renderDist();renderIdx();renderInd();renderL();renderHist();$("#datesel").value=D.tag}
 function load(t){return (t?get(vq("data/"+t+".json",DV[t])):get("data/latest.json",true)).then(function(d){D=d;render()})
  .catch(function(e){if(t)return load("");$("#amt").textContent="数据加载失败（"+e.message+"），请稍后刷新"})}
 function dates(ds){DV={};ds.forEach(function(x){if(x.v)DV[x.d]=x.v});
@@ -387,8 +448,10 @@ mgload();
 $("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
 var c1d=false;$("#cv1").addEventListener("pointerdown",function(e){c1d=true;pick1(e)});$("#cv1").addEventListener("pointermove",function(e){if(c1d||e.pointerType==="mouse")pick1(e)});
 window.addEventListener("pointerup",function(){c1d=false});
-["#h1","#h2","#h3"].forEach(function(s){var dn=false,el=$(s);el.addEventListener("pointerdown",function(e){dn=true;hpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")hpick(e)});window.addEventListener("pointerup",function(){dn=false})});
-var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(D){drawCurve();hdraw()}mgdraw()},120)});
+["#h2"].forEach(function(s){var dn=false,el=$(s);el.addEventListener("pointerdown",function(e){dn=true;hpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")hpick(e)});window.addEventListener("pointerup",function(){dn=false})});
+(function(){var dn=false,el=$("#h1");el.addEventListener("pointerdown",function(e){dn=true;lpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")lpick(e)});window.addEventListener("pointerup",function(){dn=false})})();
+Array.prototype.forEach.call(document.querySelectorAll("#rng button"),function(b){b.addEventListener("click",function(){LN=+b.getAttribute("data-n");Array.prototype.forEach.call(document.querySelectorAll("#rng button"),function(y){y.className=y===b?"on":""});LS=-1;ldraw()})});
+var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(D){drawCurve();ldraw();hdraw()}mgdraw()},120)});
 // auto-refresh while the market is open (page visible, latest date shown)
 setInterval(function(){if(document.hidden||!D||D.final||R.on)return;if($("#datesel").value&&$("#datesel").selectedIndex>0)return;
  mgload();get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
