@@ -7,11 +7,31 @@
   "start_url": "/a-share-board/",
   "scope": "/a-share-board/",
   "display": "standalone",
-  "background_color": "#f5f6f8",
+  "background_color": "#f7f4ee",
   "theme_color": "#ffffff",
   "icons": [
-    {"src": "/a-share-board/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "/a-share-board/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "/a-share-board/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}
+    {
+      "src": "/a-share-board/icon-192.png?v=4",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/a-share-board/icon-512.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/a-share-board/icon-maskable-512.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/a-share-board/apple-touch-icon.png?v=4",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
   ]
 }
