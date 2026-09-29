@@ -1,0 +1,17 @@
+{
+  "name": "复利计划",
+  "short_name": "复利计划",
+  "description": "复利增长计划计算器（本机计算，不上传数据）",
+  "lang": "zh-CN",
+  "id": "/a-share-board/compound/",
+  "start_url": "/a-share-board/compound/",
+  "scope": "/a-share-board/compound/",
+  "display": "standalone",
+  "background_color": "#0a0e17",
+  "theme_color": "#0a0e17",
+  "icons": [
+    {"src": "/a-share-board/compound/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/a-share-board/compound/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/a-share-board/compound/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}
+  ]
+}
