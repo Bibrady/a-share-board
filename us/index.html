@@ -234,7 +234,6 @@ function renderTone(){
  $("#tonesub").textContent=ndx?"纳指100 "+pct(ndx.chg)+(ndx.h52?" · 创52周新高":""):"";
  $("#ztone").hidden=!D.ztone;$("#ztone").textContent=D.ztone||"";
  $("#idx").innerHTML=(D.tone||[]).map(function(r){var v=r.k==="yield"?r.bp:r.chg,c=cls(v);
-  if(r.key==="VIX")c=c==="up"?"down":c==="down"?"up":c;   // VIX up = risk-off
   return '<div class="ix '+(c==="up"?"u":c==="down"?"d":"")+'"><div class="n">'+esc(r.n)+'<em>'+esc(r.key)+'</em></div><div class="p">'+pxs(r)+'</div><div class="c '+c+'">'+chgTxt(r)+(r.w==="24h"?' <span style="color:var(--dim);font-size:10px">24h</span>':'')+'</div></div>'}).join("")||'<div class="empty" style="grid-column:1/-1">无数据</div>';
 }
 function renderRank(){
