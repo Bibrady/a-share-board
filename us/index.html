@@ -79,6 +79,11 @@ a{color:var(--acc)}
 .nw a.big{color:var(--fg);font-size:13px}
 .nw .src{display:block;font-size:11px;color:var(--dim);margin-top:2px;font-family:var(--mono)}
 .nw.none{color:var(--dim);font-size:12px}
+.nw ol.nl{list-style:none;margin:4px 0 0;padding:0}
+.nw ol.nl li{padding:5px 0;border-top:1px dashed var(--line,rgba(127,127,127,.25))}
+.nw ol.nl li:first-child{border-top:0;padding-top:2px}
+.nw ol.nl a{color:var(--fg);font-size:13px}
+.nw .src .en{font-family:inherit;opacity:.85}
 /* storage */
 .sr{display:grid;grid-template-columns:62px 1fr auto;gap:2px 10px;padding:8px 0;border-bottom:1px solid var(--grid);align-items:center}
 .sr:last-child{border-bottom:0}
@@ -247,9 +252,11 @@ function renderFlags(){
  var F=D.flags||[];
  $("#flags").innerHTML=F.map(function(f,i){var c=cls(f.k==="yield"?f.bp:f.chg);
   var nw="";
-  if(f.news){var n=f.news,t=esc(n.title),meta='<span class="src">'+esc(n.src)+(n.time?" · "+esc(n.time)+" 北京时间":"")+'</span>';
-   var lk=n.url?'<a href="'+esc(n.url)+'" target="_blank" rel="noopener noreferrer"'+(f.zh?'':' class="big"')+'>'+t+' ↗</a>':'<a'+(f.zh?'':' class="big"')+'>'+t+'</a>';
-   nw='<div class="nw">'+(f.zh?'<div class="z">'+esc(f.zh)+'</div>':'')+lk+meta+'</div>'}
+  var NL=f.news?(Array.isArray(f.news)?f.news:[f.news]):[];
+  if(NL.length){var li=NL.map(function(n){var t=esc(n.zh||n.title),meta='<span class="src">'+esc(n.src)+(n.time?" · "+esc(n.time)+" 北京时间":"")+(n.zh?' · <span class="en">'+esc(n.title)+'</span>':'')+'</span>';
+    var lk=n.url?'<a href="'+esc(n.url)+'" target="_blank" rel="noopener noreferrer">'+t+' ↗</a>':'<a>'+t+'</a>';
+    return '<li>'+lk+meta+'</li>'}).join("");
+   nw='<div class="nw">'+(f.zh?'<div class="z">'+esc(f.zh)+'</div>':'')+'<ol class="nl">'+li+'</ol></div>'}
   else if(f.zh)nw='<div class="nw"><div class="z">'+esc(f.zh)+'</div></div>';
   else if("news" in f)nw='<div class="nw none">原因未查到</div>';
   var gs=(f.g||[]).map(function(g){return '<span class="g">'+esc(g)+'</span>'}).join("");
