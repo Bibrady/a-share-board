@@ -23,6 +23,20 @@ h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wr
 select{font:inherit;font-size:15px;height:40px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:#000;color:var(--fg);min-width:0}
 .datebar{margin-top:8px}.datebar label{font-size:13px;color:var(--mut)}
 #datesel{flex:0 1 210px}
+.rfb{margin-left:auto;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#000;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap}
+.rfb:disabled{background:#3A2A0C;border-color:#3A2A0C;color:#000;cursor:default}
+.rfp{margin-top:8px;background:rgba(255,158,27,.08);border:1px solid var(--bd);border-radius:10px;padding:8px 10px}
+.rfp.err{background:rgba(255,67,61,.10);border-color:rgba(255,67,61,.40)}.rfp.ok{background:rgba(61,220,132,.08);border-color:rgba(61,220,132,.35)}
+.rfh{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--ttl)}
+.rfp.err .rfh{color:#FF433D}.rfp.ok .rfh{color:#3DDC84}
+.bar{height:8px;background:var(--grid);border-radius:4px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px;transition:width .5s ease}
+.rfp.err .bar i{background:#FF433D}.rfp.ok .bar i{background:#3DDC84}
+.rfp.run .bar i{background-image:linear-gradient(45deg,rgba(255,255,255,.28) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.28) 75%,transparent 75%);background-size:16px 16px;animation:mv 1s linear infinite}
+@keyframes mv{from{background-position:0 0}to{background-position:16px 0}}
+.rft{font-size:12px;color:var(--mut);display:flex;justify-content:space-between;gap:8px}
+.rsteps{font-size:11.5px;color:var(--dim);margin-top:2px;line-height:1.6}.rsteps b{color:var(--acc);font-weight:600}.rsteps s{text-decoration:none;color:var(--mut)}
+.snap{background:rgba(255,158,27,.16);color:var(--acc);border:1px solid rgba(255,158,27,.45);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;margin-top:8px}
 .warn{background:rgba(255,158,27,.10);color:var(--ttl);border-radius:8px;padding:6px 10px;font-size:12.5px;margin-top:8px}
 .card{background:var(--pn);border:1px solid var(--bd);border-radius:6px;padding:12px;margin-bottom:10px}
 .card h2{font-size:15px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:var(--acc)}
@@ -155,12 +169,15 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line
   <span>生成于 <b id="gen">—</b>（北京时间）</span>
   <span>覆盖 <b id="cov">—</b></span>
  </div>
- <div class="row datebar"><label for="datesel">查看日期</label><select id="datesel" aria-label="选择日期"></select></div>
+ <div class="row datebar"><label for="datesel">查看日期</label><select id="datesel" aria-label="选择日期"></select><button class="rfb" id="rf" type="button">⟳ 强制刷新</button></div>
+ <div class="rfp" id="rfp" hidden><div class="rfh"><span id="rfs"></span><span id="rfpc"></span></div><div class="bar"><i id="rfbar"></i></div>
+  <div class="rft"><span id="rft"></span><span id="rfe"></span></div><div class="rsteps" id="rsteps"></div></div>
+ <div class="snap" id="snap" hidden></div>
  <div class="warn" id="warn" hidden></div>
 </header>
 
 <section class="card" id="c-tone">
- <h2>大盘 <small>收盘 · 较前一交易日</small></h2>
+ <h2>大盘 <small id="tonecap">收盘 · 较前一交易日</small></h2>
  <div class="tone"><b id="label">—</b><span id="tonesub"></span></div>
  <div class="ztone" id="ztone" hidden></div>
  <div class="idxg" id="idx"><div class="skel" style="grid-column:1/-1"></div></div>
@@ -232,6 +249,11 @@ function renderHead(){
  if(D.failed&&D.failed.length)w.push("未取到："+D.failed.join("、"));
  $("#warn").hidden=!w.length;$("#warn").textContent=w.join(" ");
  document.title="美股复盘 "+s.slice(5);
+ var sn=D.snap,se=$("#snap");
+ if(sn){var at=String(sn.at||""),ny=String(sn.ny||"");se.hidden=false;
+  se.textContent="⚠ "+sn.k+"快照（非收盘数据）· 截至北京时间 "+at.slice(5,10)+" "+at.slice(11,16)+"（美东 "+ny.slice(11,16)+"）"+(sn.k==="盘中"?"，价格与涨跌随盘变化，量能对比已关闭":"，价格为盘前成交价，指数无盘前报价");
+  $("#tonecap").textContent=sn.k+"快照 · 较前一交易日收盘";if(D.tag)document.title="美股复盘 "+sn.k+" "+s.slice(5)}
+ else{se.hidden=true;$("#tonecap").textContent="收盘 · 较前一交易日"}
 }
 function renderTone(){
  var L=D.label||"—";$("#label").textContent="大盘"+L;$("#label").className=/强/.test(L)?"up":/弱/.test(L)?"down":"";
@@ -309,12 +331,65 @@ document.addEventListener("click",function(e){
 function load(t){return (t&&DV[t]!=null?get(vq("data/"+t+".json",DV[t])):get("data/latest.json",true)).then(function(d){D=d;render()})
  .catch(function(e){$("#warn").hidden=false;$("#warn").textContent="数据加载失败（"+e.message+"），请稍后刷新。"})}
 function dates(ds){(ds||[]).forEach(function(x){DV[x.d]=x.v});
- $("#datesel").innerHTML=(ds||[]).map(function(x,i){return '<option value="'+x.d+'">'+pd(x.d)+" "+(x.wd||"")+(i===0?"（最新）":"")+'</option>'}).join("")}
+ $("#datesel").innerHTML=(ds||[]).map(function(x,i){return '<option value="'+x.d+'">'+pd(x.d)+" "+(x.wd||"")+(x.s?"·"+x.s:"")+(i===0?"（最新）":"")+'</option>'}).join("")}
 var m=location.hash.match(/d=(\d{8})/);
 get("data/dates.json",true).then(dates).catch(function(){}).then(function(){load(m&&DV[m[1]]!=null?m[1]:"")});
 $("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
 document.addEventListener("visibilitychange",function(){if(document.hidden||!D)return;if($("#datesel").selectedIndex>0)return;
  get("data/dates.json",true).then(function(ds){if(ds&&ds[0]&&(ds[0].d!==D.tag||ds[0].v!==DV[ds[0].d])){dates(ds);load("")}}).catch(function(){})});
+// ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"us"} -> box reruns review.py --live + publish.py; progress back via ntfy ----------
+var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-u-41AyXErhMAXcJugzilCBq8vrnF",GH="Bibrady/a-share-board";
+var STEPS=["收到请求","拉取行情","计算异动","查新闻","上传","等待页面生效","完成"];
+var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,tick:null,passive:false};
+function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
+function rfUI(step,p,text,mode){var P=$("#rfp");P.hidden=false;P.className="rfp "+(mode||"run");
+ $("#rfs").textContent=step;$("#rfpc").textContent=p!=null?Math.round(p)+"%":"";if(p!=null)$("#rfbar").style.width=Math.max(2,Math.min(100,p))+"%";
+ $("#rft").textContent=text||"";var k=STEPS.indexOf(step);
+ $("#rsteps").innerHTML=STEPS.map(function(x,i){return k<0?x:(i<k?"<s>✓"+x+"</s>":i===k?"<b>"+x+"</b>":x)}).join(" → ")}
+function elapsed(){if(!R.on)return;$("#rfe").textContent=((Date.now()-R.t0)/1000).toFixed(0)+" 秒"}
+function rfEnd(){R.on=false;R.passive=false;clearTimeout(R.wd);clearInterval(R.tick);clearTimeout(R.pt);var b=$("#rf");b.disabled=false;b.textContent="⟳ 强制刷新"}
+function rfFail(msg){rfUI("未完成",null,msg,"err");elapsed();rfEnd()}
+function watchdog(){clearTimeout(R.wd);R.wd=setTimeout(function(){if(!R.on)return;
+ if(!R.rid)rfFail("电脑没有响应（20 秒内未收到回应）。可能电脑离线/休眠，或手机无法连接 ntfy.sh（可尝试开 VPN）");
+ else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:20000)}
+function begin(passive){R.on=true;R.passive=!!passive;R.t0=Date.now();var b=$("#rf");b.disabled=true;b.textContent="刷新中…";
+ clearInterval(R.tick);R.tick=setInterval(elapsed,1000);watchdog();stream();schedPoll(1500)}
+function rfStart(){if(R.on)return;R.cid=rcid();R.rid="";begin(false);rfUI("发送请求",1,"正在通知电脑…");
+ fetch(NT+TRIG,{method:"POST",body:JSON.stringify({a:"refresh",cid:R.cid,b:"us"})}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);
+  if(R.on&&!R.rid)rfUI("发送请求",2,"已发出，等待电脑响应…")})
+ .catch(function(e){if(R.on)rfFail("无法连接 ntfy.sh 中转（"+(e.message||e)+"）。国内网络可能需要开 VPN 后再试")})}
+function onMsg(ev){if(!ev||ev.event!=="message"||R.seen[ev.id])return;R.seen[ev.id]=1;R.last=ev.id;var m;try{m=JSON.parse(ev.message)}catch(e){return}
+ if(!m||m.v!==1||m.b!=="us")return;var age=Date.now()/1000-(m.t||ev.time||0);
+ if(!R.on){if(m.st==="step"&&m.id&&age<150){R.rid=m.id;R.cid="";begin(true)}else return}
+ var mine=(R.cid&&m.cid===R.cid)||(R.rid&&m.id===R.rid);if(!mine)return;
+ if(m.st==="step"){R.rid=m.id;watchdog();rfUI(m.step,m.pct,m.text||"")}
+ else if(m.st==="busy"){R.rid=m.id;watchdog();rfUI("收到请求",5,"已有刷新任务在进行，显示其进度…")}
+ else if(m.st==="cool"||m.st==="limit"){rfUI("未刷新",null,m.text,"err");rfEnd()}
+ else if(m.st==="err"){rfFail(m.text||"刷新失败")}
+ else if(m.st==="done"){clearTimeout(R.wd);rfUI("等待页面生效",93,"从 GitHub 读取新数据…");fresh(m)}}
+function fto(u,o,ms){var c=window.AbortController?new AbortController():null,t=setTimeout(function(){if(c)c.abort()},ms);o=o||{};if(c)o.signal=c.signal;
+ return fetch(u,o).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()},function(e){clearTimeout(t);throw e})}
+// exact commit first (raw.githubusercontent / GitHub API), Pages last (Pages deploy lags ~30-60 s)
+function getSha(p,sha){return fto("https://raw.githubusercontent.com/"+GH+"/"+sha+"/us/"+p,{},6000)
+ .catch(function(){return fto("https://api.github.com/repos/"+GH+"/contents/us/"+p+"?ref="+sha,{headers:{Accept:"application/vnd.github.raw+json"}},8000)})
+ .catch(function(){return get(p,true)})}
+function fresh(m){if(R.passive&&D&&D.gen===m.gen){rfEnd();$("#rfp").hidden=true;return}var tries=0,sha=m.sha||"";
+ function go(){return getSha("data/dates.json",sha).then(dates).catch(function(){}).then(function(){return getSha("data/latest.json",sha)}).then(function(d){
+   if(d.gen!==m.gen){if(++tries<36){rfUI("等待页面生效",93,"GitHub Pages 部署中…（"+tries*5+" 秒）");return new Promise(function(r){setTimeout(r,5000)}).then(go)}throw new Error("页面数据未更新")}
+   D=d;history.replaceState(null,"",location.pathname);render();
+   var g=String(d.gen||"");rfUI("完成",100,(d.snap?d.snap.k+"快照":"收盘复盘")+" "+d.session.slice(5)+" · 生成于 "+g.slice(5,10)+" "+g.slice(11,16)+" · 用时 "+((Date.now()-R.t0)/1000).toFixed(0)+" 秒","ok");elapsed();rfEnd();
+   setTimeout(function(){if(!R.on)$("#rfp").hidden=true},10000)})}
+ go().catch(function(e){rfFail("数据已更新但读取失败（"+e.message+"），请下拉刷新页面")})}
+function stream(){if(R.es||!window.EventSource)return;try{
+ var es=new EventSource(NT+PROG+"/sse?since="+(R.last||"150s"));R.es=es;
+ es.onmessage=function(e){R.esok=true;try{onMsg(JSON.parse(e.data))}catch(x){}};
+ es.onopen=function(){R.esok=true};es.onerror=function(){R.esok=false}}catch(e){R.es=null}}
+function poll(){if(!R.on)return;fetch(NT+PROG+"/json?poll=1&since="+(R.last||"150s"),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+  t.split("\n").forEach(function(l){if(l.trim())try{onMsg(JSON.parse(l))}catch(e){}})}).catch(function(){}).then(function(){schedPoll(R.esok?5000:2500)})}
+function schedPoll(ms){clearTimeout(R.pt);if(R.on)R.pt=setTimeout(poll,ms)}
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&R.on)schedPoll(100)});
+$("#rf").addEventListener("click",rfStart);
+if(TRIG.indexOf("__")===0||PROG.indexOf("__")===0||!PROG)$("#rf").hidden=true;else setTimeout(stream,800);
 })();
 </script>
 </body>
