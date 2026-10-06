@@ -74,6 +74,7 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
 .lock .err{color:var(--dn);font-size:13px;min-height:18px;margin-top:8px}
 .note{font-size:12px;color:var(--dim);line-height:1.6;margin-top:14px}
 .empty{color:var(--mu);text-align:center;padding:30px 0}
+.bx .v.up{color:var(--up);text-shadow:none}.bx .v.dn{color:var(--dn);text-shadow:none}
 .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}.sum .bx .v{font-size:17px}
 .dot.g{background:var(--up);box-shadow:0 0 8px var(--up)}.dot.r{background:var(--dn);box-shadow:0 0 8px var(--dn)}
 .live{font-size:11px;font-family:var(--mono);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px}
@@ -172,7 +173,7 @@ function render(){if(!D){status();return}var now=Date.now(),h=[],tm=0,tu=0,bad=0
   o+='<div class="be"><div class="bx"><div class="l">真实保本价</div><div class="v">'+fp(p.be,tk)+'</div><div class="s">币安显示 '+(p.bnbe?fp(p.bnbe,tk):"—")+'</div></div>'+
      '<div class="bx sg"><div class="l">建议保本止损</div><div class="v">'+fp(p.sug,tk2)+'</div><div class="s">含约 0.02% 滑点余量</div></div></div>';
   o+='<div class="dist">标记价 <b>'+fp(mark,tk)+'</b><span class="live '+(Lv.live?"on":"off")+'">'+(Lv.live?"实时":"Mac "+bj(D.t))+'</span><br>距真实保本 <b class="'+cls(dist)+'">'+fu(dist)+'%</b> · 浮盈 <b class="'+cls(upnl)+'">'+fu(upnl)+'U</b></div>';
-  if(!p.stops.length)o+='<div class="stop bad">⚠ 没挂止损。保本止损可挂在 <b>'+fp(p.sug,tk2)+'</b></div>';
+  if(!p.stops.length)o+='<div class="stop bad">⚠ 没挂止损。'+(dist>0.03?'保本止损可挂在 <b>'+fp(p.sug,tk2)+'</b>':'现价还没到真实保本，'+(lg?'涨过':'跌破')+' <b>'+fp(p.sug,tk2)+'</b> 后才能挂保本止损')+'</div>';
   p.stops.forEach(function(s){var q=s.q==="all"?"全部平仓":"数量 "+s.q;var ty=s.ty==="TRAILING_STOP_MARKET"?"跟踪止损(激活价)":"止损";
    if(s.bad)o+='<div class="stop bad">⚠ '+ty+' <b>'+fp(s.p,tk)+'</b> 在真实保本 '+fp(p.be,tk)+(lg?' 下方':' 上方')+'，触发后约 <b class="'+cls(s.pnl)+'">'+fu(s.pnl)+'U</b>（'+q+'，含手续费和资金费）。'+(dist>0?'要保本改到 <b>'+fp(p.sug,tk2)+'</b>':'现价还没过保本价')+'</div>';
    else o+='<div class="stop good">✓ '+ty+' <b>'+fp(s.p,tk)+'</b> 已在真实保本'+(lg?'上方':'下方')+'，触发后约 <b class="'+cls(s.pnl)+'">'+fu(s.pnl)+'U</b>（'+q+'）</div>'});
