@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="/a-share-board/favicon.ico?v=4" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=4"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=4"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=4"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=4"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="A股看板"><meta name="application-name" content="A股看板"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>持仓保本</title>
+<style>
+:root{--bg:#000;--pn:#0B0B0B;--g1:#110C05;--g2:#2B1D08;--mu:#C7801A;--si:#FFB347;--dim:#8C5A12;--tx:#FFF;--hair:#1A1206;
+--acc:#FF9E1B;--accg:rgba(255,158,27,.45);--dn:#FF433D;--up:#3DDC84;
+--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,Menlo,"Roboto Mono",Consolas,"Liberation Mono",monospace;
+--cond:"Avenir Next Condensed","DIN Condensed","Arial Narrow","Roboto Condensed","PingFang SC",-apple-system,sans-serif;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(760px 420px at 100% -10%,rgba(255,158,27,.13),transparent 62%),var(--bg)}
+body .stab{background:#000;border-bottom:1px solid var(--g2)}
+body .stab a{color:var(--mu);font-weight:600}
+body .stab a.on{color:var(--acc);border-bottom-color:var(--acc);text-shadow:0 0 12px var(--accg)}
+.wrap{max-width:720px;margin:0 auto;padding:12px max(12px,env(safe-area-inset-right)) calc(30px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 8px}
+.brand .t{font-family:var(--cond);font-size:13px;letter-spacing:.2em;color:var(--mu);font-weight:600;text-transform:uppercase}
+.brand .t b{color:var(--si);letter-spacing:.06em;font-size:17px;margin-right:8px;font-family:var(--sans)}
+button{font:inherit;-webkit-tap-highlight-color:transparent}
+.btn{background:rgba(255,158,27,.08);border:1px solid rgba(255,158,27,.5);color:var(--acc);border-radius:4px;padding:6px 12px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:disabled{opacity:.55}
+.status{font-family:var(--mono);font-size:12px;color:var(--mu);background:var(--g1);border:1px solid var(--g2);border-radius:4px;padding:7px 10px;margin-bottom:10px;line-height:1.6}
+.status b{color:var(--si);font-weight:600}
+.status .w{color:var(--dn)}
+.status .ok{color:var(--up)}
+.dot{display:inline-block;width:7px;height:7px;background:var(--acc);box-shadow:0 0 8px var(--acc);transform:rotate(45deg);margin-right:6px;vertical-align:1px}
+.dot.busy{animation:pl 1s ease-in-out infinite}.dot.off{background:var(--dim);box-shadow:none}
+@keyframes pl{50%{opacity:.25}}
+.card{position:relative;background:var(--pn);border:1px solid var(--g2);border-radius:5px;margin-bottom:12px;padding:12px 12px 10px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.card::after{content:"";position:absolute;top:-1px;left:12px;width:40px;height:2px;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sym{font-family:var(--mono);font-size:19px;font-weight:700;letter-spacing:.01em}
+.chip{font-size:12px;font-family:var(--mono);padding:2px 7px;border-radius:3px;border:1px solid rgba(255,158,27,.4);color:var(--acc);background:rgba(255,158,27,.07)}
+.chip.L{color:var(--up);border-color:rgba(61,220,132,.45);background:rgba(61,220,132,.07)}
+.chip.S{color:var(--dn);border-color:rgba(255,67,61,.45);background:rgba(255,67,61,.07)}
+.hd .mg{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--si)}
+.be{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 8px}
+.bx{background:var(--g1);border:1px solid var(--g2);border-left:2px solid var(--acc);border-radius:4px;padding:7px 10px}
+.bx .l{font-size:12px;color:var(--mu)}
+.bx .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;color:var(--acc);text-shadow:0 0 14px rgba(255,158,27,.35);line-height:1.25}
+.bx.sg{border-left-color:var(--si)}.bx.sg .v{color:var(--si);text-shadow:none}
+.bx .s{font-size:11.5px;color:var(--dim);font-family:var(--mono)}
+.dist{font-family:var(--mono);font-size:13.5px;margin:2px 0 8px;color:var(--tx)}
+.up{color:var(--up)}.dn{color:var(--dn)}.mu{color:var(--mu)}
+.stop{font-size:13.5px;border-radius:4px;padding:7px 10px;margin:0 0 8px;border:1px solid var(--g2);background:#0d0d0d}
+.stop.bad{border-color:rgba(255,67,61,.55);background:rgba(255,67,61,.08)}
+.stop.good{border-color:rgba(61,220,132,.4);background:rgba(61,220,132,.06)}
+.stop.none{color:var(--mu)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;font-size:13px}
+.grid div{display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px solid var(--hair)}
+.grid span{color:var(--mu);white-space:nowrap}
+.grid em{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.fund{margin-top:8px;font-size:13px;background:var(--g1);border:1px solid var(--g2);border-radius:4px;padding:7px 10px;line-height:1.65}
+.fund em{font-style:normal;font-family:var(--mono)}
+.ft{font-size:11.5px;color:var(--dim);margin-top:6px;font-family:var(--mono)}
+.lock{max-width:420px;margin:40px auto;text-align:center}
+.lock .card{text-align:left;padding:18px}
+.lock h2{font-size:17px;margin:0 0 6px;color:var(--si)}
+.lock p{font-size:13px;color:var(--mu);margin:0 0 12px}
+.lock input[type=password]{width:100%;font:16px var(--mono);background:#000;color:var(--tx);border:1px solid var(--g2);border-radius:4px;padding:10px;margin-bottom:10px;outline:none}
+.lock input:focus{border-color:var(--acc)}
+.lock label{font-size:13px;color:var(--mu);display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.lock .err{color:var(--dn);font-size:13px;min-height:18px;margin-top:8px}
+.note{font-size:12px;color:var(--dim);line-height:1.6;margin-top:14px}
+.empty{color:var(--mu);text-align:center;padding:30px 0}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}.sum .bx .v{font-size:17px}
+.dot.g{background:var(--up);box-shadow:0 0 8px var(--up)}.dot.r{background:var(--dn);box-shadow:0 0 8px var(--dn)}
+.live{font-size:11px;font-family:var(--mono);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px}
+.live.on{color:var(--up);border:1px solid rgba(61,220,132,.45)}.live.off{color:var(--mu);border:1px solid var(--g2)}
+@media (max-width:380px){.bx .v{font-size:19px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<style>.stab{background:#000;border-top:2px solid #FF9E1B;border-bottom:1px solid #2B1D08;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#C7801A;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#FF9E1B;border-bottom-color:#FF9E1B}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 4px}}@media (max-width:420px){.stab>div{gap:0}.stab a{font-size:14px;padding:0 2px}}@media (max-width:350px){.stab a{font-size:12.5px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/">大盘盘面</a><a href="../us/">美股复盘</a><a href="../compound/">复利计算</a><a href="../be/" class="on" aria-current="page">持仓保本</a></div></nav>
+<div class="wrap">
+ <div class="brand"><div class="t"><b>持仓保本</b>TRUE BREAK-EVEN</div><button class="btn" id="rf" hidden>⟳ 刷新</button></div>
+ <div id="lock" class="lock" hidden><div class="card">
+  <h2>🔒 需要密码</h2><p>持仓数据全程加密，只在你的浏览器里解密。密码只需输入一次。</p>
+  <form id="pf"><input type="password" id="pw" autocomplete="current-password" placeholder="密码" autocapitalize="none" autocorrect="off" spellcheck="false">
+  <label><input type="checkbox" id="rem" checked>在这台设备上记住</label>
+  <button class="btn" type="submit" id="pfb" style="width:100%;padding:10px">解锁</button></form>
+  <div class="err" id="perr"></div></div></div>
+ <div id="main" hidden>
+  <div class="status" id="st"></div>
+  <div id="sum"></div>
+  <div id="list"></div>
+  <div class="note">真实保本 = 开仓价 − (本轮已实现盈亏 − 已付手续费 + 已收付资金费 − 预估平仓手续费) ÷ 持仓数量。“本轮”从这个仓位上一次归零之后算起；平仓费按你账户该合约的吃单费率估算（止损单触发按吃单成交）。建议止损 = 真实保本再往盈利方向留约 0.02% 滑点。持仓、成交、手续费、资金费和止损单由你的 Mac 通过币安推送实时计算，标记价和资金费率在手机上直连币安实时更新（连不上时用 Mac 的数据）。只读，不会下单。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
+ </div>
+</div>
+<script>
+(function(){"use strict";
+var SALT="yVpW4nUvqS+BEiWeOfsJ+g==",IT=600000,VER="8d44e05688a6f0ec",NT="https://ntfy.sh/",WSM="wss://fstream.binance.com/market/stream?streams=";
+var LSK="be2_mk",IDLE_MS=30*60000,PING_MS=150000,TE=new TextEncoder();
+var $=function(s){return document.querySelector(s)};
+var K=null,TD="",TQ="",D=null,LIVE={},S={lastMsg:0,lastPing:0,busy:false,reqT:0,cid:"",err:"",act:Date.now(),sse:null,sseOk:false,ws:null,wsSyms:"",wsT:0,wsBack:2000,answered:0,lastId:"",dirty:false};
+function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function hex(u){u=new Uint8Array(u);var s="";for(var i=0;i<u.length;i++)s+=(u[i]<16?"0":"")+u[i].toString(16);return s}
+function unhex(h){var u=new Uint8Array(h.length/2);for(var i=0;i<u.length;i++)u[i]=parseInt(h.substr(i*2,2),16);return u}
+function cat(a,b){var u=new Uint8Array(a.length+b.length);u.set(a,0);u.set(b,a.length);return u}
+function sub(m,l){return crypto.subtle.digest("SHA-256",cat(m,TE.encode(l))).then(function(d){return new Uint8Array(d)})}
+function norm(p){return p.replace(/\s+/g,"").toLowerCase()}
+function derive(pw){return crypto.subtle.importKey("raw",TE.encode(norm(pw)),"PBKDF2",false,["deriveBits"]).then(function(k){
+ return crypto.subtle.deriveBits({name:"PBKDF2",salt:b64(SALT),iterations:IT,hash:"SHA-256"},k,256)}).then(function(b){return new Uint8Array(b)})}
+function setup(m){return sub(m,"be2/verify").then(function(v){if(hex(v).slice(0,16)!==VER)throw new Error("BADPW");
+ return Promise.all([sub(m,"be2/aes"),sub(m,"be2/topic/data"),sub(m,"be2/topic/req")])}).then(function(r){
+ TD="bd_"+hex(r[1]).slice(0,32);TQ="bq_"+hex(r[2]).slice(0,32);
+ return crypto.subtle.importKey("raw",r[0],{name:"AES-GCM"},false,["decrypt"])}).then(function(k){K=k})}
+function open_(env){return crypto.subtle.decrypt({name:"AES-GCM",iv:b64(env.i),additionalData:TE.encode("be2")},K,b64(env.d)).then(function(buf){
+ if(!window.DecompressionStream)throw new Error("这个浏览器太旧，不支持解压（需要 iOS 16.4+ / 新版 Chrome）");
+ return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("deflate"))).text()}).then(JSON.parse)}
+function fto(u,o,ms){var c=window.AbortController?new AbortController():null,t=setTimeout(function(){if(c)c.abort()},ms);o=o||{};if(c)o.signal=c.signal;
+ return fetch(u,o).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r},function(e){clearTimeout(t);throw e})}
+function pad(n){return(n<10?"0":"")+n}
+function bj(ms,f){var d=new Date(ms+8*3600000),s=pad(d.getUTCHours())+":"+pad(d.getUTCMinutes())+":"+pad(d.getUTCSeconds());
+ return f===2?pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate())+" "+s.slice(0,5):f?(pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate())+" "+s):s}
+function ago(ms){var s=Math.max(0,Math.round((Date.now()-ms)/1000));return s<60?s+" 秒前":s<3600?Math.floor(s/60)+" 分钟前":s<86400?Math.floor(s/3600)+" 小时前":Math.floor(s/86400)+" 天前"}
+function dec(t){return Math.max(0,Math.min(8,Math.round(-Math.log10(t||0.01))))}
+function fp(x,t){return x==null||isNaN(x)?"—":Number(x).toFixed(dec(t))}
+function fu(x,d){if(x==null||isNaN(x))return "—";d=d==null?2:d;var s=Math.abs(x).toFixed(d);return(+s===0?"":x>0?"+":"−")+s}
+function cls(x){return x>0.004?"up":x<-0.004?"dn":"mu"}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function pct(r){return(r*100).toFixed(3).replace(/0+$/,"").replace(/\.$/,"")+"%"}
+function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(12);crypto.getRandomValues(u);for(var i=0;i<12;i++)s+=a[u[i]%a.length];return s}
+
+// ---------- incoming snapshots (ntfy: latest cached message on load + SSE live) ----------
+function handleEv(ev){if(!ev||ev.event!=="message")return Promise.resolve();if(ev.id)S.lastId=ev.id;
+ var p=ev.attachment&&ev.attachment.url?fto(ev.attachment.url,{},10000).then(function(r){return r.text()}):Promise.resolve(ev.message);
+ return p.then(function(t){var w=JSON.parse(t);if(!w||w.v!==2)return;return open_(w).then(function(d){
+  S.lastMsg=Date.now();
+  if(S.busy&&((w.c&&w.c===S.cid)||d.t>=S.reqT-1500)){S.busy=false;S.answered=Date.now();S.err="";$("#rf").disabled=false}
+  if(!D||d.t>D.t||d.seq!==D.seq&&d.t>=D.t){D=d;watchSyms()}render()})}).catch(function(e){if(e&&e.name==="OperationError")return;console.warn(e)})}
+function loadLatest(){return fto(NT+TD+"/json?poll=1&since=latest",{cache:"no-store"},8000).then(function(r){return r.text()}).then(function(t){
+ var last=null;t.split("\n").forEach(function(l){if(!l.trim())return;try{var ev=JSON.parse(l);if(ev.event==="message")last=ev}catch(e){}});
+ if(last)return handleEv(last)}).catch(function(e){S.err="连不上 ntfy.sh 中转（"+(e.message||e)+"），国内网络可能要开 VPN"})}
+function sse(){if(S.sse)try{S.sse.close()}catch(e){}
+ var es=new EventSource(NT+TD+"/sse"+(S.lastId?"?since="+encodeURIComponent(S.lastId):""));S.sse=es;
+ es.onopen=function(){S.sseOk=true;status()};es.onerror=function(){S.sseOk=false;status()};
+ es.onmessage=function(m){try{handleEv(JSON.parse(m.data))}catch(e){}}}
+function post(kind){S.lastPing=Date.now();var c=rcid();if(kind==="refresh"||kind==="hello"){S.cid=c;S.reqT=Date.now()}
+ return fto(NT+TQ,{method:"POST",body:JSON.stringify({a:kind,c:c})},8000).catch(function(e){S.err="发不出刷新请求（"+(e.message||e)+"）";if(S.busy){S.busy=false;$("#rf").disabled=false}status()})}
+function refresh(manual){if(!K)return;S.act=Date.now();if(S.busy)return;S.busy=true;S.err="";$("#rf").disabled=true;status();post(manual?"refresh":"hello");
+ var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 20 秒没响应：可能 Mac 休眠/离线，或手机连不上 ntfy.sh。下面是 "+(D?bj(D.t,1):"—")+" 的数据";status()}},20000)}
+
+// ---------- live mark price / funding straight from Binance public websocket ----------
+function watchSyms(){if(!D)return;var syms=D.pos.map(function(p){return p.s.toLowerCase()}).sort().join("/");if(syms===S.wsSyms&&S.ws)return;S.wsSyms=syms;ws()}
+function ws(){if(S.ws){try{S.ws.onclose=null;S.ws.close()}catch(e){}S.ws=null}if(!S.wsSyms||document.hidden)return;
+ var w;try{w=new WebSocket(WSM+S.wsSyms.split("/").map(function(s){return s+"@markPrice@1s"}).join("/"))}catch(e){return}S.ws=w;
+ w.onmessage=function(m){try{var x=JSON.parse(m.data).data;if(x&&x.e==="markPriceUpdate"){LIVE[x.s]={mark:+x.p,fr:+x.r,nft:+x.T,t:Date.now()};S.wsT=Date.now();S.wsBack=2000;S.dirty=true}}catch(e){}};
+ w.onclose=function(){if(S.ws!==w)return;S.ws=null;setTimeout(ws,S.wsBack);S.wsBack=Math.min(S.wsBack*2,60000)}}
+
+// ---------- render ----------
+function liveOf(p){var L=LIVE[p.s];var ok=L&&Date.now()-L.t<15000;return ok?{mark:L.mark,fr:L.fr,nft:L.nft,live:true}:{mark:p.mark,fr:p.fr,nft:p.nft,live:false}}
+function render(){if(!D){status();return}var now=Date.now(),h=[],tm=0,tu=0,bad=0,none=0;
+ if(!D.pos.length)h.push('<div class="card empty">当前没有持仓</div>');
+ D.pos.forEach(function(p){var Lv=liveOf(p),mark=Lv.mark,fr=Lv.fr,nft=Lv.nft,amt=p.amt,lg=amt>0,sg=lg?1:-1,tk=p.tick,tk2=Math.min(tk,1);
+  var upnl=(mark-p.entry)*amt,dist=(mark-p.be)/mark*100*sg,im=p.lev?Math.abs(amt)*mark/p.lev:0,efund=-amt*mark*fr,benext=p.be-efund/amt;
+  tm+=im;tu+=upnl;if(!p.stops.length)none++;p.stops.forEach(function(s){if(s.bad)bad++});
+  var nm=p.s.replace(/USDT$|USDC$/,"");
+  var o='<div class="card"><div class="hd"><span class="sym">'+esc(nm)+'</span><span class="chip '+(lg?"L":"S")+'">'+(lg?"多":"空")+' '+p.lev+'x</span>'+
+   (p.mt==="isolated"?'<span class="chip">逐仓</span>':'')+'<span class="mg">保证金 <b>'+im.toFixed(0)+'U</b></span></div>';
+  o+='<div class="be"><div class="bx"><div class="l">真实保本价</div><div class="v">'+fp(p.be,tk)+'</div><div class="s">币安显示 '+(p.bnbe?fp(p.bnbe,tk):"—")+'</div></div>'+
+     '<div class="bx sg"><div class="l">建议保本止损</div><div class="v">'+fp(p.sug,tk2)+'</div><div class="s">含约 0.02% 滑点余量</div></div></div>';
+  o+='<div class="dist">标记价 <b>'+fp(mark,tk)+'</b><span class="live '+(Lv.live?"on":"off")+'">'+(Lv.live?"实时":"Mac "+bj(D.t))+'</span><br>距真实保本 <b class="'+cls(dist)+'">'+fu(dist)+'%</b> · 浮盈 <b class="'+cls(upnl)+'">'+fu(upnl)+'U</b></div>';
+  if(!p.stops.length)o+='<div class="stop bad">⚠ 没挂止损。保本止损可挂在 <b>'+fp(p.sug,tk2)+'</b></div>';
+  p.stops.forEach(function(s){var q=s.q==="all"?"全部平仓":"数量 "+s.q;var ty=s.ty==="TRAILING_STOP_MARKET"?"跟踪止损(激活价)":"止损";
+   if(s.bad)o+='<div class="stop bad">⚠ '+ty+' <b>'+fp(s.p,tk)+'</b> 在真实保本 '+fp(p.be,tk)+(lg?' 下方':' 上方')+'，触发后约 <b class="'+cls(s.pnl)+'">'+fu(s.pnl)+'U</b>（'+q+'，含手续费和资金费）。'+(dist>0?'要保本改到 <b>'+fp(p.sug,tk2)+'</b>':'现价还没过保本价')+'</div>';
+   else o+='<div class="stop good">✓ '+ty+' <b>'+fp(s.p,tk)+'</b> 已在真实保本'+(lg?'上方':'下方')+'，触发后约 <b class="'+cls(s.pnl)+'">'+fu(s.pnl)+'U</b>（'+q+'）</div>'});
+  o+='<div class="grid">'+
+   '<div><span>开仓均价</span><em>'+fp(p.entry,tk)+'</em></div>'+
+   '<div><span>强平价</span><em>'+(p.liq?fp(p.liq,tk):"—")+'</em></div>'+
+   '<div><span>已付手续费</span><em class="dn">'+fu(-p.fees)+'U</em></div>'+
+   '<div><span>已收付资金费</span><em class="'+cls(p.fund)+'">'+fu(p.fund)+'U</em></div>'+
+   '<div><span>本轮已实现</span><em class="'+cls(p.rpnl)+'">'+fu(p.rpnl)+'U</em></div>'+
+   '<div><span>预估平仓费</span><em class="dn">'+fu(-p.cfee)+'U</em></div>'+
+   '<div><span>费率 挂/吃</span><em>'+pct(p.maker)+' / '+pct(p.taker)+'</em></div>'+
+   '<div><span>名义价值</span><em>'+Math.round(Math.abs(amt)*mark)+'U</em></div></div>';
+  var left=nft?Math.max(0,nft-now):0,hh=Math.floor(left/3600000),mm=Math.floor(left%3600000/60000);
+  o+='<div class="fund">资金费率 <em class="'+(fr*sg>0?"dn":fr*sg<0?"up":"mu")+'">'+(fr*100).toFixed(4)+'%</em>'+(fr*sg>0?'（你付）':fr*sg<0?'（你收）':'')+' · 下次结算 <em>'+(nft?bj(nft).slice(0,5):"—")+'</em>'+(nft?'（'+(hh?hh+" 小时 ":"")+mm+" 分后）":"")+'<br>'+
+   '预计这次'+(efund<0?'付':'收')+' <em class="'+cls(efund)+'">'+fu(efund,2)+'U</em>，结算后真实保本 → <em>'+fp(benext,tk)+'</em>（'+(benext>=p.be?"+":"−")+fp(Math.abs(benext-p.be),tk)+'）</div>';
+  o+='<div class="ft">本轮开仓 '+(p.start?bj(p.start,2):"—")+' · '+p.ntr+' 笔成交 · 资金费 '+p.nf+' 次'+(p.liq?' · 强平价为 '+bj(D.st.sync||D.t)+' 同步值':'')+'</div></div>';
+  h.push(o)});
+ $("#list").innerHTML=h.join("");
+ $("#sum").innerHTML=D.pos.length?'<div class="sum"><div class="bx"><div class="l">保证金合计</div><div class="v">'+tm.toFixed(0)+'U</div></div><div class="bx"><div class="l">浮盈合计</div><div class="v '+cls(tu)+'">'+fu(tu,0)+'U</div></div><div class="bx'+(bad+none?' ':' ')+'"><div class="l">止损不保本/未挂</div><div class="v '+(bad+none?"dn":"up")+'">'+bad+' / '+none+'</div></div></div>':"";
+ status();S.dirty=false}
+function status(){if(!K)return;var now=Date.now(),s;
+ if(!D){s='<span class="dot busy"></span>'+(S.err?'<span class="w">'+esc(S.err)+'</span>':'等待电脑发来数据…（Mac 离线超过 12 小时就没有缓存）');$("#st").innerHTML=s;return}
+ var macAge=now-D.t,macLive=(S.answered&&now-S.answered<PING_MS+60000)||macAge<180000,wsLive=now-S.wsT<10000;
+ var dc=macLive&&wsLive?"g":macLive||wsLive?"":"r";
+ s='<span class="dot '+dc+(S.busy?" busy":"")+'"></span>持仓数据 <b>'+bj(D.t,1)+'</b> 北京时间（'+ago(D.t)+'）'+(macLive?' <span class="ok">电脑在线</span>':' <span class="w">电脑可能离线</span>');
+ s+='<br>标记价/资金费率 '+(wsLive?'<span class="ok">实时</span> '+bj(S.wsT)+' 币安直连':'<span class="w">手机连不上币安行情</span>，用电脑 '+bj(D.t)+' 的价格');
+ var st=D.st||{};
+ if(st.u===false)s+='<br><span class="w">电脑与币安账户推送断开，正在重连（持仓变化会延迟）</span>';
+ if(st.ban)s+='<br><span class="w">币安限频，电脑暂停 REST 到 '+bj(st.ban)+'（推送照常）</span>';
+ if(st.err&&!st.ban)s+='<br><span class="w">电脑：'+esc(st.err)+'</span>';
+ if(S.busy)s+='<br>正在向电脑要最新数据…';else if(S.err)s+='<br><span class="w">'+esc(S.err)+'</span>';
+ $("#st").innerHTML=s}
+
+// ---------- lifecycle ----------
+function start(){$("#lock").hidden=true;$("#main").hidden=false;$("#rf").hidden=false;status();
+ loadLatest().then(function(){status();sse();refresh(false)})}
+function showLock(err){$("#main").hidden=true;$("#lock").hidden=false;$("#perr").textContent=err||"";setTimeout(function(){$("#pw").focus()},50)}
+$("#pf").addEventListener("submit",function(e){e.preventDefault();var v=$("#pw").value;if(!norm(v))return;$("#perr").textContent="验证中…";$("#pfb").disabled=true;
+ derive(v).then(function(m){return setup(m).then(function(){if($("#rem").checked)try{localStorage.setItem(LSK,hex(m))}catch(x){}})}).then(function(){$("#pfb").disabled=false;$("#pw").value="";start()},
+  function(err){$("#pfb").disabled=false;$("#perr").textContent=err&&err.message==="BADPW"?"密码不对":"解锁失败："+(err&&err.message||err)})});
+$("#logout").addEventListener("click",function(e){e.preventDefault();try{localStorage.removeItem(LSK)}catch(x){}location.reload()});
+$("#rf").addEventListener("click",function(){refresh(true)});
+["touchstart","pointerdown","keydown","scroll"].forEach(function(ev){window.addEventListener(ev,function(){S.act=Date.now()},{passive:true})});
+setInterval(function(){if(S.dirty&&!document.hidden)render()},1000);
+setInterval(function(){if(!K||document.hidden)return;render();var now=Date.now();
+ if(now-S.act<IDLE_MS&&now-S.lastMsg>PING_MS&&now-S.lastPing>PING_MS&&!S.busy)post("ping");
+ if(!S.ws&&S.wsSyms)ws()},30000);
+document.addEventListener("visibilitychange",function(){if(document.hidden||!K)return;S.act=Date.now();if(!S.ws)ws();if(!S.sseOk)sse();if(Date.now()-S.lastPing>20000)refresh(false)});
+if(!window.crypto||!crypto.subtle){$("#lock").hidden=false;$("#perr").textContent="这个浏览器不支持加密解锁（需要 HTTPS 和较新的浏览器）";return}
+var mk=null;try{mk=localStorage.getItem(LSK)}catch(e){}
+if(mk&&/^[0-9a-f]{64}$/.test(mk))setup(unhex(mk)).then(start,function(){try{localStorage.removeItem(LSK)}catch(x){}showLock("密码已更换，请重新输入")});else showLock("");
+})();
+</script>
+</body>
+</html>
