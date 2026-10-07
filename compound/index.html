@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#000000">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="复利计划">
 <meta name="application-name" content="复利计划">
 <link rel="icon" href="/a-share-board/favicon.ico?v=4" sizes="any">
@@ -19,8 +19,8 @@
 <link rel="manifest" href="manifest.webmanifest?v=4">
 <title>复利计划</title>
 <style>
-:root{--bg:#000000;--pn:#0B0B0B;--g1:#110C05;--g2:#2B1D08;--mu:#C7801A;--si:#FFB347;--dim:#8C5A12;--tx:#FFFFFF;--hair:#1A1206;
---acc:#FF9E1B;--accg:rgba(255,158,27,.45);--dn:#FF433D;--up:#3DDC84;
+:root{--bg:#F7F5F0;--pn:#FFFFFF;--g1:#FBF9F4;--g2:#E5E2DA;--mu:#666666;--si:#1A3A6B;--dim:#888888;--tx:#333333;--hair:#E5E2DA;
+--acc:#1A3A6B;--accg:rgba(26,58,107,.35);--dn:#B71C1C;--up:#1A1A1A;
 --mono:"IBM Plex Mono","SF Mono",SFMono-Regular,Menlo,"Roboto Mono",Consolas,"Liberation Mono",monospace;
 --cond:"Avenir Next Condensed","DIN Condensed","Arial Narrow","Roboto Condensed","PingFang SC",-apple-system,sans-serif;
 --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
@@ -28,40 +28,40 @@
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
- background:radial-gradient(760px 420px at 100% -10%,rgba(255,158,27,.13),transparent 62%),radial-gradient(520px 380px at -15% 60%,rgba(255,158,27,.05),transparent 62%),var(--bg)}
+ background:radial-gradient(760px 420px at 100% -10%,rgba(26,58,107,.05),transparent 62%),var(--bg)}
 body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
- background-image:linear-gradient(rgba(255,158,27,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,158,27,.03) 1px,transparent 1px);background-size:100% 24px,24px 100%;
- -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 55%,transparent 90%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 55%,transparent 90%)}
-/* shared tab bar (injected by site_nav.py): Bloomberg amber, matches the boards */
-body .stab{background:#000;border-bottom:1px solid var(--g2)}
+ background-image:linear-gradient(rgba(26,58,107,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,58,107,.025) 1px,transparent 1px);background-size:100% 24px,24px 100%;
+ -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.2) 55%,transparent 90%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.2) 55%,transparent 90%)}
+/* shared tab bar (injected by site_nav.py): TradingView 浅色纸 */
+body .stab{background:#FFFFFF;border-bottom:1px solid var(--g2)}
 body .stab a{color:var(--mu);font-weight:600}
-body .stab a.on{color:var(--acc);border-bottom-color:var(--acc);text-shadow:0 0 12px var(--accg)}
+body .stab a.on{color:var(--acc);border-bottom-color:var(--acc)}
 .wrap{max-width:640px;margin:0 auto;padding:14px max(14px,env(safe-area-inset-right)) calc(30px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
 .brand{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px}
 .brand .t{font-family:var(--cond);font-size:14px;letter-spacing:.24em;color:var(--mu);font-weight:600;text-transform:uppercase}
 .brand .t b{color:var(--si);letter-spacing:.08em;font-size:16px;margin-right:9px;font-family:var(--sans)}
 .brand .t em{font-style:normal;color:var(--acc)}
 .live{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:6px}
-.live i{width:7px;height:7px;background:var(--acc);box-shadow:0 0 8px var(--acc);transform:rotate(45deg);animation:pl 2.4s ease-in-out infinite}
+.live i{width:7px;height:7px;background:var(--acc);box-shadow:none;transform:rotate(45deg);animation:pl 2.4s ease-in-out infinite}
 @keyframes pl{50%{opacity:.35}}
 .glass{position:relative;background:var(--pn);border:1px solid var(--g2);border-radius:5px;
- box-shadow:0 14px 40px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.04);margin-bottom:14px}
-.glass::after{content:"";position:absolute;top:-1px;left:14px;width:44px;height:2px;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+ box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:14px}
+.glass::after{content:"";position:absolute;top:-1px;left:14px;width:44px;height:2px;background:var(--acc);box-shadow:none}
 .lb{font-family:var(--cond);font-size:12.5px;letter-spacing:.16em;color:var(--mu);font-weight:600;text-transform:uppercase}
 /* hero */
 .hero{padding:16px 16px 10px;overflow:hidden}
-.hero::before{content:"";position:absolute;top:-80px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(255,158,27,.16),transparent 65%);pointer-events:none}
+.hero::before{content:"";position:absolute;top:-80px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(26,58,107,.08),transparent 65%);pointer-events:none}
 .hl{display:flex;justify-content:space-between;align-items:center}
-.chip{font-size:11.5px;color:var(--acc);border:1px solid rgba(255,158,27,.4);background:rgba(255,158,27,.07);padding:3px 8px;border-radius:3px;font-family:var(--mono);letter-spacing:.02em}
+.chip{font-size:11.5px;color:var(--acc);border:1px solid rgba(26,58,107,.35);background:rgba(26,58,107,.08);padding:3px 8px;border-radius:3px;font-family:var(--mono);letter-spacing:.02em}
 .big{margin:6px 0 2px;display:flex;align-items:baseline;gap:8px;min-height:50px}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.02em;font-size:40px;line-height:1.1;color:var(--acc);text-shadow:0 0 18px rgba(255,158,27,.5),0 0 2px rgba(255,158,27,.6)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.02em;font-size:40px;line-height:1.1;color:var(--acc);text-shadow:none}
 .unit{font-family:var(--mono);color:var(--mu);font-size:16px;font-weight:600}
 .stats{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;margin:10px 0 6px}
 .st{background:var(--g1);border:1px solid var(--g2);border-left:2px solid var(--acc);border-radius:4px;padding:9px 12px}
 .st .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:24px;font-weight:700;margin-top:2px;line-height:1.2}
 .st .s{font-size:12px;color:var(--mu);margin-top:1px;font-family:var(--mono)}
-.acc{color:#fff;text-shadow:0 0 12px rgba(255,158,27,.85),0 0 2px rgba(255,158,27,.9)}
-.st .v.dt{font-size:19px;color:#FFFFFF;padding-top:4px}
+.acc{color:#333333;text-shadow:none}
+.st .v.dt{font-size:19px;color:#333333;padding-top:4px}
 .chart{position:relative;margin:8px -4px 0}
 .chart svg{display:block;width:100%;height:130px;overflow:visible}
 .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim);padding:4px 2px 2px}
@@ -73,29 +73,29 @@ body .stab a.on{color:var(--acc);border-bottom-color:var(--acc);text-shadow:0 0 
 .row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .row label{flex:0 0 5.4em;font-size:15px;color:var(--mu)}
 .row .f{flex:1;display:flex;align-items:center;gap:8px;min-width:0;position:relative}
-input{width:100%;min-width:0;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:19px;font-weight:600;color:#fff;padding:10px 12px;
- border:1px solid var(--g2);border-radius:4px;background:#000;-webkit-appearance:none;appearance:none;outline:none;
- transition:border-color .2s,box-shadow .2s;color-scheme:dark}
-input::placeholder{color:#5A3D10;font-weight:500}
-input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(255,158,27,.22),0 0 18px rgba(255,158,27,.28)}
+input{width:100%;min-width:0;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:19px;font-weight:600;color:#333333;padding:10px 12px;
+ border:1px solid var(--g2);border-radius:4px;background:#FFFFFF;-webkit-appearance:none;appearance:none;outline:none;
+ transition:border-color .2s,box-shadow .2s;color-scheme:light}
+input::placeholder{color:#888888;font-weight:500}
+input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(26,58,107,.22)}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 input[type=number]{-moz-appearance:textfield}
 input[type=date]{min-height:47px;line-height:1.2;text-align:left}
 input[type=date]::-webkit-date-and-time-value{text-align:left}
-input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.75)}
+input[type=date]::-webkit-calendar-picker-indicator{filter:none;opacity:.55}
 .u{flex:0 0 auto;color:var(--mu);font-size:15px;font-family:var(--mono);min-width:1em}
-.seg{position:relative;flex:1;display:grid;grid-template-columns:repeat(4,1fr);padding:3px;border-radius:4px;background:#000;border:1px solid var(--g2)}
+.seg{position:relative;flex:1;display:grid;grid-template-columns:repeat(4,1fr);padding:3px;border-radius:4px;background:#FBF9F4;border:1px solid var(--g2)}
 .seg .th{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/4);border-radius:3px;background:var(--acc);
- box-shadow:0 0 16px rgba(255,158,27,.5);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+ box-shadow:none;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 .seg button{position:relative;z-index:1;font:inherit;font-size:15px;font-weight:600;padding:9px 0;border:0;background:transparent;color:var(--mu);-webkit-tap-highlight-color:transparent;transition:color .25s}
-.seg button.on{color:#000;font-weight:700}
-.today{flex:0 0 auto;font:inherit;font-size:14px;font-weight:600;padding:11px 12px;border:1px solid rgba(255,158,27,.45);border-radius:4px;background:rgba(255,158,27,.06);color:var(--acc);-webkit-tap-highlight-color:transparent}
+.seg button.on{color:#fff;font-weight:700}
+.today{flex:0 0 auto;font:inherit;font-size:14px;font-weight:600;padding:11px 12px;border:1px solid rgba(26,58,107,.45);border-radius:4px;background:rgba(26,58,107,.08);color:var(--acc);-webkit-tap-highlight-color:transparent}
 /* table */
 .tw{padding:4px 0 2px;overflow:hidden}
 .th2{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 6px}
 .ts{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14.5px}
-th{color:var(--mu);font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.12em;padding:8px 5px;border-bottom:1px solid var(--g2);white-space:nowrap;text-align:right;background:#110C05}
+th{color:var(--mu);font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.12em;padding:8px 5px;border-bottom:1px solid var(--g2);white-space:nowrap;text-align:right;background:#FBF9F4}
 td{padding:9px 5px;border-bottom:1px solid var(--hair);text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:center;padding-left:10px;color:var(--dim)}
 th:nth-child(2),td:nth-child(2){text-align:left}
@@ -103,19 +103,19 @@ th:last-child,td:last-child{padding-right:14px}
 td .w{display:block;font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.25;margin-top:1px}
 td.p{color:var(--up)}
 td.n{color:var(--dn)}
-td.m{color:#FFFFFF;font-weight:600}
+td.m{color:#333333;font-weight:600}
 td.x{color:var(--si)}
 tbody tr:last-child td{border-bottom:0}
 tr.z td{color:var(--dim)}
 tr.z td.m{color:var(--mu);font-weight:500}
-tr.x td{background:rgba(255,158,27,.11);border-top:1px solid rgba(255,158,27,.45);border-bottom:1px solid rgba(255,158,27,.45)}
+tr.x td{background:rgba(26,58,107,.10);border-top:1px solid rgba(26,58,107,.35);border-bottom:1px solid rgba(26,58,107,.35)}
 tr.x td:first-child{box-shadow:inset 3px 0 0 var(--acc);color:var(--acc);font-weight:700}
-tr.x td.x{color:#fff;font-weight:700;text-shadow:0 0 10px rgba(255,158,27,.9)}
+tr.x td.x{color:var(--acc);font-weight:700;text-shadow:none}
 .note{font-size:12px;color:var(--dim);text-align:center;margin:16px 4px 0;line-height:1.7}
 </style>
 </head>
 <body>
-<style>.stab{background:#000;border-top:2px solid #FF9E1B;border-bottom:1px solid #2B1D08;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#C7801A;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#FF9E1B;border-bottom-color:#FF9E1B}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 4px}}@media (max-width:420px){.stab>div{gap:0}.stab a{font-size:14px;padding:0 2px}}@media (max-width:350px){.stab a{font-size:12.5px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/">大盘盘面</a><a href="../us/">美股复盘</a><a href="../compound/" class="on" aria-current="page">复利计算</a><a href="../be/">持仓保本</a></div></nav>
+<style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 4px}}@media (max-width:420px){.stab>div{gap:0}.stab a{font-size:14px;padding:0 2px}}@media (max-width:350px){.stab a{font-size:12.5px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/">大盘盘面</a><a href="../us/">美股复盘</a><a href="../compound/" class="on" aria-current="page">复利计算</a><a href="../be/">持仓保本</a></div></nav>
 <div class="wrap">
   <div class="brand"><div class="t"><b>复利计划</b>COMPOUND<em>_</em></div><div class="live"><i></i>本地计算 · 不上传</div></div>
 
@@ -190,25 +190,25 @@ function drawChart(vals,P){
   var X=function(i){return pl+(N?i*(W-pl-pr)/N:0);}, Y=function(v){return pt+(mx-v)/(mx-mn)*(H-pt-pb);};
   var line="", i; for(i=0;i<=N;i++) line+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(vals[i]).toFixed(1);
   var area=line+"L"+X(N).toFixed(1)+" "+H+"L"+X(0).toFixed(1)+" "+H+"Z";
-  var g='<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9E1B" stop-opacity=".34"/><stop offset=".6" stop-color="#FF9E1B" stop-opacity=".07"/><stop offset="1" stop-color="#FF9E1B" stop-opacity="0"/></linearGradient>'+
-    '<linearGradient id="gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C7801A"/><stop offset=".35" stop-color="#FF9E1B"/><stop offset="1" stop-color="#FFB347"/></linearGradient>'+
+  var g='<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A3A6B" stop-opacity=".34"/><stop offset=".6" stop-color="#1A3A6B" stop-opacity=".07"/><stop offset="1" stop-color="#1A3A6B" stop-opacity="0"/></linearGradient>'+
+    '<linearGradient id="gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#666666"/><stop offset=".35" stop-color="#1A3A6B"/><stop offset="1" stop-color="#1A3A6B"/></linearGradient>'+
     '<filter id="bl" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3"/></filter></defs>';
-  for(i=1;i<=3;i++){var gy=(pt+(H-pt-pb)*i/4).toFixed(1); g+='<line x1="0" x2="'+W+'" y1="'+gy+'" y2="'+gy+'" stroke="#2B1D08" stroke-dasharray="2 4"/>';}
-  g+='<path d="'+area+'" fill="url(#ga)"/><path d="'+line+'" fill="none" stroke="#FF9E1B" stroke-width="4" opacity=".5" filter="url(#bl)"/>'+
+  for(i=1;i<=3;i++){var gy=(pt+(H-pt-pb)*i/4).toFixed(1); g+='<line x1="0" x2="'+W+'" y1="'+gy+'" y2="'+gy+'" stroke="#E5E2DA" stroke-dasharray="2 4"/>';}
+  g+='<path d="'+area+'" fill="url(#ga)"/><path d="'+line+'" fill="none" stroke="#1A3A6B" stroke-width="4" opacity=".5" filter="url(#bl)"/>'+
      '<path d="'+line+'" fill="none" stroke="url(#gl)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
   var marks=[2,5,10,100,1000], k=0, nm=0;
   for(i=1;i<=N&&k<marks.length;i++){
     if(vals[i]/P>=marks[k]){
       while(k<marks.length&&vals[i]/P>=marks[k]) k++;
       var m=marks[k-1], x=X(i), y=Y(vals[i]), lx=Math.min(Math.max(x,12),W-14);
-      g+='<g class="mk"><line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+(y+5).toFixed(1)+'" y2="'+H+'" stroke="rgba(255,158,27,.3)" stroke-dasharray="2 3"/>'+
-         '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="#FF9E1B" opacity=".22"/><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.4" fill="#FF9E1B" stroke="#000" stroke-width="1.2"/>'+
-         '<text x="'+lx.toFixed(1)+'" y="'+Math.max(10,y-9).toFixed(1)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FFB347" font-family="ui-monospace,SF Mono,Menlo,monospace">'+m+'x</text></g>';
+      g+='<g class="mk"><line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+(y+5).toFixed(1)+'" y2="'+H+'" stroke="rgba(26,58,107,.3)" stroke-dasharray="2 3"/>'+
+         '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="#1A3A6B" opacity=".22"/><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.4" fill="#1A3A6B" stroke="#FFFFFF" stroke-width="1.2"/>'+
+         '<text x="'+lx.toFixed(1)+'" y="'+Math.max(10,y-9).toFixed(1)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1A3A6B" font-family="ui-monospace,SF Mono,Menlo,monospace">'+m+'x</text></g>';
       nm++;
     }
   }
   var ex=X(N), ey=Y(vals[N]);
-  g+='<circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="9" fill="#FF9E1B" opacity=".2"/><circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="3.6" fill="#fff" stroke="#FF9E1B" stroke-width="1.6"/>';
+  g+='<circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="9" fill="#1A3A6B" opacity=".2"/><circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="3.6" fill="#fff" stroke="#1A3A6B" stroke-width="1.6"/>';
   cv.setAttribute("viewBox","0 0 "+W+" "+H); cv.setAttribute("data-marks",nm); cv.innerHTML=g;
 }
 function calc(){
