@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#F7F5F0">
 <meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,229 +20,102 @@
 <link rel="manifest" href="manifest.webmanifest?v=4">
 <title>复利计划</title>
 <style>
-:root{--bg:#F7F5F0;--pn:#FFFFFF;--g1:#FBF9F4;--g2:#E5E2DA;--mu:#666666;--si:#1A3A6B;--dim:#888888;--tx:#333333;--hair:#E5E2DA;
---acc:#1A3A6B;--accg:rgba(26,58,107,.35);--dn:#B71C1C;--up:#1A1A1A;
---mono:"IBM Plex Mono","SF Mono",SFMono-Regular,Menlo,"Roboto Mono",Consolas,"Liberation Mono",monospace;
---cond:"Avenir Next Condensed","DIN Condensed","Arial Narrow","Roboto Condensed","PingFang SC",-apple-system,sans-serif;
+:root{--bg:#F7F5F0;--tx:#333333;--ink:#1A1A1A;--acc:#1A3A6B;--dn:#B71C1C;--grid:#E5E2DA;
+--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,Menlo,"Roboto Mono",Consolas,monospace;
 --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
- background:radial-gradient(760px 420px at 100% -10%,rgba(26,58,107,.05),transparent 62%),var(--bg)}
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
- background-image:linear-gradient(rgba(26,58,107,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,58,107,.025) 1px,transparent 1px);background-size:100% 24px,24px 100%;
- -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.2) 55%,transparent 90%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.2) 55%,transparent 90%)}
-/* shared tab bar (injected by site_nav.py): TradingView 浅色纸 */
-body .stab{background:#FFFFFF;border-bottom:1px solid var(--g2)}
-body .stab a{color:var(--mu);font-weight:600}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:16px;line-height:1.45}
+body .stab{background:#FFFFFF;border-bottom:1px solid var(--grid)}
+body .stab a{color:#666666;font-weight:600}
 body .stab a.on{color:var(--acc);border-bottom-color:var(--acc)}
-.wrap{max-width:640px;margin:0 auto;padding:14px max(14px,env(safe-area-inset-right)) calc(30px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
-.brand{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px}
-.brand .t{font-family:var(--cond);font-size:14px;letter-spacing:.24em;color:var(--mu);font-weight:600;text-transform:uppercase}
-.brand .t b{color:var(--si);letter-spacing:.08em;font-size:16px;margin-right:9px;font-family:var(--sans)}
-.brand .t em{font-style:normal;color:var(--acc)}
-.live{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:6px}
-.live i{width:7px;height:7px;background:var(--acc);box-shadow:none;transform:rotate(45deg);animation:pl 2.4s ease-in-out infinite}
-@keyframes pl{50%{opacity:.35}}
-.glass{position:relative;background:var(--pn);border:1px solid var(--g2);border-radius:5px;
- box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:14px}
-.glass::after{content:"";position:absolute;top:-1px;left:14px;width:44px;height:2px;background:var(--acc);box-shadow:none}
-.lb{font-family:var(--cond);font-size:12.5px;letter-spacing:.16em;color:var(--mu);font-weight:600;text-transform:uppercase}
-/* hero */
-.hero{padding:16px 16px 10px;overflow:hidden}
-.hero::before{content:"";position:absolute;top:-80px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(26,58,107,.08),transparent 65%);pointer-events:none}
-.hl{display:flex;justify-content:space-between;align-items:center}
-.chip{font-size:11.5px;color:var(--acc);border:1px solid rgba(26,58,107,.35);background:rgba(26,58,107,.08);padding:3px 8px;border-radius:3px;font-family:var(--mono);letter-spacing:.02em}
-.big{margin:6px 0 2px;display:flex;align-items:baseline;gap:8px;min-height:50px}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.02em;font-size:40px;line-height:1.1;color:var(--acc);text-shadow:none}
-.unit{font-family:var(--mono);color:var(--mu);font-size:16px;font-weight:600}
-.stats{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;margin:10px 0 6px}
-.st{background:var(--g1);border:1px solid var(--g2);border-left:2px solid var(--acc);border-radius:4px;padding:9px 12px}
-.st .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:24px;font-weight:700;margin-top:2px;line-height:1.2}
-.st .s{font-size:12px;color:var(--mu);margin-top:1px;font-family:var(--mono)}
-.acc{color:#333333;text-shadow:none}
-.st .v.dt{font-size:19px;color:#333333;padding-top:4px}
-.chart{position:relative;margin:8px -4px 0}
-.chart svg{display:block;width:100%;height:130px;overflow:visible}
-.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim);padding:4px 2px 2px}
-.empty .num{font-size:30px;color:var(--dim);text-shadow:none}
-.empty .chart,.empty .stats,.empty .chip{display:none}
-.hint{font-size:14px;color:var(--mu);margin:2px 0 8px}
-/* inputs */
-.inp{padding:16px 14px 4px}
-.row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.row label{flex:0 0 5.4em;font-size:15px;color:var(--mu)}
-.row .f{flex:1;display:flex;align-items:center;gap:8px;min-width:0;position:relative}
-input{width:100%;min-width:0;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:19px;font-weight:600;color:#333333;padding:10px 12px;
- border:1px solid var(--g2);border-radius:4px;background:#FFFFFF;-webkit-appearance:none;appearance:none;outline:none;
- transition:border-color .2s,box-shadow .2s;color-scheme:light}
-input::placeholder{color:#888888;font-weight:500}
-input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(26,58,107,.22)}
-input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-input[type=number]{-moz-appearance:textfield}
-input[type=date]{min-height:47px;line-height:1.2;text-align:left}
-input[type=date]::-webkit-date-and-time-value{text-align:left}
-input[type=date]::-webkit-calendar-picker-indicator{filter:none;opacity:.55}
-.u{flex:0 0 auto;color:var(--mu);font-size:15px;font-family:var(--mono);min-width:1em}
-.seg{position:relative;flex:1;display:grid;grid-template-columns:repeat(4,1fr);padding:3px;border-radius:4px;background:#FBF9F4;border:1px solid var(--g2)}
-.seg .th{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/4);border-radius:3px;background:var(--acc);
- box-shadow:none;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-.seg button{position:relative;z-index:1;font:inherit;font-size:15px;font-weight:600;padding:9px 0;border:0;background:transparent;color:var(--mu);-webkit-tap-highlight-color:transparent;transition:color .25s}
-.seg button.on{color:#fff;font-weight:700}
-.today{flex:0 0 auto;font:inherit;font-size:14px;font-weight:600;padding:11px 12px;border:1px solid rgba(26,58,107,.45);border-radius:4px;background:rgba(26,58,107,.08);color:var(--acc);-webkit-tap-highlight-color:transparent}
-/* table */
-.tw{padding:4px 0 2px;overflow:hidden}
-.th2{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 6px}
-.ts{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14.5px}
-th{color:var(--mu);font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.12em;padding:8px 5px;border-bottom:1px solid var(--g2);white-space:nowrap;text-align:right;background:#FBF9F4}
-td{padding:9px 5px;border-bottom:1px solid var(--hair);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:center;padding-left:10px;color:var(--dim)}
-th:nth-child(2),td:nth-child(2){text-align:left}
-th:last-child,td:last-child{padding-right:14px}
-td .w{display:block;font-family:var(--sans);font-size:11px;color:var(--dim);line-height:1.25;margin-top:1px}
-td.p{color:var(--up)}
-td.n{color:var(--dn)}
-td.m{color:#333333;font-weight:600}
-td.x{color:var(--si)}
+.wrap{max-width:640px;margin:0 auto;padding:16px max(14px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px}
+h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em}
+.chip{font-family:var(--mono);font-size:12px;color:var(--acc);border:1px solid rgba(26,58,107,.35);background:rgba(26,58,107,.08);padding:2px 8px;border-radius:3px;white-space:nowrap}
+.line{margin:0 0 10px;font-size:14px;color:var(--tx)}
+.prog{margin:0 0 12px;font-size:18px;font-weight:700;color:var(--acc)}
+.card{background:#fff;border:1px solid var(--grid);border-radius:5px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14.5px;color:var(--ink)}
+th{color:#666666;font-weight:600;font-size:12px;letter-spacing:.06em;padding:8px 8px;border-bottom:1px solid var(--grid);text-align:right;background:#FBF9F4}
+td{padding:9px 8px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:center;color:#666666}
+th:nth-child(2),td:nth-child(2){text-align:left;color:var(--tx)}
 tbody tr:last-child td{border-bottom:0}
-tr.z td{color:var(--dim)}
-tr.z td.m{color:var(--mu);font-weight:500}
-tr.x td{background:rgba(26,58,107,.10);border-top:1px solid rgba(26,58,107,.35);border-bottom:1px solid rgba(26,58,107,.35)}
-tr.x td:first-child{box-shadow:inset 3px 0 0 var(--acc);color:var(--acc);font-weight:700}
-tr.x td.x{color:var(--acc);font-weight:700;text-shadow:none}
-.note{font-size:12px;color:var(--dim);text-align:center;margin:16px 4px 0;line-height:1.7}
+tr.on td{background:rgba(26,58,107,.10)}
+tr.on td:first-child{box-shadow:inset 3px 0 0 var(--acc);color:var(--acc);font-weight:700}
+.tag{display:inline-block;margin-left:6px;font-family:var(--sans);font-size:11px;font-weight:700;color:var(--acc);letter-spacing:0}
 </style>
 </head>
 <body>
 <style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 2px;font-size:13px}}@media (max-width:420px){.stab>div{gap:0}.stab a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab a{font-size:11px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/">大盘盘面</a><a href="../us/">美股复盘</a><a href="../compound/" class="on" aria-current="page">复利计算</a><a href="../be/">持仓保本</a><a href="../pos/">仓位</a></div></nav>
 <div class="wrap">
-  <div class="brand"><div class="t"><b>复利计划</b>COMPOUND<em>_</em></div><div class="live"><i></i>本地计算 · 不上传</div></div>
-
-  <div class="glass hero empty" id="sum">
-    <div class="hl"><span class="lb">最终金额 · FINAL</span><span class="chip" id="hTag"></span></div>
-    <div class="big"><span class="num" id="hAmt">— —</span><span class="unit">U</span></div>
-    <div class="hint" id="hHint">输入起始本金与每期收益率，结果实时计算</div>
-    <div class="stats">
-      <div class="st"><div class="lb">倍数 · MULTIPLE</div><div class="v acc" id="hMul"></div></div>
-      <div class="st"><div class="lb">达成日期 · DATE</div><div class="v dt" id="hDate"></div><div class="s" id="hSub"></div></div>
-    </div>
-    <div class="chart"><svg id="cv" aria-hidden="true"></svg><div class="axis"><span id="ax0"></span><span id="ax1"></span></div></div>
-  </div>
-
-  <div class="glass inp">
-    <div class="row"><label for="p0">起始本金</label><div class="f"><input id="p0" type="number" inputmode="decimal" step="any" min="0" placeholder="例如 1000" autocomplete="off"><span class="u">U</span></div></div>
-    <div class="row"><label for="r">每期收益率</label><div class="f"><input id="r" type="number" inputmode="decimal" step="any" placeholder="例如 15" autocomplete="off"><span class="u">%</span></div></div>
-    <div class="row"><label>频次</label><div class="seg" id="fq"><span class="th" id="fth"></span>
-      <button type="button" data-v="7">每周</button><button type="button" data-v="14">每两周</button><button type="button" data-v="21">每三周</button><button type="button" data-v="m">每月</button>
-    </div></div>
-    <div class="row"><label for="d0">起始日期</label><div class="f"><input id="d0" type="date"><button type="button" class="today" id="td">今天</button></div></div>
-    <div class="row"><label for="n">期数</label><div class="f"><input id="n" type="number" inputmode="numeric" step="1" min="1" max="520" autocomplete="off"><span class="u">期</span></div></div>
-  </div>
-
-  <div class="glass tw">
-    <div class="th2"><span class="lb">逐期明细 · SCHEDULE</span><span class="chip" id="tTag" style="display:none"></span></div>
-    <div class="ts"><table>
-      <thead><tr><th>期</th><th>日期</th><th>本期盈利</th><th>期末金额</th><th>倍数</th></tr></thead>
-      <tbody id="tb"></tbody>
-    </table></div>
-  </div>
-  <p class="note">所有计算仅在本机浏览器完成，输入只保存在本机，不上传任何数据<br>每月 = 次月同日（无该日则取月末） · 金额单位 U</p>
+  <div class="top"><h1>复利</h1><span class="chip">17 次 · 约 10.8 倍</span></div>
+  <p class="line">起点是 2,500 + 转入 6,000 = 8,500，从 2026-10-09 起每两周 15%。</p>
+  <div class="prog" id="prog">暂无账户数据</div>
+  <div class="card"><table>
+    <thead><tr><th>第几次</th><th>完成日期</th><th>收益 U</th><th>账户 U</th></tr></thead>
+    <tbody>
+<tr data-n="1" data-u="9775"><td>1</td><td>10月23日</td><td>1,275</td><td>9,775</td></tr>
+<tr data-n="2" data-u="11241"><td>2</td><td>11月6日</td><td>1,466</td><td>11,241</td></tr>
+<tr data-n="3" data-u="12927"><td>3</td><td>11月20日</td><td>1,686</td><td>12,927</td></tr>
+<tr data-n="4" data-u="14867"><td>4</td><td>12月4日</td><td>1,940</td><td>14,867</td></tr>
+<tr data-n="5" data-u="17097"><td>5</td><td>12月18日</td><td>2,230</td><td>17,097</td></tr>
+<tr data-n="6" data-u="19661"><td>6</td><td>1月1日</td><td>2,564</td><td>19,661</td></tr>
+<tr data-n="7" data-u="22610"><td>7</td><td>1月15日</td><td>2,949</td><td>22,610</td></tr>
+<tr data-n="8" data-u="26002"><td>8</td><td>1月29日</td><td>3,392</td><td>26,002</td></tr>
+<tr data-n="9" data-u="29902"><td>9</td><td>2月12日</td><td>3,900</td><td>29,902</td></tr>
+<tr data-n="10" data-u="34387"><td>10</td><td>2月26日</td><td>4,485</td><td>34,387</td></tr>
+<tr data-n="11" data-u="39545"><td>11</td><td>3月12日</td><td>5,158</td><td>39,545</td></tr>
+<tr data-n="12" data-u="45477"><td>12</td><td>3月26日</td><td>5,932</td><td>45,477</td></tr>
+<tr data-n="13" data-u="52299"><td>13</td><td>4月9日</td><td>6,822</td><td>52,299</td></tr>
+<tr data-n="14" data-u="60143"><td>14</td><td>4月23日</td><td>7,844</td><td>60,143</td></tr>
+<tr data-n="15" data-u="69165"><td>15</td><td>5月7日</td><td>9,022</td><td>69,165</td></tr>
+<tr data-n="16" data-u="79540"><td>16</td><td>5月21日</td><td>10,375</td><td>79,540</td></tr>
+<tr data-n="17" data-u="91471"><td>17</td><td>6月4日</td><td>11,931</td><td>91,471<span class="tag">约 10.8 倍</span></td></tr>
+    </tbody>
+  </table></div>
 </div>
 <script>
-(function(){
-"use strict";
-var KEY="compound_v1", WD=["周日","周一","周二","周三","周四","周五","周六"], FQN={"7":"每周","14":"每两周","21":"每三周","m":"每月"};
-var $=function(id){return document.getElementById(id);};
-var p0=$("p0"), r=$("r"), d0=$("d0"), n=$("n"), fq=$("fq"), sum=$("sum"), tb=$("tb"), cv=$("cv");
-var freq="14", last=null;
-function todayBJ(){
-  try{ var s=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-       if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s; }catch(e){}
-  return new Date(Date.now()+8*3600e3).toISOString().slice(0,10);
+(function(){"use strict";
+var SALT="yVpW4nUvqS+BEiWeOfsJ+g==",IT=600000,VER="8d44e05688a6f0ec",NT="https://ntfy.sh/",LSK="be2_mk",BASE=8500;
+var TE=new TextEncoder(),K=null,TD="";
+var $=function(id){return document.getElementById(id)};
+function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function hex(u){u=new Uint8Array(u);var s="";for(var i=0;i<u.length;i++)s+=(u[i]<16?"0":"")+u[i].toString(16);return s}
+function unhex(h){var u=new Uint8Array(h.length/2);for(var i=0;i<u.length;i++)u[i]=parseInt(h.substr(i*2,2),16);return u}
+function cat(a,b){var u=new Uint8Array(a.length+b.length);u.set(a,0);u.set(b,a.length);return u}
+function sub(m,l){return crypto.subtle.digest("SHA-256",cat(m,TE.encode(l))).then(function(d){return new Uint8Array(d)})}
+function setup(m){return sub(m,"be2/verify").then(function(v){if(hex(v).slice(0,16)!==VER)throw new Error("BADPW");
+ return Promise.all([sub(m,"be2/aes"),sub(m,"be2/topic/data"),sub(m,"be2/topic/req")])}).then(function(r){
+ TD="bd_"+hex(r[1]).slice(0,32);
+ return crypto.subtle.importKey("raw",r[0],{name:"AES-GCM"},false,["decrypt"])}).then(function(k){K=k})}
+function open_(env){return crypto.subtle.decrypt({name:"AES-GCM",iv:b64(env.i),additionalData:TE.encode("be2")},K,b64(env.d)).then(function(buf){
+ if(!window.DecompressionStream)throw new Error("nodec");
+ return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("deflate"))).text()}).then(JSON.parse)}
+function mark(eq){
+ var rows=document.querySelectorAll("tbody tr"),n=0,i;
+ for(i=0;i<rows.length;i++)rows[i].className="";
+ if(eq==null||!isFinite(eq)){$("prog").textContent="暂无账户数据";return}
+ if(eq<BASE){$("prog").textContent="还没到起点";if(rows[0])rows[0].className="on";return}
+ for(i=0;i<rows.length;i++)if(eq>=+rows[i].getAttribute("data-u"))n=+rows[i].getAttribute("data-n");
+ $("prog").textContent=n>=1?("已完成到第 "+n+" 次"):"";
+ if(n<rows.length&&rows[n])rows[n].className="on";
 }
-function pad(x){return (x<10?"0":"")+x;}
-function parseD(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m?{y:+m[1],m:+m[2],d:+m[3]}:null;}
-function dim(y,m){return new Date(Date.UTC(y,m,0)).getUTCDate();}   // m: 1-12
-function addPeriod(s,k){   // k-th settlement date after start s (UTC date math, no DST issues); 每月 = same day, clamped to month end
-  var t;
-  if(freq==="m"){ var mm=s.m-1+k, y=s.y+Math.floor(mm/12), m=mm%12+1; t=Date.UTC(y,m-1,Math.min(s.d,dim(y,m))); }
-  else t=Date.UTC(s.y,s.m-1,s.d)+k*(+freq)*864e5;
-  var o=new Date(t); return {s:o.getUTCFullYear()+"-"+pad(o.getUTCMonth()+1)+"-"+pad(o.getUTCDate()), w:WD[o.getUTCDay()], t:t};
+function eqOf(d){var a=d&&d.acct;if(!a||a.eq==null||a.eq==="")return null;var x=+a.eq;return isFinite(x)?x:null}
+function boot(){
+ var mk=null;try{mk=localStorage.getItem(LSK)}catch(e){}
+ if(!mk||!/^[0-9a-f]{64}$/.test(mk)||!window.crypto||!crypto.subtle)return;
+ setup(unhex(mk)).then(function(){
+  return fetch(NT+TD+"/json?poll=1&since=latest",{cache:"no-store",referrerPolicy:"no-referrer"}).then(function(r){if(!r.ok)throw 0;return r.text()})
+ }).then(function(t){
+  var last=null;t.split("\n").forEach(function(l){if(!l.trim())return;try{var ev=JSON.parse(l);if(ev.event==="message")last=ev}catch(e){}});
+  if(!last)return;
+  var p=last.attachment&&last.attachment.url?fetch(last.attachment.url,{cache:"no-store",referrerPolicy:"no-referrer"}).then(function(r){if(!r.ok)throw 0;return r.text()}):Promise.resolve(last.message||"");
+  return p.then(function(raw){var w=JSON.parse(raw);if(!w||w.v!==2)return;return open_(w).then(function(d){mark(eqOf(d))})})
+ }).catch(function(){})
 }
-function fm(v){return v.toLocaleString("zh-CN",Math.abs(v)>=1e4?{maximumFractionDigits:0}:{minimumFractionDigits:2,maximumFractionDigits:2});}
-function ft(v){var a=Math.abs(v);   // table cells: compact 万/亿 so 5 columns fit an iPhone screen
-  if(a>=1e8) return (v/1e8).toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2})+"亿";
-  if(a>=1e6) return (v/1e4).toLocaleString("zh-CN",{maximumFractionDigits:0})+"万";
-  if(a>=1e5) return (v/1e4).toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2})+"万";
-  return fm(v);}
-function fx(v){return (v>=1000?v.toFixed(0):v>=100?v.toFixed(1):v.toFixed(2))+"x";}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({p0:p0.value,r:r.value,f:freq,d0:d0.value,n:n.value}));}catch(e){}}
-function load(){var o=null;try{o=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){}
-  o=o||{}; p0.value=o.p0||""; r.value=(o.r!=null&&o.r!=="")?o.r:""; freq=FQN[o.f]?o.f:"14"; d0.value=o.d0||todayBJ(); n.value=o.n||"12";}
-function setSeg(){var b=fq.querySelectorAll("button"), idx=0;
-  for(var i=0;i<b.length;i++){var on=b[i].getAttribute("data-v")===freq; b[i].className=on?"on":""; if(on) idx=i;}
-  $("fth").style.transform="translateX("+(idx*100)+"%)";}
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-function drawChart(vals,P){
-  var W=Math.max(200,cv.clientWidth||340), H=130, pl=6, pr=10, pt=18, pb=8, N=vals.length-1;
-  var mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals); if(mx-mn<1e-9){mx+=1;mn-=1;}
-  var X=function(i){return pl+(N?i*(W-pl-pr)/N:0);}, Y=function(v){return pt+(mx-v)/(mx-mn)*(H-pt-pb);};
-  var line="", i; for(i=0;i<=N;i++) line+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(vals[i]).toFixed(1);
-  var area=line+"L"+X(N).toFixed(1)+" "+H+"L"+X(0).toFixed(1)+" "+H+"Z";
-  var g='<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A3A6B" stop-opacity=".34"/><stop offset=".6" stop-color="#1A3A6B" stop-opacity=".07"/><stop offset="1" stop-color="#1A3A6B" stop-opacity="0"/></linearGradient>'+
-    '<linearGradient id="gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#666666"/><stop offset=".35" stop-color="#1A3A6B"/><stop offset="1" stop-color="#1A3A6B"/></linearGradient>'+
-    '<filter id="bl" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3"/></filter></defs>';
-  for(i=1;i<=3;i++){var gy=(pt+(H-pt-pb)*i/4).toFixed(1); g+='<line x1="0" x2="'+W+'" y1="'+gy+'" y2="'+gy+'" stroke="#E5E2DA" stroke-dasharray="2 4"/>';}
-  g+='<path d="'+area+'" fill="url(#ga)"/><path d="'+line+'" fill="none" stroke="#1A3A6B" stroke-width="4" opacity=".5" filter="url(#bl)"/>'+
-     '<path d="'+line+'" fill="none" stroke="url(#gl)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
-  var marks=[2,5,10,100,1000], k=0, nm=0;
-  for(i=1;i<=N&&k<marks.length;i++){
-    if(vals[i]/P>=marks[k]){
-      while(k<marks.length&&vals[i]/P>=marks[k]) k++;
-      var m=marks[k-1], x=X(i), y=Y(vals[i]), lx=Math.min(Math.max(x,12),W-14);
-      g+='<g class="mk"><line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+(y+5).toFixed(1)+'" y2="'+H+'" stroke="rgba(26,58,107,.3)" stroke-dasharray="2 3"/>'+
-         '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="#1A3A6B" opacity=".22"/><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.4" fill="#1A3A6B" stroke="#FFFFFF" stroke-width="1.2"/>'+
-         '<text x="'+lx.toFixed(1)+'" y="'+Math.max(10,y-9).toFixed(1)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1A3A6B" font-family="ui-monospace,SF Mono,Menlo,monospace">'+m+'x</text></g>';
-      nm++;
-    }
-  }
-  var ex=X(N), ey=Y(vals[N]);
-  g+='<circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="9" fill="#1A3A6B" opacity=".2"/><circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="3.6" fill="#fff" stroke="#1A3A6B" stroke-width="1.6"/>';
-  cv.setAttribute("viewBox","0 0 "+W+" "+H); cv.setAttribute("data-marks",nm); cv.innerHTML=g;
-}
-function calc(){
-  save(); setSeg();
-  var P=parseFloat(p0.value), R=parseFloat(r.value), N=parseInt(n.value,10), S=parseD(d0.value)||parseD(todayBJ());
-  if(!(P>0)||!isFinite(R)||R<=-100){
-    sum.className="glass hero empty"; $("hAmt").textContent="— —"; $("hHint").style.display=""; tb.innerHTML=""; $("tTag").style.display="none"; last=null; return; }
-  if(!(N>=1)) N=12; if(N>520) N=520;
-  var g=1+R/100, v=P, h=[], st=addPeriod(S,0), dd=st, vals=[P], nextX=10;
-  h.push('<tr class="z"><td>0</td><td>'+st.s.slice(5)+'<span class="w">'+st.s.slice(0,4)+' '+st.w+'</span></td><td>起始</td><td class="m">'+ft(P)+'</td><td class="x">1.00x</td></tr>');
-  for(var k=1;k<=N;k++){
-    var pr=v*(g-1), nv=v*g, mul=nv/P, hit=false; dd=addPeriod(S,k);
-    if(R>0&&mul>=nextX){ hit=true; while(mul>=nextX) nextX*=10; }   // highlight the row where 10x / 100x ... is first reached
-    h.push('<tr'+(hit?' class="x"':'')+'><td>'+k+'</td><td>'+dd.s.slice(5)+'<span class="w">'+dd.s.slice(0,4)+' '+dd.w+'</span></td><td class="'+(pr>=0?'p':'n')+'">'+(pr>=0?'+':'')+ft(pr)+'</td><td class="m">'+ft(nv)+'</td><td class="x">'+fx(mul)+'</td></tr>');
-    v=nv; vals.push(v);
-  }
-  tb.innerHTML=h.join("");
-  var days=Math.round((dd.t-st.t)/864e5), amt=fm(v);
-  sum.className="glass hero"; $("hHint").style.display="none";
-  var ha=$("hAmt"); ha.textContent=amt; ha.style.fontSize=(amt.length>13?26:amt.length>11?32:amt.length>9?36:40)+"px";
-  $("hMul").textContent=fx(v/P);
-  $("hDate").textContent=dd.s; $("hSub").textContent=dd.w+" · "+days+" 天";
-  $("hTag").textContent=N+" 期 · "+FQN[freq]+" · "+(R>0?"+":"")+esc(R)+"%";
-  $("tTag").textContent=N+" 期"; $("tTag").style.display="";
-  $("ax0").textContent=st.s; $("ax1").textContent=dd.s;
-  last={vals:vals,P:P}; drawChart(vals,P);
-}
-load(); setSeg();
-[p0,r,d0,n].forEach(function(e){e.addEventListener("input",calc); e.addEventListener("change",calc);});
-fq.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b) return; freq=b.getAttribute("data-v"); calc();});
-$("td").addEventListener("click",function(){d0.value=todayBJ(); calc();});
-var rt; window.addEventListener("resize",function(){clearTimeout(rt); rt=setTimeout(function(){ if(last) drawChart(last.vals,last.P); },120);});
-calc();
+boot();
 })();
 </script>
 </body>
