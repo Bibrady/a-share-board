@@ -56,6 +56,13 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
 .acct div{display:flex;justify-content:space-between;gap:6px;padding:6px 0;border-bottom:1px solid var(--hair)}
 .acct span{color:var(--mu)}
 .acct em{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.room{display:grid;grid-template-columns:1fr;margin:0 0 12px;background:#FFFFFF;border:1px solid var(--g2);border-radius:5px;padding:2px 12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.room div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--hair)}
+.room div:last-child{border-bottom:0}
+.room span{color:var(--mu);font-size:14px}
+.room small{display:block;color:var(--dim);font-size:11.5px;font-family:var(--mono);font-weight:400;margin-top:1px}
+.room em{font-style:normal;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;color:var(--acc);white-space:nowrap}
+.room .bad em{color:var(--dn)}
 .dist{font-family:var(--mono);font-size:13.5px;margin:8px 0;color:var(--tx)}
 .up{color:var(--up)}.dn{color:var(--dn)}.mu{color:var(--mu)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;font-size:13px}
@@ -120,11 +127,12 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
   <div class="status" id="st"></div>
   <div class="rule">10 倍全仓，保留 40%。满仓 = 保证金等于全部权益；每次大约用权益的 10% 做保证金，6 档就是账户大约 6 倍。只看总占用，不限标的个数。</div>
   <div id="warn"></div>
+  <div id="room"></div>
   <div id="viz"></div>
   <div id="sum"></div>
   <div id="acct"></div>
   <div id="list"></div>
-  <div class="note">仓位占用 = 该合约初始保证金 ÷ 权益。保证金按标记价 × 数量 ÷ 杠杆实时算；电脑同步到币安的初始保证金时，以那个数为准并随标记价缩放。账户杠杆 = 全部名义价值 ÷ 权益。强平价是币安上次同步的值，不是实时估算。只读，不会下单。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
+  <div class="note">仓位占用 = 该合约初始保证金 ÷ 权益。保证金按标记价 × 数量 ÷ 杠杆实时算；电脑同步到币安的初始保证金时，以那个数为准并随标记价缩放。账户杠杆 = 全部名义价值 ÷ 权益。强平价是币安上次同步的值，不是实时估算。只读，不会下单。还能买按权益的 60% 减去已用保证金，不是可用余额。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
  </div>
 </div>
 <script>
@@ -201,7 +209,10 @@ function book(){var rows=(D.pos||[]).map(function(p){return {p:p,r:rowOf(p)}});
  var avail=A&&A.avail!=null?+A.avail:null;
  if(A&&A.upnl!=null&&avail!=null)avail=avail+(up-(+A.upnl));
  var used=eq?im/eq*100:null,left=used==null?null:100-used,slots=used==null?null:used/10,lev=eq?no/eq:null;
- return {rows:rows,im:im,up:up,no:no,wb:wb,eq:eq,avail:avail,used:used,left:left,slots:slots,lev:lev,acct:!!A}}
+ var pim=(A&&A.pim!=null&&A.pim!==""&&!isNaN(+A.pim))?+A.pim:null;
+ var bought=pim!=null?pim:((rows.length||A)?im:null);
+ var room=(bought==null||eq==null)?null:Math.max(0,0.6*eq-bought);
+ return {rows:rows,im:im,up:up,no:no,wb:wb,eq:eq,avail:avail,used:used,left:left,slots:slots,lev:lev,acct:!!A,bought:bought,room:room}}
 
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function bookViz(B){
@@ -231,7 +242,7 @@ function render(){if(!D){status();return}
   var o='<div class="card"><div class="hd"><span class="sym">'+esc(nm)+'</span><span class="chip '+(r.lg?"L":"S")+'">'+(r.lg?"多":"空")+(r.lev?" "+r.lev+"x":"")+'</span>'+
    (p.mt==="isolated"?'<span class="chip">逐仓</span>':'<span class="chip">全仓</span>')+
    '<span class="mg">保证金 <b>'+u0(r.im)+' U</b><small>数量 '+esc(String(p.amt))+'</small></span></div>';
-  o+='<div class="dist">仓位占用 <b>'+(share==null?"暂无数据":pct1(share))+'</b>';
+  o+='<div class="dist">仓位占用 <b>'+(share==null?"暂无数据":pct1(share))+'</b> · 已买 <b>'+u0(r.im)+' U</b>';
   if(share!=null)o+=' · 大约 <b>'+(share/10).toFixed(1)+'</b> 个 10% 档';
   o+='<br>距强平 '+(r.dpct==null?'<b>暂无数据</b>':'<b class="'+(r.dpct<10?"dn":"up")+'">'+r.dpct.toFixed(2)+'%</b> · 价差 <b>'+fp(r.dpx,tk)+'</b>（强平价在标记价'+(r.lg?"下方":"上方")+'）')+'</div>';
   o+=shareBar(share)+liqBar(r);
@@ -248,6 +259,8 @@ function render(){if(!D){status();return}
  var over=B.used!=null&&B.used>CAP;
  $("#viz").innerHTML='<div class="viz">'+bookViz(B)+'</div>';
  $("#warn").innerHTML=over?'<div class="warn">已用 '+pct1(B.used)+'，超过 60% 上限。按规则要留至少 40% 空仓，先别加。</div>':"";
+ var roomBad=B.room===0&&B.bought!=null&&B.eq!=null&&B.bought>0.6*B.eq;
+ $("#room").innerHTML='<div class="room"><div><span>已买仓位<small>已用保证金</small></span><em>'+(B.bought==null?"暂无数据":u0(B.bought)+" U")+'</em></div><div'+(roomBad?' class="bad"':'')+'><span>还能买<small>按 60% 上限还能加</small></span><em>'+(B.room==null?"暂无数据":u0(B.room)+" U")+'</em></div></div>';
  $("#sum").innerHTML='<div class="sum">'+
   '<div class="bx'+(over?" bad":"")+'"><div class="l">已用仓位</div><div class="v">'+(B.used==null?"暂无数据":pct1(B.used))+'</div><div class="s">'+(B.slots==null?"— / "+SLOTS+" 档":B.slots.toFixed(1)+" / "+SLOTS+" 档")+' · '+u0(B.im)+' U</div></div>'+
   '<div class="bx'+(over?" bad":"")+'"><div class="l">剩余仓位</div><div class="v">'+(B.left==null?"暂无数据":pct1(B.left))+'</div><div class="s">上限 60%，保留 40%</div></div>'+
