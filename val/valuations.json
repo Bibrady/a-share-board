@@ -1,0 +1,390 @@
+{
+  "MU": {
+    "src": "mu_val.py / mu_valuation_notes.md",
+    "asof": "2026-10-08",
+    "inputs": {
+      "E27": 176.15,
+      "E28": 206.33,
+      "BVPS": 122.524,
+      "inputs_note": "S&P一致预期10/7; futu BVPS 10/8"
+    },
+    "zones": [
+      {
+        "lo": 367.57,
+        "hi": 490.1,
+        "color": "#2E6B4F",
+        "name": "极端地板",
+        "method": "P/B 3.0–4.0x × BVPS 122.5"
+      },
+      {
+        "lo": 490.1,
+        "hi": 616.52,
+        "color": "#4F7D63",
+        "name": "深度熊市",
+        "method": "FY27E × 2.8–3.5x / P/B 4.0–5.0x"
+      },
+      {
+        "lo": 616.52,
+        "hi": 792.68,
+        "color": "#6B8E7B",
+        "name": "熊市/估值底",
+        "method": "FY27E 176.15 × 3.5–4.5x"
+      },
+      {
+        "lo": 792.68,
+        "hi": 968.83,
+        "color": "#7A8C9E",
+        "name": "偏低",
+        "method": "FY27E 176.15 × 4.5–5.5x"
+      },
+      {
+        "lo": 968.83,
+        "hi": 1233.05,
+        "color": "#1A3A6B",
+        "name": "基准",
+        "method": "FY27E 176.15 × 5.5–7.0x"
+      },
+      {
+        "lo": 1233.05,
+        "hi": 1444.31,
+        "color": "#8C4A3A",
+        "name": "乐观",
+        "method": "FY27E × 7.0–8.2x / FY28E × 6.0–7.0x"
+      },
+      {
+        "lo": 1444.31,
+        "hi": 1650.64,
+        "color": "#B71C1C",
+        "name": "牛市/估值顶",
+        "method": "FY28E 206.33 × 7.0–8.0x"
+      }
+    ],
+    "lines": [
+      {
+        "v": 844.8,
+        "lab": "箱底",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 1102.0,
+        "lab": "箱顶",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 1125.1,
+        "lab": "突破触发",
+        "color": "#8a6d3b",
+        "dash": true
+      }
+    ]
+  },
+  "SNDK": {
+    "src": "sndk_val.py / sndk_valuation_notes.md",
+    "asof": "2026-10-08",
+    "inputs": {
+      "E26": 70.88,
+      "E27": 214.38,
+      "E28": 265.24,
+      "inputs_note": "non-GAAP S&P一致预期 2026-10-06"
+    },
+    "zones": [
+      {
+        "lo": 643.14,
+        "hi": 857.52,
+        "color": "#2E6B4F",
+        "name": "极端地板",
+        "method": "FY27E 214.38 × 3–4x"
+      },
+      {
+        "lo": 857.52,
+        "hi": 1071.9,
+        "color": "#4F7D63",
+        "name": "深度熊市",
+        "method": "FY27E × 4–5x"
+      },
+      {
+        "lo": 1071.9,
+        "hi": 1286.28,
+        "color": "#6B8E7B",
+        "name": "熊市/估值底",
+        "method": "FY27E × 5–6x"
+      },
+      {
+        "lo": 1286.28,
+        "hi": 1500.66,
+        "color": "#7A8C9E",
+        "name": "偏低",
+        "method": "FY27E × 6–7x"
+      },
+      {
+        "lo": 1500.66,
+        "hi": 1929.42,
+        "color": "#1A3A6B",
+        "name": "基准",
+        "method": "FY27E 214.38 × 7–9x"
+      },
+      {
+        "lo": 1929.42,
+        "hi": 2254.54,
+        "color": "#8C4A3A",
+        "name": "乐观",
+        "method": "FY27E × 9–10.5x ≈ FY28E × 7.3–8.5x"
+      },
+      {
+        "lo": 2254.54,
+        "hi": 2917.64,
+        "color": "#B71C1C",
+        "name": "牛市/估值顶",
+        "method": "FY28E 265.24 × 8.5–11x"
+      }
+    ],
+    "lines": [
+      {
+        "v": 1175.63,
+        "lab": "日线VP箱底",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 1827.05,
+        "lab": "日线VP箱顶",
+        "color": "#8a6d3b"
+      }
+    ]
+  },
+  "AVGO": {
+    "src": "avgo_val2.py / avgo_valuation_notes.md",
+    "asof": "2026-10-08",
+    "inputs": {
+      "E27": 19.39,
+      "E28": 25.86,
+      "inputs_note": "FY27E S&P / FY28E LSEG ~2026-10-07"
+    },
+    "zones": [
+      {
+        "lo": 213.29,
+        "hi": 252.07,
+        "color": "#2E6B4F",
+        "name": "极端地板",
+        "method": "FY27E 19.39 × 11–13x"
+      },
+      {
+        "lo": 252.07,
+        "hi": 300.55,
+        "color": "#4F7D63",
+        "name": "深度熊市",
+        "method": "FY27E × 13–15.5x"
+      },
+      {
+        "lo": 300.55,
+        "hi": 339.32,
+        "color": "#6B8E7B",
+        "name": "熊市/估值底",
+        "method": "FY27E × 15.5–17.5x"
+      },
+      {
+        "lo": 339.32,
+        "hi": 378.11,
+        "color": "#7A8C9E",
+        "name": "偏低",
+        "method": "FY27E × 17.5–19.5x"
+      },
+      {
+        "lo": 378.11,
+        "hi": 449.85,
+        "color": "#1A3A6B",
+        "name": "基准",
+        "method": "FY27E 19.39 × 19.5–23.2x"
+      },
+      {
+        "lo": 449.85,
+        "hi": 491.34,
+        "color": "#8C4A3A",
+        "name": "乐观",
+        "method": "FY27E × 23.2–25.3x / FY28E × 17.4–19x"
+      },
+      {
+        "lo": 491.34,
+        "hi": 561.16,
+        "color": "#B71C1C",
+        "name": "牛市/估值顶",
+        "method": "FY28E 25.86 × 19–21.7x"
+      }
+    ],
+    "lines": [
+      {
+        "v": 305.0,
+        "lab": "箱底",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 407.32,
+        "lab": "箱顶",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 413.0,
+        "lab": "突破触发",
+        "color": "#8a6d3b",
+        "dash": true
+      }
+    ]
+  },
+  "INTC": {
+    "src": "intc_val.py / intc_valuation_notes.md",
+    "asof": "2026-10-08",
+    "inputs": {
+      "E26": 1.52,
+      "E27": 2.08,
+      "E28": 3.22,
+      "BVPS": 16.664,
+      "inputs_note": "non-GAAP一致预期 2026-10-07; BVPS futu 2026-10-08"
+    },
+    "zones": [
+      {
+        "lo": 16.66,
+        "hi": 33.33,
+        "color": "#2E6B4F",
+        "name": "极端地板",
+        "method": "P/B 1.0–2.0x（2024–25困境区间）"
+      },
+      {
+        "lo": 33.33,
+        "hi": 49.99,
+        "color": "#4F7D63",
+        "name": "深度熊市",
+        "method": "P/B 2.0–3.0x ≈ P/S(FY27E) 2.4–3.6x（20年常态）"
+      },
+      {
+        "lo": 49.99,
+        "hi": 72.45,
+        "color": "#6B8E7B",
+        "name": "熊市/估值底",
+        "method": "FY28E 3.22 × 15.5–22.5x（≈GFS/TSM倍数）"
+      },
+      {
+        "lo": 72.45,
+        "hi": 90.16,
+        "color": "#7A8C9E",
+        "name": "偏低",
+        "method": "FY28E × 22.5–28x / SOTP 73–98"
+      },
+      {
+        "lo": 90.16,
+        "hi": 122.36,
+        "color": "#1A3A6B",
+        "name": "基准",
+        "method": "FY28E × 28–38x（=FY27E 43–59x）/ 目标均价 118"
+      },
+      {
+        "lo": 122.36,
+        "hi": 144.9,
+        "color": "#8C4A3A",
+        "name": "乐观",
+        "method": "FY28E × 38–45x / SOTP 137（代工 2x PP&E）"
+      },
+      {
+        "lo": 144.9,
+        "hi": 177.1,
+        "color": "#B71C1C",
+        "name": "牛市/估值顶",
+        "method": "FY28E × 45–55x / SOTP 157（14A锚定客户）"
+      }
+    ],
+    "lines": [
+      {
+        "v": 127.5,
+        "lab": "VP箱体 127.5",
+        "color": "#1A3A6B"
+      },
+      {
+        "v": 86.5,
+        "lab": "VP箱体 86.5",
+        "color": "#1A3A6B"
+      }
+    ]
+  },
+  "CRCL": {
+    "src": "crcl_val.py / crcl_valuation_notes.md",
+    "asof": "2026-10-08",
+    "inputs": {
+      "EB27": 841.35,
+      "EB28": 1095.0,
+      "NETCASH": 2619.0,
+      "SHARES": 268.637,
+      "inputs_note": "调整后EBITDA一致预期; 净现金+稀释股本"
+    },
+    "zones": [
+      {
+        "lo": 41.07,
+        "hi": 56.73,
+        "color": "#2E6B4F",
+        "name": "极端地板",
+        "method": "EV/EBITDA 2027E 841 × 10–15x"
+      },
+      {
+        "lo": 56.73,
+        "hi": 66.12,
+        "color": "#4F7D63",
+        "name": "深度熊市",
+        "method": "2027E × 15–18x"
+      },
+      {
+        "lo": 66.12,
+        "hi": 72.39,
+        "color": "#6B8E7B",
+        "name": "熊市/估值底",
+        "method": "2027E × 18–20x"
+      },
+      {
+        "lo": 72.39,
+        "hi": 78.65,
+        "color": "#7A8C9E",
+        "name": "偏低",
+        "method": "2027E × 20–22x"
+      },
+      {
+        "lo": 78.65,
+        "hi": 94.31,
+        "color": "#1A3A6B",
+        "name": "基准",
+        "method": "2027E × 22–27x"
+      },
+      {
+        "lo": 94.31,
+        "hi": 111.65,
+        "color": "#8C4A3A",
+        "name": "乐观",
+        "method": "2027E×27–32x ≈ 2028E×21–25x"
+      },
+      {
+        "lo": 111.65,
+        "hi": 140.19,
+        "color": "#B71C1C",
+        "name": "牛市/估值顶",
+        "method": "2028E 1,095 × 25–32x"
+      }
+    ],
+    "lines": [
+      {
+        "v": 58.2,
+        "lab": "VP箱底",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 136.25,
+        "lab": "VP箱顶",
+        "color": "#8a6d3b"
+      },
+      {
+        "v": 76.0,
+        "lab": "止损参考 76",
+        "color": "#6A1B9A"
+      },
+      {
+        "v": 87.0,
+        "lab": "收复位 87",
+        "color": "#6A1B9A"
+      }
+    ]
+  }
+}

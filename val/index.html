@@ -17,11 +17,11 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
-.wrap{max-width:960px;margin:0 auto;padding:12px max(12px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.wrap{max-width:1080px;margin:0 auto;padding:12px max(12px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
 .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 10px}
 h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em}
 .hint{font-size:12px;color:var(--mu)}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .tabs button{appearance:none;border:1px solid var(--grid);background:#fff;color:var(--tx);font:600 14px/1 var(--sans);padding:8px 14px;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .card{background:#fff;border:1px solid var(--grid);border-radius:5px;overflow:hidden;margin:0 0 12px}
@@ -29,123 +29,203 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 .khead .nm{font-weight:700;color:var(--ink);font-size:15px}
 .khead .meta{font-family:var(--mono);font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums}
 .zoom{display:flex;gap:4px}
-.zoom button{appearance:none;border:1px solid var(--grid);background:#fff;color:var(--acc);font:600 12px/1 var(--mono);padding:5px 8px;border-radius:3px;cursor:pointer}
+.zoom button{appearance:none;border:1px solid var(--grid);background:#fff;color:var(--acc);font:600 12px/1 var(--mono);padding:5px 10px;border-radius:3px;cursor:pointer}
 .zoom button.on{background:rgba(26,58,107,.1);border-color:rgba(26,58,107,.35)}
-.cvw{position:relative;width:100%;height:min(52vh,420px);touch-action:none;background:#fff}
+.cvw{position:relative;width:100%;height:min(58vh,480px);touch-action:none;background:#fff}
 .cvw canvas{display:block;width:100%;height:100%}
 .kinfo{padding:8px 12px;font-family:var(--mono);font-size:12.5px;color:var(--tx);border-top:1px solid var(--grid);min-height:2.6em;font-variant-numeric:tabular-nums}
 .kinfo b{color:var(--ink)}
 .kinfo .up{color:var(--ink)}.kinfo .dn{color:var(--dn)}
-.src{padding:0 12px 10px;font-size:11px;color:var(--mu)}
-.vimg{display:block;width:100%;height:auto;background:#FBF9F4}
-.vcap{padding:8px 12px 10px;font-size:12px;color:var(--mu);border-top:1px solid var(--grid)}
+.src{padding:0 12px 8px;font-size:11px;color:var(--mu)}
+.legend{padding:0 12px 10px;font-size:11.5px;color:var(--mu);line-height:1.55}
+.legend b{color:var(--acc);font-weight:600}
 .note{font-size:12px;color:var(--mu);margin:4px 0 0}
-@media (max-width:520px){.tabs button{flex:1;text-align:center;padding:8px 6px;font-size:13px}.cvw{height:min(48vh,360px)}}
+@media (max-width:520px){.tabs button{flex:1;text-align:center;padding:8px 6px;font-size:13px}.cvw{height:min(52vh,400px)}}
 </style>
 </head>
 <body>
 <style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab>div{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab a{flex:1;text-align:center;padding:0 2px;font-size:13px}}@media (max-width:420px){.stab>div{gap:0}.stab a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab a{font-size:11px}}</style><nav class="stab" aria-label="看板切换"><div><a href="../">10日新高</a><a href="../market/">大盘盘面</a><a href="../us/">美股复盘</a><a href="../compound/">复利计算</a><a href="../be/">持仓保本</a><a href="../pos/">仓位</a><a href="../val/" class="on" aria-current="page">估值</a></div></nav>
 <div class="wrap">
-  <div class="top"><h1>估值</h1><span class="hint">日K · 可拖动缩放</span></div>
+  <div class="top"><h1>估值</h1><span class="hint">日K × 估值区间 · 可拖动缩放</span></div>
   <div class="tabs" id="tabs" role="tablist"></div>
   <div class="card">
     <div class="khead">
       <div><span class="nm" id="knm">—</span> <span class="meta" id="kmeta"></span></div>
       <div class="zoom" id="zoom">
-        <button type="button" data-n="60">60</button>
-        <button type="button" data-n="120" class="on">120</button>
-        <button type="button" data-n="0">全部</button>
+        <button type="button" data-n="60">60天</button>
+        <button type="button" data-n="120" class="on">120天</button>
+        <button type="button" data-n="365">365天</button>
       </div>
     </div>
     <div class="cvw"><canvas id="cv"></canvas></div>
     <div class="kinfo" id="kinfo">加载中…</div>
     <div class="src" id="ksrc"></div>
+    <div class="legend" id="legend"></div>
   </div>
-  <div class="card" id="vcard">
-    <img class="vimg" id="vimg" alt="估值图" hidden>
-    <div class="vcap" id="vcap">暂无估值图</div>
-  </div>
-  <p class="note">仅供研究，不构成交易建议。估值图为既有静态图；K 线为公开行情日线。</p>
+  <p class="note">仅供研究，不构成交易建议。估值区间来自既有估值脚本参数；K 线为公开行情日线。</p>
 </div>
 <script>
 (function(){"use strict";
-var SYMS=[
-  {c:"SNDK",n:"SNDK",chart:true},
-  {c:"MU",n:"MU",chart:true},
-  {c:"AVGO",n:"AVGO",chart:true},
-  {c:"INTC",n:"INTC",chart:true},
-  {c:"CRCL",n:"CRCL",chart:true}
-];
+var SYMS=["SNDK","MU","AVGO","INTC","CRCL"];
 var $=function(id){return document.getElementById(id)};
-var S={i:0,bars:null,src:"",n:120,st:0,sel:-1,drag:null,pinch:null,cache:{}};
-var UP="#1A1A1A",DN="#B71C1C",GRID="#E5E2DA",ACC="#1A3A6B",TX="#333333",MU="#666666";
+var S={i:0,bars:null,src:"",want:120,st:0,sel:-1,drag:null,pinch:null,cache:{},vals:null,val:null};
+var UP="#1A1A1A",DN="#B71C1C",GRID="#E5E2DA",ACC="#1A3A6B",TX="#333333",MU="#666666",BG="#F7F5F0";
 
 function pd(t){return t?t.slice(0,4)+"-"+t.slice(4,6)+"-"+t.slice(6):"—"}
 function cls(x){return x==null||x===0?"":(x>0?"up":"dn")}
-function sg(x,n){if(x==null||!isFinite(x))return "—";var s=(x>=0?"+":"")+x.toFixed(n);return s}
+function sg(x,n){if(x==null||!isFinite(x))return "—";return (x>=0?"+":"")+x.toFixed(n)}
+function fmt(x){if(x==null||!isFinite(x))return "—";var a=Math.abs(x);return a>=1000?x.toFixed(0):a>=100?x.toFixed(1):a>=10?x.toFixed(2):x.toFixed(3)}
+function fmtR(lo,hi){return fmt(lo)+"–"+fmt(hi)}
 
 function buildTabs(){
   var el=$("tabs");el.innerHTML="";
   SYMS.forEach(function(s,i){
-    var b=document.createElement("button");b.type="button";b.textContent=s.n;b.setAttribute("role","tab");
+    var b=document.createElement("button");b.type="button";b.textContent=s;b.setAttribute("role","tab");
     if(i===S.i)b.className="on";
     b.addEventListener("click",function(){select(i)});
     el.appendChild(b);
   });
 }
 function select(i){
-  S.i=i;S.sel=-1;S.bars=null;
+  S.i=i;S.sel=-1;S.bars=null;S.val=(S.vals&&S.vals[SYMS[i]])||null;
   [].forEach.call($("tabs").children,function(b,j){b.className=j===i?"on":""});
-  $("knm").textContent=SYMS[i].n;
-  $("kmeta").textContent="";$("kinfo").textContent="加载中…";$("ksrc").textContent="";
-  showVal(SYMS[i]);
-  loadK(SYMS[i].c);
+  $("knm").textContent=SYMS[i];
+  $("kmeta").textContent="";$("kinfo").textContent="加载中…";$("ksrc").textContent="";$("legend").textContent="";
+  legend();
+  loadK(SYMS[i]);
 }
-function showVal(s){
-  var img=$("vimg"),cap=$("vcap");
-  if(s.chart){
-    img.hidden=false;img.src="charts/"+s.c+".png";img.alt=s.n+" 估值图";
-    cap.textContent=s.n+" · 估值区间图（静态）";
-  }else{
-    img.hidden=true;img.removeAttribute("src");cap.textContent=s.n+" · 暂无估值图";
-  }
+function legend(){
+  var v=S.val,el=$("legend");
+  if(!v||!v.zones){el.textContent="";return}
+  var parts=v.zones.map(function(z){return "<b style=\"color:"+z.color+"\">"+z.name+"</b> "+fmtR(z.lo,z.hi)});
+  var extra=(v.lines||[]).map(function(l){return l.lab+" "+fmt(l.v)}).join(" · ");
+  el.innerHTML="估值档："+parts.join(" · ")+(extra?"<br>参考线："+extra:"");
+}
+function loadVals(){
+  return fetch("valuations.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
+  .then(function(d){S.vals=d;S.val=d[SYMS[S.i]]||null;legend()});
 }
 function loadK(c){
   if(S.cache[c]){apply(S.cache[c]);return}
   fetch("k/"+c+".json",{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
-  .then(function(d){S.cache[c]=d;if(SYMS[S.i].c===c)apply(d)})
+  .then(function(d){S.cache[c]=d;if(SYMS[S.i]===c)apply(d)})
   .catch(function(e){$("kinfo").textContent="K线暂不可用（"+e.message+"）";$("ksrc").textContent=""});
 }
 function apply(d){
   S.bars=d.d||[];S.src=d.src||"";
-  var n=S.n||S.bars.length;S.st=Math.max(0,S.bars.length-n);
+  fitWindow();
   S.sel=S.bars.length-1;
   var last=S.bars[S.sel];
-  $("kmeta").textContent=(last?pd(last[0])+"  收 "+fmt(last[4]):"")+" · "+S.bars.length+" 根";
-  var srcLabel=S.src==="binance-futures"?"币安 USDT 永续日K（"+((d.pair)|| (SYMS[S.i].c+"USDT"))+"）":(S.src||"公开行情");
-  $("ksrc").textContent="数据来源："+srcLabel+" · 截至 "+pd(d.asof||"");
+  $("kmeta").textContent=(last?pd(last[0])+"  收 "+fmt(last[4]):"");
+  var srcLabel=S.src==="binance-futures"?"币安 USDT 永续日K（"+((d.pair)||(SYMS[S.i]+"USDT"))+"）":(S.src||"公开行情");
+  var note=rangeNote();
+  $("ksrc").textContent="数据来源："+srcLabel+" · 截至 "+pd(d.asof||"")+(note?" · "+note:"");
   draw();
 }
-function fmt(x){if(x==null)return "—";var a=Math.abs(x);return a>=1000?x.toFixed(2):a>=100?x.toFixed(2):a>=10?x.toFixed(3):x.toFixed(4)}
+function rangeNote(){
+  if(!S.bars)return "";
+  var have=S.bars.length,want=S.want;
+  if(have<want)return "仅有 "+have+" 根日K（不足 "+want+" 天，已显示全部）";
+  return "显示最近 "+Math.min(want,have)+" / 共 "+have+" 根";
+}
+function fitWindow(){
+  if(!S.bars)return;
+  var vis=Math.min(S.want,S.bars.length);
+  S.st=Math.max(0,S.bars.length-vis);
+}
+function setWant(n){
+  S.want=+n;
+  [].forEach.call($("zoom").querySelectorAll("button"),function(b){b.className=(+b.getAttribute("data-n")===S.want)?"on":""});
+  fitWindow();
+  if(S.bars){
+    var note=rangeNote();
+    var d=S.cache[SYMS[S.i]];
+    var srcLabel=S.src==="binance-futures"?"币安 USDT 永续日K（"+((d&&d.pair)||(SYMS[S.i]+"USDT"))+"）":(S.src||"公开行情");
+    $("ksrc").textContent="数据来源："+srcLabel+(d?" · 截至 "+pd(d.asof||""):"")+(note?" · "+note:"");
+    draw();
+  }
+}
+$("zoom").addEventListener("click",function(e){var bt=e.target.closest("button");if(!bt)return;setWant(bt.getAttribute("data-n"))});
 
 function view(){
-  var b=S.bars,n=S.n?Math.min(S.n,b.length):b.length;
+  var b=S.bars,n=Math.min(S.want,b.length);
   S.st=Math.max(0,Math.min(S.st,b.length-n));
   return {st:S.st,b:b.slice(S.st,S.st+n)};
+}
+function hexAlpha(hex,a){
+  var h=hex.replace("#","");
+  if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return "rgba("+r+","+g+","+b+","+a+")";
 }
 function draw(){
   if(!S.bars||!S.bars.length){$("kinfo").textContent="无K线数据";return}
   var cv=$("cv"),dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;
   cv.width=W*dpr;cv.height=H*dpr;
   var x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
-  var V=view(),b=V.b,n=b.length,R=52,L=4,top=8,bot=18,pH=Math.round((H-bot-top)*0.74),vT=top+pH+6,vH=H-vT-bot,pw=W-L-R,cw=pw/n;
+  var V=view(),b=V.b,n=b.length,R=78,L=4,top=8,bot=18,pH=Math.round((H-bot-top)*0.74),vT=top+pH+6,vH=H-vT-bot,pw=W-L-R,cw=pw/n;
   var lo=1e18,mx=-1e18,vm=0;b.forEach(function(k){lo=Math.min(lo,k[3]);mx=Math.max(mx,k[2]);vm=Math.max(vm,k[5])});
-  var pad=(mx-lo)*0.06||1;lo-=pad;mx+=pad;
+  // include visible valuation bands / lines that intersect price range (expand a bit for context)
+  var val=S.val;
+  if(val&&val.zones){
+    val.zones.forEach(function(z){
+      // only expand ylim if zone overlaps visible price band ±20%
+      var mid=(z.lo+z.hi)/2;
+      if(mid>=lo*0.7&&mid<=mx*1.35){lo=Math.min(lo,z.lo);mx=Math.max(mx,z.hi)}
+    });
+  }
+  if(val&&val.lines){
+    val.lines.forEach(function(l){
+      if(l.v>=lo*0.85&&l.v<=mx*1.2){lo=Math.min(lo,l.v);mx=Math.max(mx,l.v)}
+    });
+  }
+  var pad=(mx-lo)*0.05||1;lo-=pad;mx+=pad;
   function Y(v){return top+(mx-v)/(mx-lo)*pH}function X(i){return L+cw*(i+.5)}
   x.font="11px "+getComputedStyle(document.body).fontFamily;x.textBaseline="middle";
+
+  // valuation bands (behind grid)
+  if(val&&val.zones){
+    val.zones.forEach(function(z,i){
+      var y1=Y(z.hi),y2=Y(z.lo);
+      if(y2<top||y1>top+pH)return;
+      y1=Math.max(top,y1);y2=Math.min(top+pH,y2);
+      x.fillStyle=hexAlpha(z.color,i%2?0.10:0.16);
+      x.fillRect(L,y1,pw,Math.max(1,y2-y1));
+      x.strokeStyle=hexAlpha(z.color,0.55);x.setLineDash([4,3]);x.lineWidth=0.8;
+      x.beginPath();x.moveTo(L,Math.round(Y(z.lo))+.5);x.lineTo(L+pw,Math.round(Y(z.lo))+.5);x.stroke();
+      if(i===val.zones.length-1){x.beginPath();x.moveTo(L,Math.round(Y(z.hi))+.5);x.lineTo(L+pw,Math.round(Y(z.hi))+.5);x.stroke()}
+      x.setLineDash([]);
+      // label on right if mid in view
+      var ym=(y1+y2)/2;
+      if(ym>=top+6&&ym<=top+pH-6){
+        x.fillStyle=z.color;x.textAlign="left";x.font="bold 10px "+getComputedStyle(document.body).fontFamily;
+        x.fillText(z.name,L+pw+3,ym);
+        x.font="11px "+getComputedStyle(document.body).fontFamily;
+      }
+    });
+  }
+
+  // grid + price axis
   x.strokeStyle=GRID;x.lineWidth=1;x.fillStyle=MU;x.textAlign="left";
-  for(var g=0;g<=4;g++){var yv=mx-(mx-lo)*g/4,yy=Math.round(Y(yv))+.5;x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();x.fillText(fmt(yv),L+pw+4,yy)}
+  for(var g=0;g<=4;g++){var yv=mx-(mx-lo)*g/4,yy=Math.round(Y(yv))+.5;x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();
+    // avoid overlapping zone labels: put price under if needed — still at right
+    x.fillText(fmt(yv),L+pw+3,yy+(val&&val.zones?-10:0))}
   x.beginPath();x.moveTo(L,vT-.5);x.lineTo(L+pw,vT-.5);x.stroke();
+
+  // key lines (box / trigger / VP)
+  if(val&&val.lines){
+    val.lines.forEach(function(l){
+      if(l.v<lo||l.v>mx)return;
+      var yy=Math.round(Y(l.v))+.5;
+      x.strokeStyle=l.color||ACC;x.lineWidth=1.1;x.setLineDash(l.dash?[5,4]:[]);
+      x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();x.setLineDash([]);
+      x.fillStyle=l.color||ACC;x.font="10px "+getComputedStyle(document.body).fontFamily;
+      x.textAlign="left";x.fillText(l.lab+" "+fmt(l.v),L+4,yy-6);
+      x.font="11px "+getComputedStyle(document.body).fontFamily;
+    });
+  }
+
+  // candles + volume
   var bw=Math.max(1,Math.min(cw*.7,12));
   for(var i=0;i<n;i++){
     var k=b[i],pc=i>0?b[i-1][4]:(V.st>0?S.bars[V.st-1][4]:k[1]);
@@ -157,27 +237,27 @@ function draw(){
   x.fillStyle=MU;x.textBaseline="alphabetic";
   [0,Math.floor((n-1)/2),n-1].forEach(function(i,j){if(i<0||i>=n)return;var d=b[i][0];x.textAlign=j===0?"left":j===2?"right":"center";x.fillText(d.slice(4,6)+"-"+d.slice(6),j===0?L:j===2?L+pw:X(i),H-4)});
   x.textAlign="left";x.fillText("量",L+2,vT+10);
+
+  // crosshair
   var s=S.sel-V.st;if(s<0||s>=n)s=n-1;S.sel=V.st+s;
   var k=b[s],cx=Math.round(X(s))+.5;
   x.strokeStyle="rgba(26,58,107,.4)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,top);x.lineTo(cx,H-bot);x.stroke();
   var yc=Math.round(Y(k[4]))+.5;x.beginPath();x.moveTo(L,yc);x.lineTo(L+pw,yc);x.stroke();x.setLineDash([]);
   var pc=s>0?b[s-1][4]:(V.st>0?S.bars[V.st-1][4]:null),chg=pc?(k[4]/pc-1)*100:null;
-  $("kinfo").innerHTML="<b>"+pd(k[0])+"</b>　开 "+fmt(k[1])+"　高 "+fmt(k[2])+"　低 "+fmt(k[3])+"　收 <b class=\""+cls(chg)+"\">"+fmt(k[4])+"</b>　涨跌 <b class=\""+cls(chg)+"\">"+(chg==null?"—":sg(chg,2)+"%")+"</b>";
+  var zone="";
+  if(val&&val.zones){
+    for(var zi=0;zi<val.zones.length;zi++){var z=val.zones[zi];if(k[4]>=z.lo&&k[4]<=z.hi){zone=" · <b style=\"color:"+z.color+"\">"+z.name+"</b>";break}
+      if(zi===val.zones.length-1&&k[4]>z.hi)zone=" · 高于估值顶";
+      if(zi===0&&k[4]<z.lo)zone=" · 低于极端地板";
+    }
+  }
+  $("kinfo").innerHTML="<b>"+pd(k[0])+"</b>　开 "+fmt(k[1])+"　高 "+fmt(k[2])+"　低 "+fmt(k[3])+"　收 <b class=\""+cls(chg)+"\">"+fmt(k[4])+"</b>　涨跌 <b class=\""+cls(chg)+"\">"+(chg==null?"—":sg(chg,2)+"%")+"</b>"+zone;
 }
 
 function pick(clientX){
-  if(!S.bars)return;var cv=$("cv"),rc=cv.getBoundingClientRect(),V=view(),n=V.b.length,pw=rc.width-56;
+  if(!S.bars)return;var cv=$("cv"),rc=cv.getBoundingClientRect(),V=view(),n=V.b.length,pw=rc.width-82;
   var i=Math.floor((clientX-rc.left-4)/(pw/n));i=Math.max(0,Math.min(n-1,i));S.sel=V.st+i;draw();
 }
-function setN(n){
-  S.n=+n;if(!S.n)S.n=0;
-  var vis=S.n|| (S.bars?S.bars.length:120);
-  if(S.bars){S.st=Math.max(0,S.bars.length-vis);if(S.sel<0)S.sel=S.bars.length-1}
-  [].forEach.call($("zoom").querySelectorAll("button"),function(b){b.className=(+b.getAttribute("data-n")===S.n)?"on":""});
-  draw();
-}
-$("zoom").addEventListener("click",function(e){var bt=e.target.closest("button");if(!bt)return;setN(bt.getAttribute("data-n"))});
-
 var cv=$("cv");
 cv.addEventListener("pointerdown",function(e){
   cv.setPointerCapture(e.pointerId);
@@ -189,45 +269,38 @@ cv.addEventListener("pointermove",function(e){
   var dx=e.clientX-S.drag.x;
   if(Math.abs(dx)>4)S.drag.moved=true;
   if(!S.bars)return;
-  var Vn=S.n||S.bars.length,cw=(cv.clientWidth-56)/Math.max(1,Math.min(Vn,S.bars.length));
+  var Vn=Math.min(S.want,S.bars.length),cw=(cv.clientWidth-82)/Math.max(1,Vn);
   var shift=Math.round(-dx/Math.max(cw,2));
-  S.st=Math.max(0,Math.min(S.bars.length-Math.min(Vn,S.bars.length), S.drag.st+shift));
+  S.st=Math.max(0,Math.min(S.bars.length-Vn, S.drag.st+shift));
   pick(e.clientX);
 });
 function endDrag(e){if(S.drag&&e.pointerId===S.drag.id)S.drag=null}
 cv.addEventListener("pointerup",endDrag);cv.addEventListener("pointercancel",endDrag);
 cv.addEventListener("wheel",function(e){
   if(!S.bars)return;e.preventDefault();
-  var cur=S.n||S.bars.length,dir=e.deltaY>0?1:-1;
-  var next=Math.max(30,Math.min(S.bars.length, Math.round(cur*(dir>0?1.15:1/1.15))));
-  if(next>=S.bars.length)next=0;
-  var mid=S.sel>=0?S.sel:S.st+Math.floor(cur/2);
-  S.n=next;var vis=S.n||S.bars.length;
-  S.st=Math.max(0,Math.min(S.bars.length-vis, mid-Math.floor(vis/2)));
-  [].forEach.call($("zoom").querySelectorAll("button"),function(b){b.className=""});
-  draw();
+  var opts=[60,120,365],cur=S.want,idx=opts.indexOf(cur);if(idx<0)idx=1;
+  var next=opts[Math.max(0,Math.min(opts.length-1,idx+(e.deltaY>0?1:-1)))];
+  if(next!==S.want)setWant(next);
 },{passive:false});
-
-// pinch zoom
 cv.addEventListener("touchstart",function(e){
   if(e.touches.length===2){
     var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
-    S.pinch={dist:Math.hypot(dx,dy),n:S.n||S.bars.length};S.drag=null;
+    S.pinch={dist:Math.hypot(dx,dy),want:S.want};S.drag=null;
   }
 },{passive:true});
 cv.addEventListener("touchmove",function(e){
   if(!S.pinch||e.touches.length!==2||!S.bars)return;
   var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
   var dist=Math.hypot(dx,dy),ratio=S.pinch.dist/Math.max(dist,1);
-  var next=Math.max(30,Math.min(S.bars.length, Math.round(S.pinch.n*ratio)));
-  if(next>=S.bars.length)S.n=0;else S.n=next;
-  var vis=S.n||S.bars.length;S.st=Math.max(0,Math.min(S.bars.length-vis,S.st));
-  draw();
+  var cand=S.pinch.want*ratio;
+  var next=cand<90?60:cand<240?120:365;
+  if(next!==S.want)setWant(next);
 },{passive:true});
 cv.addEventListener("touchend",function(){S.pinch=null},{passive:true});
-
 window.addEventListener("resize",function(){if(S.bars)draw()});
-buildTabs();select(0);
+
+buildTabs();
+loadVals().catch(function(){}).then(function(){select(0)});
 })();
 </script>
 </body>
