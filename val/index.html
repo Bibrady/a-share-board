@@ -37,8 +37,11 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 .kinfo b{color:var(--ink)}
 .kinfo .up{color:var(--ink)}.kinfo .dn{color:var(--dn)}
 .src{padding:0 12px 8px;font-size:11px;color:var(--mu)}
-.legend{padding:0 12px 10px;font-size:11.5px;color:var(--mu);line-height:1.55}
-.legend b{color:var(--acc);font-weight:600}
+.logic{padding:8px 12px 0;font-size:13px;color:var(--tx);line-height:1.5}
+.zones{padding:6px 12px 10px;font-size:12px;color:var(--mu);line-height:1.55;font-variant-numeric:tabular-nums}
+.zones .z{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:4px}
+.zones .z span{white-space:nowrap}
+.zones b{font-weight:600}
 .note{font-size:12px;color:var(--mu);margin:4px 0 0}
 @media (max-width:520px){.tabs button{flex:1;text-align:center;padding:8px 6px;font-size:13px}.cvw{height:min(52vh,400px)}}
 </style>
@@ -60,9 +63,10 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
     <div class="cvw"><canvas id="cv"></canvas></div>
     <div class="kinfo" id="kinfo">加载中…</div>
     <div class="src" id="ksrc"></div>
-    <div class="legend" id="legend"></div>
+    <div class="logic" id="logic"></div>
+    <div class="zones" id="zones"></div>
   </div>
-  <p class="note">仅供研究，不构成交易建议。估值区间来自既有估值脚本参数；K 线为公开行情日线。</p>
+  <p class="note">仅供研究，不构成交易建议。图上只画估值区间；逻辑与股价来自既有估值脚本；K 线为公开行情日线。</p>
 </div>
 <script>
 (function(){"use strict";
@@ -90,16 +94,17 @@ function select(i){
   S.i=i;S.sel=-1;S.bars=null;S.val=(S.vals&&S.vals[SYMS[i]])||null;
   [].forEach.call($("tabs").children,function(b,j){b.className=j===i?"on":""});
   $("knm").textContent=SYMS[i];
-  $("kmeta").textContent="";$("kinfo").textContent="加载中…";$("ksrc").textContent="";$("legend").textContent="";
+  $("kmeta").textContent="";$("kinfo").textContent="加载中…";$("ksrc").textContent="";$("logic").textContent="";$("zones").textContent="";
   legend();
   loadK(SYMS[i]);
 }
 function legend(){
-  var v=S.val,el=$("legend");
-  if(!v||!v.zones){el.textContent="";return}
-  var parts=v.zones.map(function(z){return "<b style=\"color:"+z.color+"\">"+z.name+"</b> "+fmtR(z.lo,z.hi)});
-  var extra=(v.lines||[]).map(function(l){return l.lab+" "+fmt(l.v)}).join(" · ");
-  el.innerHTML="估值档："+parts.join(" · ")+(extra?"<br>参考线："+extra:"");
+  var v=S.val;
+  if(!v||!v.zones){$("logic").textContent="";$("zones").textContent="";return}
+  $("logic").textContent=v.logic||"";
+  $("zones").innerHTML="<div>各档对应股价：</div><div class=\"z\">"+v.zones.map(function(z){
+    return "<span><b style=\"color:"+z.color+"\">"+z.name+"</b> "+fmtR(z.lo,z.hi)+(z.method?"（"+z.method+"）":"")+"</span>";
+  }).join("")+"</div>";
 }
 function loadVals(){
   return fetch("valuations.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
@@ -163,7 +168,7 @@ function draw(){
   var cv=$("cv"),dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;
   cv.width=W*dpr;cv.height=H*dpr;
   var x=cv.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
-  var V=view(),b=V.b,n=b.length,R=78,L=4,top=8,bot=18,pH=Math.round((H-bot-top)*0.74),vT=top+pH+6,vH=H-vT-bot,pw=W-L-R,cw=pw/n;
+  var V=view(),b=V.b,n=b.length,R=118,L=4,top=8,bot=18,pH=Math.round((H-bot-top)*0.74),vT=top+pH+6,vH=H-vT-bot,pw=W-L-R,cw=pw/n;
   var lo=1e18,mx=-1e18,vm=0;b.forEach(function(k){lo=Math.min(lo,k[3]);mx=Math.max(mx,k[2]);vm=Math.max(vm,k[5])});
   // include visible valuation bands / lines that intersect price range (expand a bit for context)
   var val=S.val;
@@ -172,11 +177,6 @@ function draw(){
       // only expand ylim if zone overlaps visible price band ±20%
       var mid=(z.lo+z.hi)/2;
       if(mid>=lo*0.7&&mid<=mx*1.35){lo=Math.min(lo,z.lo);mx=Math.max(mx,z.hi)}
-    });
-  }
-  if(val&&val.lines){
-    val.lines.forEach(function(l){
-      if(l.v>=lo*0.85&&l.v<=mx*1.2){lo=Math.min(lo,l.v);mx=Math.max(mx,l.v)}
     });
   }
   var pad=(mx-lo)*0.05||1;lo-=pad;mx+=pad;
@@ -199,7 +199,7 @@ function draw(){
       var ym=(y1+y2)/2;
       if(ym>=top+6&&ym<=top+pH-6){
         x.fillStyle=z.color;x.textAlign="left";x.font="bold 10px "+getComputedStyle(document.body).fontFamily;
-        x.fillText(z.name,L+pw+3,ym);
+        x.fillText(z.name+" "+fmtR(z.lo,z.hi),L+pw+3,ym);
         x.font="11px "+getComputedStyle(document.body).fontFamily;
       }
     });
@@ -211,19 +211,6 @@ function draw(){
     // avoid overlapping zone labels: put price under if needed — still at right
     x.fillText(fmt(yv),L+pw+3,yy+(val&&val.zones?-10:0))}
   x.beginPath();x.moveTo(L,vT-.5);x.lineTo(L+pw,vT-.5);x.stroke();
-
-  // key lines (box / trigger / VP)
-  if(val&&val.lines){
-    val.lines.forEach(function(l){
-      if(l.v<lo||l.v>mx)return;
-      var yy=Math.round(Y(l.v))+.5;
-      x.strokeStyle=l.color||ACC;x.lineWidth=1.1;x.setLineDash(l.dash?[5,4]:[]);
-      x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();x.setLineDash([]);
-      x.fillStyle=l.color||ACC;x.font="10px "+getComputedStyle(document.body).fontFamily;
-      x.textAlign="left";x.fillText(l.lab+" "+fmt(l.v),L+4,yy-6);
-      x.font="11px "+getComputedStyle(document.body).fontFamily;
-    });
-  }
 
   // candles + volume
   var bw=Math.max(1,Math.min(cw*.7,12));
@@ -269,7 +256,7 @@ cv.addEventListener("pointermove",function(e){
   var dx=e.clientX-S.drag.x;
   if(Math.abs(dx)>4)S.drag.moved=true;
   if(!S.bars)return;
-  var Vn=Math.min(S.want,S.bars.length),cw=(cv.clientWidth-82)/Math.max(1,Vn);
+  var Vn=Math.min(S.want,S.bars.length),cw=(cv.clientWidth-122)/Math.max(1,Vn);
   var shift=Math.round(-dx/Math.max(cw,2));
   S.st=Math.max(0,Math.min(S.bars.length-Vn, S.drag.st+shift));
   pick(e.clientX);

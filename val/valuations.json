@@ -1,12 +1,12 @@
 {
   "MU": {
-    "src": "mu_val.py / mu_valuation_notes.md",
+    "logic": "用 S&P 一致预期 FY27E EPS 176.15、FY28E 206.33 与 BVPS 122.5，按 P/E 与 P/B 倍数划七档连续股价区间（2026-10-07/08）。",
     "asof": "2026-10-08",
+    "src": "mu_val.py",
     "inputs": {
       "E27": 176.15,
       "E28": 206.33,
-      "BVPS": 122.524,
-      "inputs_note": "S&P一致预期10/7; futu BVPS 10/8"
+      "BVPS": 122.524
     },
     "zones": [
       {
@@ -58,34 +58,16 @@
         "name": "牛市/估值顶",
         "method": "FY28E 206.33 × 7.0–8.0x"
       }
-    ],
-    "lines": [
-      {
-        "v": 844.8,
-        "lab": "箱底",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 1102.0,
-        "lab": "箱顶",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 1125.1,
-        "lab": "突破触发",
-        "color": "#8a6d3b",
-        "dash": true
-      }
     ]
   },
   "SNDK": {
-    "src": "sndk_val.py / sndk_valuation_notes.md",
+    "logic": "用 S&P non-GAAP 一致预期 FY27E EPS 214.38、FY28E 265.24，按周期品偏低 P/E 倍数划七档连续股价区间（2026-10-06）。",
     "asof": "2026-10-08",
+    "src": "sndk_val.py",
     "inputs": {
       "E26": 70.88,
       "E27": 214.38,
-      "E28": 265.24,
-      "inputs_note": "non-GAAP S&P一致预期 2026-10-06"
+      "E28": 265.24
     },
     "zones": [
       {
@@ -137,27 +119,15 @@
         "name": "牛市/估值顶",
         "method": "FY28E 265.24 × 8.5–11x"
       }
-    ],
-    "lines": [
-      {
-        "v": 1175.63,
-        "lab": "日线VP箱底",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 1827.05,
-        "lab": "日线VP箱顶",
-        "color": "#8a6d3b"
-      }
     ]
   },
   "AVGO": {
-    "src": "avgo_val2.py / avgo_valuation_notes.md",
+    "logic": "用 FY27E EPS 19.39（S&P）、FY28E 25.86（LSEG）按 P/E 倍数划七档连续股价区间（约 2026-10-07）。",
     "asof": "2026-10-08",
+    "src": "avgo_val2.py",
     "inputs": {
       "E27": 19.39,
-      "E28": 25.86,
-      "inputs_note": "FY27E S&P / FY28E LSEG ~2026-10-07"
+      "E28": 25.86
     },
     "zones": [
       {
@@ -209,35 +179,17 @@
         "name": "牛市/估值顶",
         "method": "FY28E 25.86 × 19–21.7x"
       }
-    ],
-    "lines": [
-      {
-        "v": 305.0,
-        "lab": "箱底",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 407.32,
-        "lab": "箱顶",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 413.0,
-        "lab": "突破触发",
-        "color": "#8a6d3b",
-        "dash": true
-      }
     ]
   },
   "INTC": {
-    "src": "intc_val.py / intc_valuation_notes.md",
+    "logic": "用 non-GAAP 一致预期 FY27E EPS 2.08、FY28E 3.22 与 BVPS 16.66，按 P/B 与 FY28E P/E（及 SOTP 参考）划七档连续股价区间（2026-10-07/08）。",
     "asof": "2026-10-08",
+    "src": "intc_val.py",
     "inputs": {
       "E26": 1.52,
       "E27": 2.08,
       "E28": 3.22,
-      "BVPS": 16.664,
-      "inputs_note": "non-GAAP一致预期 2026-10-07; BVPS futu 2026-10-08"
+      "BVPS": 16.664
     },
     "zones": [
       {
@@ -289,29 +241,17 @@
         "name": "牛市/估值顶",
         "method": "FY28E × 45–55x / SOTP 157（14A锚定客户）"
       }
-    ],
-    "lines": [
-      {
-        "v": 127.5,
-        "lab": "VP箱体 127.5",
-        "color": "#1A3A6B"
-      },
-      {
-        "v": 86.5,
-        "lab": "VP箱体 86.5",
-        "color": "#1A3A6B"
-      }
     ]
   },
   "CRCL": {
-    "src": "crcl_val.py / crcl_valuation_notes.md",
+    "logic": "用调整后 EBITDA 一致预期 2027E $841M、2028E $1,095M，加净现金 $2.62B、稀释股本 268.6M，按 EV/EBITDA 倍数换算每股价划七档（约 2026-09）。",
     "asof": "2026-10-08",
+    "src": "crcl_val.py",
     "inputs": {
       "EB27": 841.35,
       "EB28": 1095.0,
       "NETCASH": 2619.0,
-      "SHARES": 268.637,
-      "inputs_note": "调整后EBITDA一致预期; 净现金+稀释股本"
+      "SHARES": 268.637
     },
     "zones": [
       {
@@ -362,28 +302,6 @@
         "color": "#B71C1C",
         "name": "牛市/估值顶",
         "method": "2028E 1,095 × 25–32x"
-      }
-    ],
-    "lines": [
-      {
-        "v": 58.2,
-        "lab": "VP箱底",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 136.25,
-        "lab": "VP箱顶",
-        "color": "#8a6d3b"
-      },
-      {
-        "v": 76.0,
-        "lab": "止损参考 76",
-        "color": "#6A1B9A"
-      },
-      {
-        "v": 87.0,
-        "lab": "收复位 87",
-        "color": "#6A1B9A"
       }
     ]
   }
