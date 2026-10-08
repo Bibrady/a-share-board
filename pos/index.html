@@ -145,7 +145,7 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
   <div id="sum"></div>
   <div id="acct"></div>
   <div id="list"></div>
-  <div class="note">仓位占用 = 该合约初始保证金 ÷ 权益。保证金按标记价 × 数量 ÷ 杠杆实时算；电脑同步到币安的初始保证金时，以那个数为准并随标记价缩放。账户杠杆 = 全部名义价值 ÷ 权益。强平价是币安上次同步的值，不是实时估算。只读，不会下单。还能加 = 保证金上限 − 已用保证金，上限 = 整体杠杆 ÷ 开仓杠杆（不超过 100%），不是可用余额。这两个选择只记在这台设备上。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
+  <div class="note">仓位占用 = 该合约初始保证金 ÷ 权益。保证金按标记价 × 数量 ÷ 杠杆实时算；电脑同步到币安的初始保证金时，以那个数为准并随标记价缩放。账户杠杆 = 全部名义价值 ÷ 权益。强平价是币安上次同步的值，不是实时估算。只读，不会下单。还能加 = max(0, 所选整体杠杆 × 权益 − 当前总名义) ÷ 开仓杠杆；实际杠杆已经达到或超过所选整体杠杆时为 0，不是可用余额。保证金上限和需要预留只表示假如全部按开仓杠杆，该用多少、该留多少。这两个选择只记在这台设备上。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
  </div>
 </div>
 <script>
@@ -236,23 +236,24 @@ function book(){var rows=(D.pos||[]).map(function(p){return {p:p,r:rowOf(p)}});
  var bought=pim!=null?pim:((rows.length||A)?im:null);
  var used=(bought!=null&&eq)?bought/eq*100:(eq?im/eq*100:null);
  var capU=eq==null?null:eq*P.ratio,reserve=capU==null?null:eq-capU;
- var room=(capU==null||bought==null)?null:Math.max(0,capU-bought);
- var slots=used==null?null:used/P.slot,lev=eq?no/eq:null;
- return {rows:rows,im:im,up:up,no:no,wb:wb,eq:eq,avail:avail,used:used,slots:slots,lev:lev,acct:!!A,bought:bought,room:room,capU:capU,reserve:reserve,P:P}}
+ var lev=eq?no/eq:null;
+ var room=eq==null?null:Math.max(0,P.o*eq-no)/P.x;
+ var over=lev!=null&&lev+1e-9>=P.o;
+ if(over)room=0;
+ return {rows:rows,im:im,up:up,no:no,wb:wb,eq:eq,avail:avail,used:used,lev:lev,acct:!!A,bought:bought,room:room,capU:capU,reserve:reserve,P:P,over:over}}
 
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function bookViz(B){
- var P=B.P,over=B.bought!=null&&B.capU!=null&&B.bought>B.capU+1e-6;
- var w=B.used==null?0:Math.min(100,Math.max(0,B.used));
- var slots="",s=B.slots==null?0:B.slots,n=P.n,capL=Math.max(0,Math.min(100,P.cap));
+ var P=B.P,over=!!B.over,n=P.o;
+ var w=B.lev==null?0:Math.min(100,Math.max(0,B.lev/n*100));
+ var slots="",s=B.lev==null?0:B.lev;
  for(var i=0;i<n;i++){
-  var frac=B.slots==null?0:clamp(s-i,0,1);
+  var frac=B.lev==null?0:(over?1:clamp(s-i,0,1));
   slots+='<div class="slot'+(over&&frac>0?" bad":"")+'" aria-hidden="true"><b style="width:'+(frac*100).toFixed(1)+'%"></b><em>'+(i+1)+'</em></div>'}
- var leg=B.used==null?"暂无数据，条先空着":"已用 "+pct1(B.used)+(over?"，已越过 "+pctN(P.cap):"，未到 "+pctN(P.cap));
- var reserveTxt=P.cap>=99.5?"不预留":"后 "+pctN(100-P.cap)+" 必须留空";
- return '<h3>总占用</h3><div class="meter'+(over?" over":"")+'" role="img" aria-label="'+esc(leg)+'" style="background:linear-gradient(90deg,#FBF9F4 0 '+capL+'%,rgba(183,28,28,.14) '+capL+'% 100%)"><div class="fill" style="width:'+w.toFixed(1)+'%"></div><i class="cap" style="left:'+capL+'%"></i></div>'+
-  '<div class="vleg"><span><i class="a"></i>已用</span><span><i class="k"></i>'+pctN(P.cap)+' 上限</span><span><i class="f"></i>'+reserveTxt+'</span></div>'+
-  '<div class="slots">'+slots+'</div><div class="slcap"><span>'+pctN(P.slot)+' 一档，共 '+n+' 档</span><span>'+(B.slots==null?"— / "+n:(B.slots.toFixed(1)+" / "+n))+'</span></div>'}
+ var leg=B.lev==null?"暂无数据，条先空着":"实际 "+B.lev.toFixed(2)+"x"+(over?"，已到或超过所选 "+n+" 倍":"，未到所选 "+n+" 倍");
+ return '<h3>总占用</h3><div class="meter'+(over?" over":"")+'" role="img" aria-label="'+esc(leg)+'" style="background:#FBF9F4"><div class="fill" style="width:'+w.toFixed(1)+'%"></div><i class="cap" style="left:100%"></i></div>'+
+  '<div class="vleg"><span><i class="a"></i>实际杠杆</span><span><i class="k"></i>右端是所选 '+n+' 倍</span>'+(over?'<span><i class="f"></i>已超线，没有空位</span>':'<span><i class="f"></i>空着的是还能加的杠杆</span>')+'</div>'+
+  '<div class="slots">'+slots+'</div><div class="slcap"><span>1 倍一档，共 '+n+' 档</span><span>'+(B.lev==null?"— / "+n:(B.lev.toFixed(2)+" / "+n))+'</span></div>'}
 function shareBar(share,P){
  var tick=Math.max(0,Math.min(100,P.slot/P.cap*100));
  var capTxt='刻度到 '+pctN(P.cap)+'，竖线是 '+pctN(P.slot)+' 一档';
@@ -285,18 +286,18 @@ function render(){paintOpts();if(!D){status();return}
   o+='<div class="ft">'+(p.mt==="isolated"?"逐仓":"全仓")+' · 强平价为 '+(D.st&&D.st.sync?bj(D.st.sync):bj(D.t))+' 同步</div></div>';
   h.push(o)});
  $("#list").innerHTML=h.join("");
- var over=B.bought!=null&&B.capU!=null&&B.bought>B.capU+1e-6;
+ var over=!!B.over;
  $("#viz").innerHTML='<div class="viz">'+bookViz(B)+'</div>';
- $("#warn").innerHTML=over?'<div class="warn">已用 '+pct1(B.used)+'，超过当前上限 '+pctN(B.P.cap)+'。先别加。</div>':"";
+ $("#warn").innerHTML=over?'<div class="warn">实际杠杆 '+(B.lev==null?"—":B.lev.toFixed(2)+"x")+'，已到或超过所选整体 '+B.P.o+' 倍。先别加。</div>':"";
  $("#room").innerHTML='<div class="room">'+
   '<div><span>已买仓位<small>已用保证金</small></span><em>'+(B.bought==null?"暂无数据":u0(B.bought)+" U")+'</em></div>'+
-  '<div'+(over?' class="bad"':'')+'><span>还能加<small>按当前整体 '+B.P.o+' 倍、开仓 '+B.P.x+' 倍，不是可用余额</small></span><em>'+(B.room==null?"暂无数据":u0(B.room)+" U")+'</em></div>'+
-  '<div><span>保证金上限<small>权益的 '+pctN(B.P.cap)+'</small></span><em>'+(B.capU==null?"暂无数据":u0(B.capU)+" U")+'</em></div>'+
-  '<div><span>需要预留<small>'+(B.P.bad?"达不到，预留为 0":"权益减去保证金上限")+'</small></span><em>'+(B.reserve==null?"暂无数据":u0(B.reserve)+" U")+'</em></div></div>';
+  '<div'+(over?' class="bad"':'')+'><span>还能加<small>按实际杠杆相对所选整体 '+B.P.o+' 倍，再除以开仓 '+B.P.x+' 倍。不是可用余额</small></span><em>'+(B.room==null?"暂无数据":u0(B.room)+" U")+'</em></div>'+
+  '<div><span>保证金上限<small>假如全部按开仓杠杆，权益的 '+pctN(B.P.cap)+'</small></span><em>'+(B.capU==null?"暂无数据":u0(B.capU)+" U")+'</em></div>'+
+  '<div><span>需要预留<small>'+(B.P.bad?"达不到，预留为 0":"假如全部按开仓杠杆，权益减去保证金上限")+'</small></span><em>'+(B.reserve==null?"暂无数据":u0(B.reserve)+" U")+'</em></div></div>';
  $("#sum").innerHTML='<div class="sum">'+
-  '<div class="bx'+(over?" bad":"")+'"><div class="l">已用仓位</div><div class="v">'+(B.used==null?"暂无数据":pct1(B.used))+'</div><div class="s">'+(B.slots==null?"— / "+B.P.n+" 档":B.slots.toFixed(1)+" / "+B.P.n+" 档")+' · '+(B.bought==null?"—":u0(B.bought)+" U")+'</div></div>'+
+  '<div class="bx"><div class="l">已用仓位</div><div class="v">'+(B.used==null?"暂无数据":pct1(B.used))+'</div><div class="s">'+(B.bought==null?"—":u0(B.bought)+" U")+'</div></div>'+
   '<div class="bx"><div class="l">需要预留</div><div class="v">'+(B.reserve==null?"暂无数据":u0(B.reserve)+" U")+'</div><div class="s">'+pctN(100-B.P.cap)+' · 上限 '+pctN(B.P.cap)+'</div></div>'+
-  '<div class="bx"><div class="l">账户杠杆</div><div class="v">'+(B.lev==null?"暂无数据":B.lev.toFixed(2)+"x")+'</div><div class="s">名义 '+u0(B.no)+' U</div></div></div>';
+  '<div class="bx'+(over?" bad":"")+'"><div class="l">账户杠杆</div><div class="v">'+(B.lev==null?"暂无数据":B.lev.toFixed(2)+"x")+'</div><div class="s">名义 '+u0(B.no)+' U · 所选 '+B.P.o+' 倍</div></div></div>';
  $("#acct").innerHTML='<div class="acct">'+
   '<div><span>钱包余额</span><em>'+(B.wb==null?"暂无数据":u0(B.wb)+" U")+'</em></div>'+
   '<div><span>权益</span><em>'+(B.eq==null?"暂无数据":u0(B.eq)+" U")+'</em></div>'+
