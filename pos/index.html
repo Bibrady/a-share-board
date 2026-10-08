@@ -83,6 +83,15 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
 .dot.g{background:var(--up)}.dot.r{background:var(--dn)}
 .live{font-size:11px;font-family:var(--mono);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px}
 .live.on{color:var(--up);border:1px solid rgba(26,26,26,.35)}.live.off{color:var(--mu);border:1px solid var(--g2)}
+.opts{background:#fff;border:1px solid var(--g2);border-radius:5px;padding:8px 12px 10px;margin:0 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--hair)}
+.opt:last-of-type{border-bottom:0}
+.opt .lb{font-size:13px;color:var(--mu)}
+.seg{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.seg button{background:#fff;border:1px solid var(--g2);color:var(--tx);border-radius:4px;padding:4px 0;min-width:36px;font-family:var(--mono);font-size:13px;font-weight:650;cursor:pointer}
+.seg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.capnote{font-size:12.5px;color:var(--si);line-height:1.55;margin-top:6px}
+.capnote.bad{color:var(--dn)}
 
 .viz{background:#fff;border:1px solid var(--g2);border-radius:5px;padding:10px 12px 12px;margin:0 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .viz h3{margin:0 0 8px;font-size:13px;font-weight:650;color:var(--si);letter-spacing:.04em}
@@ -125,20 +134,24 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
   <div class="err" id="perr"></div></div></div>
  <div id="main" hidden>
   <div class="status" id="st"></div>
-  <div class="rule">10 倍全仓，保留 40%。满仓 = 保证金等于全部权益；每次大约用权益的 10% 做保证金，6 档就是账户大约 6 倍。只看总占用，不限标的个数。</div>
+  <div class="opts" id="opts">
+   <div class="opt"><span class="lb">账户整体杠杆</span><div class="seg" data-k="o"><button type="button" data-v="3">3</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button><button type="button" data-v="6" class="on">6</button><button type="button" data-v="7">7</button></div></div>
+   <div class="opt"><span class="lb">开仓杠杆</span><div class="seg" data-k="x"><button type="button" data-v="5">5</button><button type="button" data-v="10" class="on">10</button><button type="button" data-v="20">20</button></div></div>
+   <div class="capnote" id="capnote">保证金上限 = 整体杠杆 ÷ 开仓杠杆。默认整体 6 倍、开仓 10 倍，上限 60%，预留 40%。</div>
+  </div>
   <div id="warn"></div>
   <div id="room"></div>
   <div id="viz"></div>
   <div id="sum"></div>
   <div id="acct"></div>
   <div id="list"></div>
-  <div class="note">仓位占用 = 该合约初始保证金 ÷ 权益。保证金按标记价 × 数量 ÷ 杠杆实时算；电脑同步到币安的初始保证金时，以那个数为准并随标记价缩放。账户杠杆 = 全部名义价值 ÷ 权益。强平价是币安上次同步的值，不是实时估算。只读，不会下单。还能买按权益的 60% 减去已用保证金，不是可用余额。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
+  <div class="note">仓位占用 = 该合约初始保证金 ÷ 权益。保证金按标记价 × 数量 ÷ 杠杆实时算；电脑同步到币安的初始保证金时，以那个数为准并随标记价缩放。账户杠杆 = 全部名义价值 ÷ 权益。强平价是币安上次同步的值，不是实时估算。只读，不会下单。还能加 = 保证金上限 − 已用保证金，上限 = 整体杠杆 ÷ 开仓杠杆（不超过 100%），不是可用余额。这两个选择只记在这台设备上。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
  </div>
 </div>
 <script>
 (function(){"use strict";
 var SALT="yVpW4nUvqS+BEiWeOfsJ+g==",IT=600000,VER="8d44e05688a6f0ec",NT="https://ntfy.sh/",WSM="wss://fstream.binance.com/market/stream?streams=";
-var LSK="be2_mk",IDLE_MS=30*60000,PING_MS=150000,CAP=60,SLOTS=6,TE=new TextEncoder();
+var LSK="be2_mk",IDLE_MS=30*60000,PING_MS=150000,TE=new TextEncoder();
 var $=function(s){return document.querySelector(s)};
 var K=null,TD="",TQ="",D=null,LIVE={},S={lastMsg:0,lastPing:0,busy:false,reqT:0,cid:"",err:"",act:Date.now(),sse:null,sseOk:false,ws:null,wsSyms:"",wsT:0,wsBack:2000,answered:0,lastId:"",dirty:false};
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
@@ -169,6 +182,16 @@ function cls(x){return x>0.004?"up":x<-0.004?"dn":"mu"}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function u0(x){return x==null||isNaN(x)?"—":Math.round(x).toLocaleString("en-US")}
 function pct1(x){return x==null||isNaN(x)?"—":x.toFixed(1)+"%"}
+function pctN(x){return Math.round(x)+"%"}
+function limits(){var o=6,x=10;try{var a=parseInt(localStorage.getItem("pos_overall"),10),b=parseInt(localStorage.getItem("pos_open"),10);
+ if(a===3||a===4||a===5||a===6||a===7)o=a;if(b===5||b===10||b===20)x=b}catch(e){}
+ var bad=o>x,ratio=bad?1:o/x;if(ratio>1)ratio=1;
+ return {o:o,x:x,bad:bad,ratio:ratio,cap:ratio*100,slot:100/x,n:bad?x:o}}
+function paintOpts(){var P=limits(),t;
+ document.querySelectorAll("#opts button").forEach(function(btn){var k=btn.parentNode.getAttribute("data-k"),v=+btn.getAttribute("data-v");
+  btn.className=(k==="o"&&v===P.o)||(k==="x"&&v===P.x)?"on":""});
+ t=P.bad?("整体 "+P.o+" 倍高于开仓 "+P.x+" 倍，达不到。保证金上限按 100%，预留为 0。"):("保证金上限 = 整体 ÷ 开仓 = "+pctN(P.cap)+"，需要预留 "+pctN(100-P.cap)+"。");
+ $("#capnote").textContent=t;$("#capnote").className="capnote"+(P.bad?" bad":"")}
 function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(12);crypto.getRandomValues(u);for(var i=0;i<12;i++)s+=a[u[i]%a.length];return s}
 
 function handleEv(ev){if(!ev||ev.event!=="message")return Promise.resolve();if(ev.id)S.lastId=ev.id;
@@ -208,33 +231,39 @@ function book(){var rows=(D.pos||[]).map(function(p){return {p:p,r:rowOf(p)}});
  var eq=wb!=null?wb+up:(A&&A.eq!=null?+A.eq:null);
  var avail=A&&A.avail!=null?+A.avail:null;
  if(A&&A.upnl!=null&&avail!=null)avail=avail+(up-(+A.upnl));
- var used=eq?im/eq*100:null,left=used==null?null:100-used,slots=used==null?null:used/10,lev=eq?no/eq:null;
+ var P=limits();
  var pim=(A&&A.pim!=null&&A.pim!==""&&!isNaN(+A.pim))?+A.pim:null;
  var bought=pim!=null?pim:((rows.length||A)?im:null);
- var room=(bought==null||eq==null)?null:Math.max(0,0.6*eq-bought);
- return {rows:rows,im:im,up:up,no:no,wb:wb,eq:eq,avail:avail,used:used,left:left,slots:slots,lev:lev,acct:!!A,bought:bought,room:room}}
+ var used=(bought!=null&&eq)?bought/eq*100:(eq?im/eq*100:null);
+ var capU=eq==null?null:eq*P.ratio,reserve=capU==null?null:eq-capU;
+ var room=(capU==null||bought==null)?null:Math.max(0,capU-bought);
+ var slots=used==null?null:used/P.slot,lev=eq?no/eq:null;
+ return {rows:rows,im:im,up:up,no:no,wb:wb,eq:eq,avail:avail,used:used,slots:slots,lev:lev,acct:!!A,bought:bought,room:room,capU:capU,reserve:reserve,P:P}}
 
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function bookViz(B){
- var over=B.used!=null&&B.used>CAP;
+ var P=B.P,over=B.bought!=null&&B.capU!=null&&B.bought>B.capU+1e-6;
  var w=B.used==null?0:Math.min(100,Math.max(0,B.used));
- var slots="",s=B.slots==null?0:B.slots;
- for(var i=0;i<SLOTS;i++){
+ var slots="",s=B.slots==null?0:B.slots,n=P.n,capL=Math.max(0,Math.min(100,P.cap));
+ for(var i=0;i<n;i++){
   var frac=B.slots==null?0:clamp(s-i,0,1);
   slots+='<div class="slot'+(over&&frac>0?" bad":"")+'" aria-hidden="true"><b style="width:'+(frac*100).toFixed(1)+'%"></b><em>'+(i+1)+'</em></div>'}
- var leg=B.used==null?"暂无数据，条先空着":"已用 "+pct1(B.used)+(over?"，已越过 60%":"，未到 60%");
- return '<h3>总占用</h3><div class="meter'+(over?" over":"")+'" role="img" aria-label="'+esc(leg)+'"><div class="fill" style="width:'+w.toFixed(1)+'%"></div><i class="cap"></i></div>'+
-  '<div class="vleg"><span><i class="a"></i>已用</span><span><i class="k"></i>60% 上限</span><span><i class="f"></i>后 40% 必须留空</span></div>'+
-  '<div class="slots">'+slots+'</div><div class="slcap"><span>10% 一档，共 6 档</span><span>'+(B.slots==null?"— / 6":(B.slots.toFixed(1)+" / 6"))+'</span></div>'}
-function shareBar(share){
- if(share==null)return '<div class="pbar"><div class="pl"><span>占权益</span><span>暂无数据</span></div><div class="track"><i></i><span class="tick"></span></div></div>';
- var over=share>CAP,w=Math.min(100,Math.max(0,share/CAP*100));
- return '<div class="pbar"><div class="pl"><span>占权益</span><span>刻度到 60%，竖线是 10% 一档</span></div><div class="track'+(over?" over":"")+'"><i style="width:'+w.toFixed(1)+'%"></i><span class="tick"></span></div></div>'}
+ var leg=B.used==null?"暂无数据，条先空着":"已用 "+pct1(B.used)+(over?"，已越过 "+pctN(P.cap):"，未到 "+pctN(P.cap));
+ var reserveTxt=P.cap>=99.5?"不预留":"后 "+pctN(100-P.cap)+" 必须留空";
+ return '<h3>总占用</h3><div class="meter'+(over?" over":"")+'" role="img" aria-label="'+esc(leg)+'" style="background:linear-gradient(90deg,#FBF9F4 0 '+capL+'%,rgba(183,28,28,.14) '+capL+'% 100%)"><div class="fill" style="width:'+w.toFixed(1)+'%"></div><i class="cap" style="left:'+capL+'%"></i></div>'+
+  '<div class="vleg"><span><i class="a"></i>已用</span><span><i class="k"></i>'+pctN(P.cap)+' 上限</span><span><i class="f"></i>'+reserveTxt+'</span></div>'+
+  '<div class="slots">'+slots+'</div><div class="slcap"><span>'+pctN(P.slot)+' 一档，共 '+n+' 档</span><span>'+(B.slots==null?"— / "+n:(B.slots.toFixed(1)+" / "+n))+'</span></div>'}
+function shareBar(share,P){
+ var tick=Math.max(0,Math.min(100,P.slot/P.cap*100));
+ var capTxt='刻度到 '+pctN(P.cap)+'，竖线是 '+pctN(P.slot)+' 一档';
+ if(share==null)return '<div class="pbar"><div class="pl"><span>占权益</span><span>暂无数据</span></div><div class="track"><i></i><span class="tick" style="left:'+tick.toFixed(2)+'%"></span></div></div>';
+ var over=share>P.cap,w=Math.min(100,Math.max(0,share/P.cap*100));
+ return '<div class="pbar"><div class="pl"><span>占权益</span><span>'+capTxt+'</span></div><div class="track'+(over?" over":"")+'"><i style="width:'+w.toFixed(1)+'%"></i><span class="tick" style="left:'+tick.toFixed(2)+'%"></span></div></div>'}
 function liqBar(r){
  if(r.dpct==null)return '<div class="liqrow"><div class="pl"><span>距强平</span><span>暂无数据</span></div><div class="liq"></div><div class="liqends"><span>近</span><span>远</span></div></div>';
  var x=clamp(r.dpct,0,40)/40*100;
  return '<div class="liqrow"><div class="pl"><span>距强平</span><span>越靠左越近，标尺到 40%</span></div><div class="liq" role="img"><i style="left:'+x.toFixed(1)+'%"></i></div><div class="liqends"><span>近 · 强平</span><span>远</span></div></div>'}
-function render(){if(!D){status();return}
+function render(){paintOpts();if(!D){status();return}
  var B=book(),h=[];
  if(!B.rows.length)h.push('<div class="card empty">当前没有持仓</div>');
  B.rows.forEach(function(x){var p=x.p,r=x.r,tk=p.tick||0.01,nm=p.s.replace(/USDT$|USDC$/,"");
@@ -243,9 +272,9 @@ function render(){if(!D){status();return}
    (p.mt==="isolated"?'<span class="chip">逐仓</span>':'<span class="chip">全仓</span>')+
    '<span class="mg">保证金 <b>'+u0(r.im)+' U</b><small>数量 '+esc(String(p.amt))+'</small></span></div>';
   o+='<div class="dist">仓位占用 <b>'+(share==null?"暂无数据":pct1(share))+'</b> · 已买 <b>'+u0(r.im)+' U</b>';
-  if(share!=null)o+=' · 大约 <b>'+(share/10).toFixed(1)+'</b> 个 10% 档';
+  if(share!=null)o+=' · 大约 <b>'+(share/B.P.slot).toFixed(1)+'</b> 个 '+pctN(B.P.slot)+' 档';
   o+='<br>距强平 '+(r.dpct==null?'<b>暂无数据</b>':'<b class="'+(r.dpct<10?"dn":"up")+'">'+r.dpct.toFixed(2)+'%</b> · 价差 <b>'+fp(r.dpx,tk)+'</b>（强平价在标记价'+(r.lg?"下方":"上方")+'）')+'</div>';
-  o+=shareBar(share)+liqBar(r);
+  o+=shareBar(share,B.P)+liqBar(r);
   o+='<div class="grid">'+
    '<div><span>开仓价</span><em>'+fp(p.entry,tk)+'</em></div>'+
    '<div><span>标记价</span><em>'+fp(r.mark,tk)+'<span class="live '+(r.live?"on":"off")+'">'+(r.live?"实时":"快照")+'</span></em></div>'+
@@ -256,14 +285,17 @@ function render(){if(!D){status();return}
   o+='<div class="ft">'+(p.mt==="isolated"?"逐仓":"全仓")+' · 强平价为 '+(D.st&&D.st.sync?bj(D.st.sync):bj(D.t))+' 同步</div></div>';
   h.push(o)});
  $("#list").innerHTML=h.join("");
- var over=B.used!=null&&B.used>CAP;
+ var over=B.bought!=null&&B.capU!=null&&B.bought>B.capU+1e-6;
  $("#viz").innerHTML='<div class="viz">'+bookViz(B)+'</div>';
- $("#warn").innerHTML=over?'<div class="warn">已用 '+pct1(B.used)+'，超过 60% 上限。按规则要留至少 40% 空仓，先别加。</div>':"";
- var roomBad=B.room===0&&B.bought!=null&&B.eq!=null&&B.bought>0.6*B.eq;
- $("#room").innerHTML='<div class="room"><div><span>已买仓位<small>已用保证金</small></span><em>'+(B.bought==null?"暂无数据":u0(B.bought)+" U")+'</em></div><div'+(roomBad?' class="bad"':'')+'><span>还能买<small>按 60% 上限还能加</small></span><em>'+(B.room==null?"暂无数据":u0(B.room)+" U")+'</em></div></div>';
+ $("#warn").innerHTML=over?'<div class="warn">已用 '+pct1(B.used)+'，超过当前上限 '+pctN(B.P.cap)+'。先别加。</div>':"";
+ $("#room").innerHTML='<div class="room">'+
+  '<div><span>已买仓位<small>已用保证金</small></span><em>'+(B.bought==null?"暂无数据":u0(B.bought)+" U")+'</em></div>'+
+  '<div'+(over?' class="bad"':'')+'><span>还能加<small>按当前整体 '+B.P.o+' 倍、开仓 '+B.P.x+' 倍，不是可用余额</small></span><em>'+(B.room==null?"暂无数据":u0(B.room)+" U")+'</em></div>'+
+  '<div><span>保证金上限<small>权益的 '+pctN(B.P.cap)+'</small></span><em>'+(B.capU==null?"暂无数据":u0(B.capU)+" U")+'</em></div>'+
+  '<div><span>需要预留<small>'+(B.P.bad?"达不到，预留为 0":"权益减去保证金上限")+'</small></span><em>'+(B.reserve==null?"暂无数据":u0(B.reserve)+" U")+'</em></div></div>';
  $("#sum").innerHTML='<div class="sum">'+
-  '<div class="bx'+(over?" bad":"")+'"><div class="l">已用仓位</div><div class="v">'+(B.used==null?"暂无数据":pct1(B.used))+'</div><div class="s">'+(B.slots==null?"— / "+SLOTS+" 档":B.slots.toFixed(1)+" / "+SLOTS+" 档")+' · '+u0(B.im)+' U</div></div>'+
-  '<div class="bx'+(over?" bad":"")+'"><div class="l">剩余仓位</div><div class="v">'+(B.left==null?"暂无数据":pct1(B.left))+'</div><div class="s">上限 60%，保留 40%</div></div>'+
+  '<div class="bx'+(over?" bad":"")+'"><div class="l">已用仓位</div><div class="v">'+(B.used==null?"暂无数据":pct1(B.used))+'</div><div class="s">'+(B.slots==null?"— / "+B.P.n+" 档":B.slots.toFixed(1)+" / "+B.P.n+" 档")+' · '+(B.bought==null?"—":u0(B.bought)+" U")+'</div></div>'+
+  '<div class="bx"><div class="l">需要预留</div><div class="v">'+(B.reserve==null?"暂无数据":u0(B.reserve)+" U")+'</div><div class="s">'+pctN(100-B.P.cap)+' · 上限 '+pctN(B.P.cap)+'</div></div>'+
   '<div class="bx"><div class="l">账户杠杆</div><div class="v">'+(B.lev==null?"暂无数据":B.lev.toFixed(2)+"x")+'</div><div class="s">名义 '+u0(B.no)+' U</div></div></div>';
  $("#acct").innerHTML='<div class="acct">'+
   '<div><span>钱包余额</span><em>'+(B.wb==null?"暂无数据":u0(B.wb)+" U")+'</em></div>'+
@@ -281,7 +313,7 @@ function status(){if(!K)return;var now=Date.now(),s;
  if(S.busy)s+='<br>正在向电脑要最新数据…';else if(S.err)s+='<br><span class="w">'+esc(S.err)+'</span>';
  $("#st").innerHTML=s}
 
-function start(){$("#lock").hidden=true;$("#main").hidden=false;$("#rf").hidden=false;status();
+function start(){$("#lock").hidden=true;$("#main").hidden=false;$("#rf").hidden=false;paintOpts();status();
  loadLatest().then(function(){status();sse();refresh(false)})}
 function showLock(err){$("#main").hidden=true;$("#lock").hidden=false;$("#perr").textContent=err||"";setTimeout(function(){$("#pw").focus()},50)}
 $("#pf").addEventListener("submit",function(e){e.preventDefault();var v=$("#pw").value;if(!norm(v))return;$("#perr").textContent="验证中…";$("#pfb").disabled=true;
@@ -289,6 +321,10 @@ $("#pf").addEventListener("submit",function(e){e.preventDefault();var v=$("#pw")
   function(err){$("#pfb").disabled=false;$("#perr").textContent=err&&err.message==="BADPW"?"密码不对":"解锁失败："+(err&&err.message||err)})});
 $("#logout").addEventListener("click",function(e){e.preventDefault();try{localStorage.removeItem(LSK)}catch(x){}location.reload()});
 $("#rf").addEventListener("click",function(){refresh(true)});
+$("#opts").addEventListener("click",function(e){var b=e.target.closest?e.target.closest("button"):null;if(!b||!$("#opts").contains(b))return;
+ var k=b.parentNode.getAttribute("data-k"),v=+b.getAttribute("data-v");
+ if(k==="o"&&!(v===3||v===4||v===5||v===6||v===7))return;if(k==="x"&&!(v===5||v===10||v===20))return;
+ try{localStorage.setItem(k==="o"?"pos_overall":"pos_open",String(v))}catch(err){}render()});
 ["touchstart","pointerdown","keydown","scroll"].forEach(function(ev){window.addEventListener(ev,function(){S.act=Date.now()},{passive:true})});
 setInterval(function(){if(S.dirty&&!document.hidden)render()},1000);
 setInterval(function(){if(!K||document.hidden)return;render();var now=Date.now();
