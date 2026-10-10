@@ -70,7 +70,7 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 </div>
 <script>
 (function(){"use strict";
-var SYMS=["SNDK","MU","AVGO","INTC","CRCL"];
+var SYMS=["SNDK","MU","AVGO","INTC","CRCL","AAOI","LITE","COHR"];
 var $=function(id){return document.getElementById(id)};
 var S={i:0,bars:null,src:"",want:120,st:0,sel:-1,drag:null,pinch:null,cache:{},vals:null,val:null};
 var UP="#1A1A1A",DN="#B71C1C",GRID="#E5E2DA",ACC="#1A3A6B",TX="#333333",MU="#666666",BG="#F7F5F0";
@@ -121,10 +121,11 @@ function apply(d){
   fitWindow();
   S.sel=S.bars.length-1;
   var last=S.bars[S.sel];
-  $("kmeta").textContent=(last?pd(last[0])+"  收 "+fmt(last[4]):"");
+  $("kmeta").textContent=(last?pd(last[0])+"  "+(d.price==="mark"?"现价(标记) ":"收 ")+fmt(last[4]):"");
   var srcLabel=S.src==="binance-futures"?"币安 USDT 永续日K（"+((d.pair)||(SYMS[S.i]+"USDT"))+"）":(S.src||"公开行情");
+  var px=(d.price==="mark"?"最新价=标记价（无标记则用日收）":"日收盘价");
   var note=rangeNote();
-  $("ksrc").textContent="数据来源："+srcLabel+" · 截至 "+pd(d.asof||"")+(note?" · "+note:"");
+  $("ksrc").textContent="数据来源："+srcLabel+" · "+px+" · 截至 "+pd(d.asof||"")+(note?" · "+note:"");
   draw();
 }
 function rangeNote(){
@@ -146,7 +147,8 @@ function setWant(n){
     var note=rangeNote();
     var d=S.cache[SYMS[S.i]];
     var srcLabel=S.src==="binance-futures"?"币安 USDT 永续日K（"+((d&&d.pair)||(SYMS[S.i]+"USDT"))+"）":(S.src||"公开行情");
-    $("ksrc").textContent="数据来源："+srcLabel+(d?" · 截至 "+pd(d.asof||""):"")+(note?" · "+note:"");
+    var px=(d&&d.price==="mark"?"最新价=标记价（无标记则用日收）":"日收盘价");
+    $("ksrc").textContent="数据来源："+srcLabel+(d?" · "+px+" · 截至 "+pd(d.asof||""):"")+(note?" · "+note:"");
     draw();
   }
 }

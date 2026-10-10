@@ -150,7 +150,7 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
 </div>
 <script>
 (function(){"use strict";
-var SALT="yVpW4nUvqS+BEiWeOfsJ+g==",IT=600000,VER="8d44e05688a6f0ec",NT="https://ntfy.sh/",WSM="wss://fstream.binance.com/market/stream?streams=";
+var SALT="VetqMVAh3xDaR5KRV4vbqA==",IT=600000,VER="9b36db1dfd2c58db",NT="https://ntfy.sh/",WSM="wss://fstream.binance.com/market/stream?streams=";
 var LSK="be2_mk",IDLE_MS=30*60000,PING_MS=150000,TE=new TextEncoder();
 var $=function(s){return document.querySelector(s)};
 var K=null,TD="",TQ="",D=null,LIVE={},S={lastMsg:0,lastPing:0,busy:false,reqT:0,cid:"",err:"",act:Date.now(),sse:null,sseOk:false,ws:null,wsSyms:"",wsT:0,wsBack:2000,answered:0,lastId:"",dirty:false};
@@ -210,7 +210,7 @@ function sse(){if(S.sse)try{S.sse.close()}catch(e){}
 function post(kind){S.lastPing=Date.now();var c=rcid();if(kind==="refresh"||kind==="hello"){S.cid=c;S.reqT=Date.now()}
  return fto(NT+TQ,{method:"POST",body:JSON.stringify({a:kind,c:c})},8000).catch(function(e){S.err="发不出刷新请求（"+(e.message||e)+"）";if(S.busy){S.busy=false;$("#rf").disabled=false}status()})}
 function refresh(manual){if(!K)return;S.act=Date.now();if(S.busy)return;S.busy=true;S.err="";$("#rf").disabled=true;status();post(manual?"refresh":"hello");
- var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 20 秒没响应：可能 Mac 休眠/离线，或手机连不上 ntfy.sh。下面是 "+(D?bj(D.t,1):"暂无数据");status()}},20000)}
+ var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 20 秒没响应：电脑离线或手机连不上 ntfy.sh。下面是 "+(D?bj(D.t,1):"暂无数据");status()}},20000)}
 function watchSyms(){if(!D)return;var syms=(D.pos||[]).map(function(p){return p.s.toLowerCase()}).sort().join("/");if(syms===S.wsSyms&&S.ws)return;S.wsSyms=syms;ws()}
 function ws(){if(S.ws){try{S.ws.onclose=null;S.ws.close()}catch(e){}S.ws=null}if(!S.wsSyms||document.hidden)return;
  var w;try{w=new WebSocket(WSM+S.wsSyms.split("/").map(function(s){return s+"@markPrice@1s"}).join("/"))}catch(e){return}S.ws=w;
@@ -305,7 +305,7 @@ function render(){paintOpts();if(!D){status();return}
   '<div><span>可用余额</span><em>'+(B.avail==null?"暂无数据":u0(B.avail)+" U")+'</em></div></div>';
  status();S.dirty=false}
 function status(){if(!K)return;var now=Date.now(),s;
- if(!D){s='<span class="dot '+(S.err?"off":"busy")+'"></span>'+(S.err?'<span class="w">'+esc(S.err)+'</span>':'暂无数据。等待电脑发来加密快照…（Mac 离线超过 12 小时就没有缓存）');$("#st").innerHTML=s;return}
+ if(!D){s='<span class="dot '+(S.err?"off":"busy")+'"></span>'+(S.err?'<span class="w">'+esc(S.err)+'</span>':'暂无数据。等待电脑发来加密快照…（电脑离线超过 12 小时就没有缓存）');$("#st").innerHTML=s;return}
  var macAge=now-D.t,macLive=(S.answered&&now-S.answered<PING_MS+60000)||macAge<180000;
  var dc=macLive?"g":"r";
  s='<span class="dot '+dc+(S.busy?" busy":"")+'"></span>快照 <b>'+bj(D.t,1)+'</b> 北京时间（'+ago(D.t)+'）'+(macLive?' <span class="ok">电脑在线</span>':' <span class="w">电脑可能离线，显示上次快照</span>');

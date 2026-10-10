@@ -96,12 +96,12 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
   <div class="status" id="st"></div>
   <div id="sum"></div>
   <div id="list"></div>
-  <div class="note">真实保本 = 开仓价 − (本轮已实现盈亏 − 已付手续费 + 已收付资金费 − 预估平仓手续费) ÷ 持仓数量。“本轮”从这个仓位上一次归零之后算起；平仓费按你账户该合约的吃单费率估算（止损单触发按吃单成交）。建议止损 = 真实保本再往盈利方向留约 0.02% 滑点。持仓、成交、手续费、资金费和止损单由你的 Mac 通过币安推送实时计算，标记价和资金费率在手机上直连币安实时更新（连不上时用 Mac 的数据）。只读，不会下单。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
+  <div class="note">真实保本 = 开仓价 − (本轮已实现盈亏 − 已付手续费 + 已收付资金费 − 预估平仓手续费) ÷ 持仓数量。“本轮”从这个仓位上一次归零之后算起；平仓费按你账户该合约的吃单费率估算（止损单触发按吃单成交）。建议止损 = 真实保本再往盈利方向留约 0.02% 滑点。持仓、成交、手续费、资金费和止损单由看板电脑通过币安推送实时计算，标记价和资金费率在手机上直连币安实时更新（连不上时用电脑快照）。只读，不会下单。<br><a href="#" id="logout" style="color:var(--dim)">在这台设备上忘记密码</a></div>
  </div>
 </div>
 <script>
 (function(){"use strict";
-var SALT="yVpW4nUvqS+BEiWeOfsJ+g==",IT=600000,VER="8d44e05688a6f0ec",NT="https://ntfy.sh/",WSM="wss://fstream.binance.com/market/stream?streams=";
+var SALT="VetqMVAh3xDaR5KRV4vbqA==",IT=600000,VER="9b36db1dfd2c58db",NT="https://ntfy.sh/",WSM="wss://fstream.binance.com/market/stream?streams=";
 var LSK="be2_mk",IDLE_MS=30*60000,PING_MS=150000,TE=new TextEncoder();
 var $=function(s){return document.querySelector(s)};
 var K=null,TD="",TQ="",D=null,LIVE={},S={lastMsg:0,lastPing:0,busy:false,reqT:0,cid:"",err:"",act:Date.now(),sse:null,sseOk:false,ws:null,wsSyms:"",wsT:0,wsBack:2000,answered:0,lastId:"",dirty:false};
@@ -151,7 +151,7 @@ function sse(){if(S.sse)try{S.sse.close()}catch(e){}
 function post(kind){S.lastPing=Date.now();var c=rcid();if(kind==="refresh"||kind==="hello"){S.cid=c;S.reqT=Date.now()}
  return fto(NT+TQ,{method:"POST",body:JSON.stringify({a:kind,c:c})},8000).catch(function(e){S.err="发不出刷新请求（"+(e.message||e)+"）";if(S.busy){S.busy=false;$("#rf").disabled=false}status()})}
 function refresh(manual){if(!K)return;S.act=Date.now();if(S.busy)return;S.busy=true;S.err="";$("#rf").disabled=true;status();post(manual?"refresh":"hello");
- var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 20 秒没响应：可能 Mac 休眠/离线，或手机连不上 ntfy.sh。下面是 "+(D?bj(D.t,1):"—")+" 的数据";status()}},20000)}
+ var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 20 秒没响应：电脑离线或手机连不上 ntfy.sh。下面是 "+(D?bj(D.t,1):"—")+" 的数据";status()}},20000)}
 
 // ---------- live mark price / funding straight from Binance public websocket ----------
 function watchSyms(){if(!D)return;var syms=D.pos.map(function(p){return p.s.toLowerCase()}).sort().join("/");if(syms===S.wsSyms&&S.ws)return;S.wsSyms=syms;ws()}
@@ -172,7 +172,7 @@ function render(){if(!D){status();return}var now=Date.now(),h=[],tm=0,tu=0,bad=0
    (p.mt==="isolated"?'<span class="chip">逐仓</span>':'')+'<span class="mg">保证金 <b>'+im.toFixed(0)+'U</b></span></div>';
   o+='<div class="be"><div class="bx"><div class="l">真实保本价</div><div class="v">'+fp(p.be,tk)+'</div><div class="s">币安显示 '+(p.bnbe?fp(p.bnbe,tk):"—")+'</div></div>'+
      '<div class="bx sg"><div class="l">建议保本止损</div><div class="v">'+fp(p.sug,tk2)+'</div><div class="s">含约 0.02% 滑点余量</div></div></div>';
-  o+='<div class="dist">标记价 <b>'+fp(mark,tk)+'</b><span class="live '+(Lv.live?"on":"off")+'">'+(Lv.live?"实时":"Mac "+bj(D.t))+'</span><br>距真实保本 <b class="'+cls(dist)+'">'+fu(dist)+'%</b> · 浮盈 <b class="'+cls(upnl)+'">'+fu(upnl)+'U</b></div>';
+  o+='<div class="dist">标记价 <b>'+fp(mark,tk)+'</b><span class="live '+(Lv.live?"on":"off")+'">'+(Lv.live?"实时":"快照 "+bj(D.t))+'</span><br>距真实保本 <b class="'+cls(dist)+'">'+fu(dist)+'%</b> · 浮盈 <b class="'+cls(upnl)+'">'+fu(upnl)+'U</b></div>';
   if(!p.stops.length)o+='<div class="stop bad">⚠ 没挂止损。'+(dist>0.03?'保本止损可挂在 <b>'+fp(p.sug,tk2)+'</b>':'现价还没到真实保本，'+(lg?'涨过':'跌破')+' <b>'+fp(p.sug,tk2)+'</b> 后才能挂保本止损')+'</div>';
   p.stops.forEach(function(s){var q=s.q==="all"?"全部平仓":"数量 "+s.q;var ty=s.ty==="TRAILING_STOP_MARKET"?"跟踪止损(激活价)":"止损";
    if(s.bad)o+='<div class="stop bad">⚠ '+ty+' <b>'+fp(s.p,tk)+'</b> 在真实保本 '+fp(p.be,tk)+(lg?' 下方':' 上方')+'，触发后约 <b class="'+cls(s.pnl)+'">'+fu(s.pnl)+'U</b>（'+q+'，含手续费和资金费）。'+(dist>0?'要保本改到 <b>'+fp(p.sug,tk2)+'</b>':'现价还没过保本价')+'</div>';
@@ -195,7 +195,7 @@ function render(){if(!D){status();return}var now=Date.now(),h=[],tm=0,tu=0,bad=0
  $("#sum").innerHTML=D.pos.length?'<div class="sum"><div class="bx"><div class="l">保证金合计</div><div class="v">'+tm.toFixed(0)+'U</div></div><div class="bx"><div class="l">浮盈合计</div><div class="v '+cls(tu)+'">'+fu(tu,0)+'U</div></div><div class="bx'+(bad+none?' ':' ')+'"><div class="l">止损不保本/未挂</div><div class="v '+(bad+none?"dn":"up")+'">'+bad+' / '+none+'</div></div></div>':"";
  status();S.dirty=false}
 function status(){if(!K)return;var now=Date.now(),s;
- if(!D){s='<span class="dot busy"></span>'+(S.err?'<span class="w">'+esc(S.err)+'</span>':'等待电脑发来数据…（Mac 离线超过 12 小时就没有缓存）');$("#st").innerHTML=s;return}
+ if(!D){s='<span class="dot busy"></span>'+(S.err?'<span class="w">'+esc(S.err)+'</span>':'等待电脑发来数据…（电脑离线超过 12 小时就没有缓存）');$("#st").innerHTML=s;return}
  var macAge=now-D.t,macLive=(S.answered&&now-S.answered<PING_MS+60000)||macAge<180000,wsLive=now-S.wsT<10000;
  var dc=macLive&&wsLive?"g":macLive||wsLive?"":"r";
  s='<span class="dot '+dc+(S.busy?" busy":"")+'"></span>持仓数据 <b>'+bj(D.t,1)+'</b> 北京时间（'+ago(D.t)+'）'+(macLive?' <span class="ok">电脑在线</span>':' <span class="w">电脑可能离线</span>');
