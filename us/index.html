@@ -347,9 +347,9 @@ function rfUI(step,p,text,mode){var P=$("#rfp");P.hidden=false;P.className="rfp 
 function elapsed(){if(!R.on)return;$("#rfe").textContent=((Date.now()-R.t0)/1000).toFixed(0)+" 秒"}
 function rfEnd(){R.on=false;R.passive=false;clearTimeout(R.wd);clearInterval(R.tick);clearTimeout(R.pt);var b=$("#rf");b.disabled=false;b.textContent="⟳ 强制刷新"}
 function rfFail(msg){rfUI("未完成",null,msg,"err");elapsed();rfEnd()}
-function watchdog(){clearTimeout(R.wd);R.wd=setTimeout(function(){if(!R.on)return;
- if(!R.rid)rfFail("电脑没有响应（20 秒内未收到回应）。可能电脑离线/休眠，或手机无法连接 ntfy.sh（可尝试开 VPN）");
- else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:20000)}
+function watchdog(){clearTimeout(R.wd);clearTimeout(R.wk);if(!R.rid)R.wk=setTimeout(function(){if(R.on&&!R.rid)rfUI("收到请求",null,"正在唤醒电脑…（最长约 90 秒）")},12000);R.wd=setTimeout(function(){if(!R.on)return;
+ if(!R.rid)rfFail("90 秒内电脑未响应。电脑可能在休眠，打开和CEO的聊天即可唤醒，请求会自动补跑（10 分钟内有效）；也可能手机连不上 ntfy.sh（可开 VPN）");
+ else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:90000)}
 function begin(passive){R.on=true;R.passive=!!passive;R.t0=Date.now();var b=$("#rf");b.disabled=true;b.textContent="刷新中…";
  clearInterval(R.tick);R.tick=setInterval(elapsed,1000);watchdog();stream();schedPoll(1500)}
 function rfStart(){if(R.on)return;R.cid=rcid();R.rid="";begin(false);rfUI("发送请求",1,"正在通知电脑…");
