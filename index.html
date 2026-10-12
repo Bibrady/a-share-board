@@ -313,7 +313,7 @@ function showK(c){var r=null;D.rows.forEach(function(x){if(x.c===c)r=x});if(!r)r
  var a=$("#ktv"),w=$("#ktvw");a.hidden=w.hidden=!t;if(t){a.href=tvapp(t);w.href=tvweb(t);a.setAttribute("data-sym",t)}
  $("#kths").href=url(c);$("#kinfo").textContent="加载中…";
  clearCv();
- kget(c).then(function(d){if(K.r!==r)return;K.bars=d.d;K.src=d.src;
+ kget(c).then(function(d){if(K.r!==r)return;K.bars=d.d;K.src=d.src;K.ema=EMAP.map(function(p){return ema(K.bars,p[0])});
   $("#knote").innerHTML="日K（前复权）· 红涨绿跌 · 虚线＝前10日最高收盘（突破位）· ▲＝突破日 · 点按/拖动查看当日数据<br>数据来源："+(d.src==="fuyao"?"同花顺 Fuyao":"⚠️备用数据源（腾讯）")+" · 截至 "+pd(d.asof);
   var bi=idxOf(D.tag);K.sel=bi>=0?bi:K.bars.length-1;drawK()})
  .catch(function(e){$("#kinfo").textContent="K线数据暂不可用（"+e.message+"），可点“同花顺”查看"});
@@ -322,6 +322,8 @@ function closeK(fromPop){if(!K.open)return;K.open=false;$("#kov").hidden=true;do
  var tr=K.r&&document.querySelector('#tb tr[data-c="'+K.r.c+'"]');if(tr){tr.scrollIntoView({block:"center"});tr.classList.remove("flash");void tr.offsetWidth;tr.classList.add("flash")}}
 function idxOf(tag){if(!K.bars)return -1;for(var i=K.bars.length-1;i>=0;i--)if(K.bars[i][0]===tag)return i;return -1}
 function clearCv(){var cv=$("#kcv"),x=cv.getContext("2d");x.clearRect(0,0,cv.width,cv.height)}
+var EMAP=[[50,"#C77C02"],[144,"#2E7D32"],[169,"#7B1FA2"]];
+function ema(b,p){var a=2/(p+1),o=[],e=null;for(var i=0;i<b.length;i++){var c=b[i][4];e=e==null?c:e+a*(c-e);o.push(i>=p-1?e:null)}return o}
 function view(){var b=K.bars,st=Math.max(0,b.length-K.n);return{st:st,b:b.slice(st)}}
 function drawK(){
  if(!K.bars||!K.bars.length){$("#kinfo").textContent="无K线数据";return}
@@ -345,6 +347,10 @@ function drawK(){
   x.strokeStyle=col;x.fillStyle=col;x.beginPath();x.moveTo(Math.round(cx)+.5,Y(k[2]));x.lineTo(Math.round(cx)+.5,Y(k[3]));x.stroke();
   var y1=Y(Math.max(k[1],k[4])),y2=Y(Math.min(k[1],k[4]));x.fillRect(cx-bw/2,y1,bw,Math.max(1,y2-y1));
   var vh=vm?k[5]/vm*vH:0;x.globalAlpha=.55;x.fillRect(cx-bw/2,vT+vH-vh,bw,vh);x.globalAlpha=1}
+ // EMA50/144/169 overlays (clipped to price pane) + legend
+ if(K.ema){x.save();x.beginPath();x.rect(L,top,pw,pH);x.clip();x.lineWidth=1.1;EMAP.forEach(function(p,j){var e=K.ema[j],on=false;x.strokeStyle=p[1];x.beginPath();
+  for(var i=0;i<n;i++){var v=e[V.st+i];if(v==null){on=false;continue}var yy=Y(v);if(on)x.lineTo(X(i),yy);else{x.moveTo(X(i),yy);on=true}}x.stroke()});x.restore();
+  var lx=L+4;x.textAlign="left";x.textBaseline="middle";EMAP.forEach(function(p,j){var t="EMA"+p[0];x.fillStyle=p[1];x.fillRect(lx,top+5,10,2);x.fillText(t,lx+13,top+6);lx+=18+x.measureText(t).width})}
  // breakout level dashed line
  if(hi!=null){var yh=Math.round(Y(hi))+.5;x.setLineDash([5,4]);x.strokeStyle="#1A3A6B";x.lineWidth=1.2;x.beginPath();x.moveTo(L,yh);x.lineTo(L+pw,yh);x.stroke();x.setLineDash([]);
   x.fillStyle="#1A3A6B";x.fillRect(L+pw+1,yh-8,R-2,16);x.fillStyle="#fff";x.fillText(hi.toFixed(2),L+pw+4,yh)}
@@ -405,9 +411,9 @@ function rfUI(step,pct,text,mode){var P=$("#rfp");P.hidden=false;P.className="rf
 function elapsed(){if(!R.on)return;$("#rfe").textContent=((Date.now()-R.t0)/1000).toFixed(0)+" 秒"}
 function rfEnd(){R.on=false;R.passive=false;clearTimeout(R.wd);clearInterval(R.tick);clearTimeout(R.pt);var b=$("#rf");b.disabled=false;b.textContent="⟳ 强制刷新"}
 function rfFail(msg){rfUI("未完成",null,msg,"err");elapsed();rfEnd()}
-function watchdog(){clearTimeout(R.wd);R.wd=setTimeout(function(){if(!R.on)return;
- if(!R.rid)rfFail("电脑没有响应（15 秒内未收到回应）。可能电脑离线，或手机无法连接 ntfy.sh（可尝试开 VPN）");
- else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:15000)}
+function watchdog(){clearTimeout(R.wd);clearTimeout(R.wk);if(!R.rid)R.wk=setTimeout(function(){if(R.on&&!R.rid)rfUI("收到请求",null,"正在唤醒电脑…（最长约 90 秒）")},12000);R.wd=setTimeout(function(){if(!R.on)return;
+ if(!R.rid)rfFail("90 秒内电脑未响应。电脑可能在休眠，打开和CEO的聊天即可唤醒，请求会自动补跑（10 分钟内有效）；也可能手机连不上 ntfy.sh（可开 VPN）");
+ else rfFail("进度中断（120 秒无消息），请稍后查看或重试")},R.rid?120000:90000)}
 function begin(passive){R.on=true;R.passive=!!passive;R.t0=Date.now();var b=$("#rf");b.disabled=true;b.textContent="刷新中…";
  clearInterval(R.tick);R.tick=setInterval(elapsed,1000);watchdog();stream();schedPoll(1500)}
 function rfStart(){if(R.on)return;R.cid=rcid();R.rid="";begin(false);rfUI("发送请求",1,"正在通知电脑…");

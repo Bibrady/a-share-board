@@ -151,7 +151,7 @@ function sse(){if(S.sse)try{S.sse.close()}catch(e){}
 function post(kind){S.lastPing=Date.now();var c=rcid();if(kind==="refresh"||kind==="hello"){S.cid=c;S.reqT=Date.now()}
  return fto(NT+TQ,{method:"POST",body:JSON.stringify({a:kind,c:c})},8000).catch(function(e){S.err="发不出刷新请求（"+(e.message||e)+"）";if(S.busy){S.busy=false;$("#rf").disabled=false}status()})}
 function refresh(manual){if(!K)return;S.act=Date.now();if(S.busy)return;S.busy=true;S.err="";$("#rf").disabled=true;status();post(manual?"refresh":"hello");
- var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 20 秒没响应：电脑离线或手机连不上 ntfy.sh。下面是 "+(D?bj(D.t,1):"—")+" 的数据";status()}},20000)}
+ var my=S.reqT;setTimeout(function(){if(S.busy&&S.reqT===my){S.busy=false;$("#rf").disabled=false;S.err="电脑 90 秒没响应：电脑可能在休眠，打开和CEO的聊天即可唤醒，请求会自动补跑（10 分钟内有效）。下面是 "+(D?bj(D.t,1):"—")+" 的数据";status()}},90000)}
 
 // ---------- live mark price / funding straight from Binance public websocket ----------
 function watchSyms(){if(!D)return;var syms=D.pos.map(function(p){return p.s.toLowerCase()}).sort().join("/");if(syms===S.wsSyms&&S.ws)return;S.wsSyms=syms;ws()}
