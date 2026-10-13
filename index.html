@@ -75,11 +75,11 @@ tr.grp td small{font-weight:400;color:var(--mut);margin-left:6px}
 details{font-size:12.5px;color:var(--mut)}
 details summary{cursor:pointer;color:var(--acc);padding:4px 0}
 .tv{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;line-height:18px;height:20px;padding:0 5px;border:1px solid var(--bd);border-radius:5px;color:var(--acc);background:rgba(26,58,107,.08);text-decoration:none;vertical-align:1px}
-.kov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.kov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:flex-end;justify-content:center;padding-top:max(8px,env(safe-area-inset-top,0px));box-sizing:border-box}
 .kov[hidden]{display:none}
-.ksheet{background:var(--pn);width:100%;max-height:94vh;overflow:auto;border-radius:16px 16px 0 0;padding:12px 12px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 30px rgba(0,0,0,.18);animation:up .18s ease-out}
+.ksheet{background:var(--pn);width:100%;max-height:94vh;max-height:calc(100dvh - max(8px,env(safe-area-inset-top,0px)) - 8px);overflow:auto;border-radius:16px 16px 0 0;padding:0 12px;box-shadow:0 -6px 30px rgba(0,0,0,.18);animation:up .18s ease-out;-webkit-overflow-scrolling:touch}
 @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
-.khd{display:flex;align-items:flex-start;gap:8px}
+.khd{display:flex;align-items:flex-start;gap:8px;position:sticky;top:0;z-index:3;background:var(--pn);margin:0 -12px;padding:12px 12px 8px;border-radius:16px 16px 0 0}
 .khd .t{flex:1;min-width:0}
 .khd .t b{font-size:18px}.khd .t span{color:var(--mut);margin-left:6px;font-size:13px}
 .kx{border:0;background:var(--grid);border-radius:50%;width:36px;height:36px;font-size:18px;color:var(--mut);cursor:pointer;flex:none}
@@ -94,8 +94,6 @@ details summary{cursor:pointer;color:var(--acc);padding:4px 0}
 .kinfo{font-size:12.5px;min-height:38px;color:var(--fg);background:var(--pn2);border-radius:8px;padding:4px 8px;font-variant-numeric:tabular-nums;line-height:1.5}
 .kinfo b{font-weight:600}
 #kcv{display:block;width:100%;height:420px;touch-action:pan-y;margin-top:6px}
-.knote{font-size:11.5px;color:var(--mut);margin-top:6px;line-height:1.5}
-.ksheet{padding-bottom:0}
 .knav{position:sticky;bottom:0;background:var(--pn);display:flex;align-items:center;gap:10px;margin:8px -12px 0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--bd);z-index:2}
 .knav button{flex:1;height:48px;border-radius:12px;border:1px solid var(--bd);background:rgba(26,58,107,.08);color:var(--acc);font:inherit;font-size:16px;font-weight:600;cursor:pointer;touch-action:manipulation}
 .knav button:focus:not(:focus-visible){outline:none}
@@ -103,7 +101,7 @@ details summary{cursor:pointer;color:var(--acc);padding:4px 0}
 .knav span{min-width:64px;text-align:center;font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
 tr.flash td{animation:fl 1.6s ease-out}
 @keyframes fl{0%,40%{background:rgba(26,58,107,.28)}100%{}}
-@media (min-width:760px){.kov{align-items:center}.knav{margin:10px -18px 0;padding:10px 18px}.ksheet{width:860px;max-width:94vw;border-radius:16px;padding:16px 18px}#kcv{height:540px}}
+@media (min-width:760px){.kov{align-items:center;padding-top:0}.knav{margin:10px -18px 0;padding:10px 18px}.ksheet{width:860px;max-width:94vw;border-radius:16px;padding:0 18px;max-height:min(90vh,calc(100dvh - 24px))}.khd{margin:0 -18px;padding:16px 18px 10px}#kcv{height:540px}}
 .prov{background:var(--ttl);color:#fff;border-radius:12px;padding:1px 9px;font-size:13px;font-weight:600}
 .rfb{margin-left:auto;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap}
 .rfb:disabled{background:#C8C4BA;border-color:#C8C4BA;color:#666666;cursor:default}
@@ -186,7 +184,6 @@ td.nm b,td.ind{font-family:inherit}
   <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120" class="on">6个月</button><button data-n="240">12个月</button></span></div>
  <div class="kinfo" id="kinfo">加载中…</div>
  <canvas id="kcv"></canvas>
- <div class="knote" id="knote">日K（前复权）· 红涨绿跌 · 虚线＝前10日最高收盘（突破位）· ▲＝突破日 · 下方＝成交额 / MACD · 点按/拖动查看当日数据</div>
  <div class="knav"><button id="kprev" aria-label="上一只">‹ 上一只</button><span id="kpos"></span><button id="knext" aria-label="下一只">下一只 ›</button></div>
 </div></div>
 <footer>每个交易日 15:35 后自动更新；“强制刷新”可随时重跑（盘中为临时结果）· 仅供参考，不构成投资建议<br><a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
@@ -300,7 +297,7 @@ var K={r:null,bars:null,n:120,sel:-1,open:false,src:"",list:[],i:-1},KC={};
 function kget(c){if(!KC[c])KC[c]=get(vq("data/k/"+c+".json",KV)).catch(function(e){delete KC[c];throw e});return KC[c]}
 // open from table: nav order = rows currently visible (sort + filter + search)
 function openK(c){K.list=rows().map(function(r){return r.c});showK(c);
- $("#kov").hidden=false;document.body.style.overflow="hidden";
+ $("#kov").hidden=false;document.body.style.overflow="hidden";$(".ksheet").scrollTop=0;
  if(!(history.state&&history.state.k))history.pushState({k:1},"")}
 function navK(d){var j=K.i+d;if(!K.open||j<0||j>=K.list.length)return;showK(K.list[j]);$(".ksheet").scrollTop=0}
 function showK(c){var r=null;D.rows.forEach(function(x){if(x.c===c)r=x});if(!r)return;
@@ -314,7 +311,6 @@ function showK(c){var r=null;D.rows.forEach(function(x){if(x.c===c)r=x});if(!r)r
  $("#kths").href=url(c);$("#kinfo").textContent="加载中…";
  clearCv();
  kget(c).then(function(d){if(K.r!==r)return;K.bars=d.d;K.src=d.src;K.macd=null;K.ema=EMAP.map(function(p){return ema(K.bars,p[0])});
-  $("#knote").innerHTML="日K（前复权）· 红涨绿跌 · 虚线＝前10日最高收盘（突破位）· ▲＝突破日 · 下方＝成交额 / MACD · 点按/拖动查看当日数据<br>数据来源："+(d.src==="fuyao"?"同花顺 Fuyao":"⚠️备用数据源（腾讯）")+" · 截至 "+pd(d.asof);
   var bi=idxOf(D.tag);K.sel=bi>=0?bi:K.bars.length-1;drawK()})
  .catch(function(e){$("#kinfo").textContent="K线数据暂不可用（"+e.message+"），可点“同花顺”查看"});
 }
