@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>A股大盘盘面</title>
+<title>朔元 · 大盘盘面</title>
 <meta name="description" content="A股大盘盘面：成交额、涨跌家数、涨跌停、涨跌幅分布、主要指数、行业涨跌（自动更新）">
 <meta name="theme-color" content="#F7F5F0">
-<link rel="icon" href="/a-share-board/favicon.ico?v=4" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=4"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=4"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=4"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=4"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="A股看板"><meta name="application-name" content="A股看板"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{color-scheme:light;--up:#1A1A1A;--down:#B71C1C;--flat:#888888;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
 *{box-sizing:border-box}
@@ -447,7 +447,7 @@ function renderHist(){var H=D.hist||[];HS=H.length-1;hdraw();
  $("#hnote").textContent=n.join("")}
 function render(){var st=$("#st");st.textContent=D.status;st.className="st"+(D.final?" done":/盘中|午间/.test(D.status)?" live":"");
  var a=bj(D.asof||D.data_ts);$("#tdate").textContent=D.date;$("#asof").textContent=(a.d===D.date?"":a.d+" ")+a.t;
- document.title="大盘盘面 "+D.date+" · "+D.status;
+ document.title="朔元 · 大盘盘面 "+D.date+" · "+D.status;
  var w=$("#warn"),fb=D.fallback||[];w.hidden=!fb.length;w.textContent=fb.length?"⚠️ 部分数据来自备用源："+fb.join("；"):"";
  renderAmt();renderBr();renderDist();renderIdx();renderInd();renderL();renderHist();$("#datesel").value=D.tag}
 function load(t){return (t?get(vq("data/"+t+".json",DV[t])):get("data/latest.json",true)).then(function(d){D=d;render()})

@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>A股运行在EMA144/169上方</title>
+<title>朔元 · 运行在EMA144/169上方</title>
 <meta name="description" content="A股每日运行在EMA144/169上方筛选（自动更新）">
 <meta name="theme-color" content="#F7F5F0">
-<link rel="icon" href="/a-share-board/favicon.ico?v=4" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=4"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=4"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=4"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=4"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="A股看板"><meta name="application-name" content="A股看板"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{color-scheme:light;--up:#1A1A1A;--down:#B71C1C;--flat:#888888;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;--hl:rgba(183,28,28,.12)}
 *{box-sizing:border-box}
@@ -280,7 +280,7 @@ function setInd(g){S.ind=(S.ind===g?"":g);chips();body()}
 function render(){
  $("#cnt").textContent=D.count+" 只";$("#tdate").textContent=D.date;$("#gen").textContent=bj(D.run_at);
  var pv=$("#prov");pv.hidden=!D.prov;pv.textContent=D.prov?"盘中临时 "+bj(D.run_at).slice(11):"";
- document.title="A股运行在EMA144/169上方 "+D.date+" · "+D.count+"只";
+ document.title="朔元 · 运行在EMA144/169上方 "+D.date+" · "+D.count+"只";
  var f=D.funnel||{};
  $("#funnel").textContent=f.universe?("全市场 "+f.universe+"（含北交所 "+f.bse_in_universe+"）→ 剔ST "+f.after_st+" → 剔停牌 "+f.after_suspended+" → 市值>60亿 "+f.after_mcap+" → 成交额≥2亿 "+f.after_amount+" → 日K≥170根 "+f.after_history+" → 入选 "+f.final):"";
  var w=$("#warn");w.hidden=!D.fallback;w.textContent=D.fallback?"⚠️ 当日部分数据来自备用数据源":"";
