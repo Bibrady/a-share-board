@@ -173,14 +173,14 @@ td.nm b,td.ind{font-family:inherit}
 <section class="card" style="margin-top:10px">
  <details><summary>筛选规则与漏斗</summary>
   <p style="margin:6px 0">规则：收盘同时高于 EMA144 与 EMA169（含当日上穿），EMA 用同花顺 Fuyao 前复权日收盘（约 400 根）计算，不足 170 根不计；剔除 ST / *ST / 退市整理、停牌；总市值 &gt; 60 亿；成交额 ≥ 2 亿。<br>
-  相对板块超额 = 个股涨幅 − 所属同花顺行业指数涨幅（未分类显示“—”）。默认排序：按“行业”列分组，组按当日上榜只数降序（同数按组成交额），未分类置后，组内按总市值降序。连续上榜天数按本看板历史中连续交易日上榜计算。点按个股查看近 3/6/12 个月日K（前复权，数据来源同花顺 Fuyao）；TV 按钮会先复制股票代码再打开 TradingView App，在 App 搜索框粘贴即可（北交所个股 TradingView 暂无行情，不显示）。</p>
+  相对板块超额 = 个股涨幅 − 所属同花顺行业指数涨幅（未分类显示“—”）。默认排序：按“行业”列分组，组按当日上榜只数降序（同数按组成交额），未分类置后，组内按总市值降序。连续上榜天数按本看板历史中连续交易日上榜计算。点按个股查看近 3/6/12 个月日K（前复权，数据来源同花顺 Fuyao）；TV 按钮直接打开 TradingView 个股页（手机上会直接跳到 App 对应代码）（北交所个股 TradingView 暂无行情，不显示）。</p>
   <p id="funnel" style="margin:6px 0;color:var(--mut)"></p>
  </details>
 </section>
 <div class="kov" id="kov" hidden><div class="ksheet" role="dialog" aria-modal="true">
  <div class="khd"><div class="t"><b id="kname"></b><span id="kcode"></span></div><button class="kx" id="kx" aria-label="关闭">✕</button></div>
  <div class="kmeta" id="kmeta"></div>
- <div class="kbtns"><a class="pri" id="ktv">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
+ <div class="kbtns"><a class="pri" id="ktv" target="_blank" rel="noopener">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
   <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120" class="on">6个月</button><button data-n="240">12个月</button></span></div>
  <div class="kinfo" id="kinfo">加载中…</div>
  <canvas id="kcv"></canvas>
@@ -220,12 +220,13 @@ function tvsym(c){c=String(c);if(/^(60|68)/.test(c))return "SSE:"+c;if(/^(00|30)
 var FINE=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches;
 function tvapp(t){return "tradingview://chart?symbol="+t}
 function tvweb(t){return "https://www.tradingview.com/chart/?symbol="+encodeURIComponent(t)}
-function tvhref(t){return FINE?tvweb(t):tvapp(t)}
+function tvsy(t){return "https://www.tradingview.com/symbols/"+t.replace(":","-")+"/"}
+function tvhref(t){return tvsy(t)}
 function toast(m){var d=document.getElementById("toast");if(!d){d=document.createElement("div");d.id="toast";d.style.cssText="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(20,20,20,.9);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:9999;max-width:88%;text-align:center;transition:opacity .3s";document.body.appendChild(d)}d.textContent=m;d.style.opacity=1;clearTimeout(d._t);d._t=setTimeout(function(){d.style.opacity=0},2600)}
 function copyTxt(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);return}}catch(e){}var a=document.createElement("textarea");a.value=t;a.setAttribute("readonly","");a.style.cssText="position:fixed;top:-99px;opacity:0";document.body.appendChild(a);a.select();a.setSelectionRange(0,99);try{document.execCommand("copy")}catch(e){}document.body.removeChild(a)}
 function tvGo(t){if(!t)return;if(FINE){window.open(tvweb(t),"_blank","noopener");return}var c=t.split(":")[1]||t;copyTxt(c);toast("已复制 "+c+"，在 TradingView 里点搜索粘贴即可");setTimeout(function(){location.href=tvapp(t)},700)}
 var COLS=[
- {k:"n",t:"名称<br>代码",td:function(r){var t=tvsym(r.c);return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small>'+(t?'<a class="tv" href="'+tvhref(t)+'" data-tv="1" data-sym="'+t+'" title="TradingView '+t+'">TV</a>':'')+'</td>'}},
+ {k:"n",t:"名称<br>代码",td:function(r){var t=tvsym(r.c);return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small>'+(t?'<a class="tv" href="'+tvhref(t)+'" target="_blank" rel="noopener" data-sym="'+t+'" title="TradingView '+t+'">TV</a>':'')+'</td>'}},
  {k:"chg",t:"涨幅%",td:function(r){return '<td class="big '+cls(r.chg)+'">'+sg(r.chg,2)+'</td>'}},
  {k:"p",t:"收盘",td:function(r){return '<td class="'+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</td>'}},
  {k:"amt",t:"成交额<br>(亿)",td:function(r){return '<td>'+fx(r.amt,1)+'</td>'}},
@@ -291,7 +292,7 @@ $("#thr").addEventListener("click",function(e){var th=e.target.closest("th");if(
  if(S.k===k)S.dir=-S.dir;else{S.k=k;S.dir=(k==="n"||k==="ind")?1:-1}head();body()});
 $("#defsort").addEventListener("click",function(){S.k="o";S.dir=1;head();body();$(".tbox").scrollTop=0});
 $("#lvtabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.lv=b.getAttribute("data-lv");S.ind="";$("#chips").classList.remove("open");chips();body()});
-$("#tb").addEventListener("click",function(e){var tva=e.target.closest("a.tv");if(tva){e.stopPropagation();e.preventDefault();tvGo(tva.getAttribute("data-sym"));return}
+$("#tb").addEventListener("click",function(e){if(e.target.closest("a.tv"))return;
  var tr=e.target.closest("tr[data-c]");if(tr)openK(tr.getAttribute("data-c"))});
 // ---------- K-line sheet (own canvas renderer, no external libs) ----------
 var K={r:null,bars:null,n:120,sel:-1,open:false,src:"",list:[],i:-1},KC={};
@@ -308,7 +309,7 @@ function showK(c){var r=null;D.rows.forEach(function(x){if(x.c===c)r=x});if(!r)r
  if(K.i>0)kget(K.list[K.i-1]).catch(function(){});if(K.i>=0&&K.i<N-1)kget(K.list[K.i+1]).catch(function(){});
  $("#kname").textContent=r.n;$("#kcode").textContent=c+" · "+(r.b||"");
  $("#kmeta").innerHTML='<span class="px '+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</span><span class="'+cls(r.chg)+'">'+sg(r.chg,2)+'%</span><span>'+esc(r.ind)+(r.g&&r.g!==base(r.ind)?" · "+esc(r.g):"")+'</span>'+(r.ex!=null?'<span>超额 <b class="'+cls(r.ex)+'">'+sg(r.ex,2)+'</b></span>':"")+'<span>交易日 '+esc(D.date)+'</span>';
- var a=$("#ktv"),w=$("#ktvw");a.hidden=w.hidden=!t;if(t){a.href=tvapp(t);w.href=tvweb(t);a.setAttribute("data-sym",t)}
+ var a=$("#ktv"),w=$("#ktvw");a.hidden=w.hidden=!t;if(t){a.href=tvsy(t);w.href=tvweb(t)}
  $("#kths").href=url(c);$("#kinfo").textContent="加载中…";
  clearCv();
  kget(c).then(function(d){if(K.r!==r)return;K.bars=d.d;K.src=d.src;K.macd=null;K.ema=EMAP.map(function(p){return ema(K.bars,p[0])});
@@ -424,7 +425,7 @@ function dates(ds){DV={};ds.forEach(function(x){if(x.v)DV[x.d]=x.v});if(ds[0]&&d
  $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+'（'+x.n+'只'+(x.p?' · 盘中临时':'')+'）</option>'}).join("");
 }
 get("data/dates.json",true).then(dates).catch(function(){}).then(function(){load(m?m[1]:"")});
-$("#ktv").addEventListener("click",function(e){e.preventDefault();tvGo(this.getAttribute("data-sym"))});
+
 // ---------- 强制刷新: trigger via ntfy.sh -> box re-runs screen + publish; progress back via ntfy (SSE + poll fallback) ----------
 var NT="https://ntfy.sh/",TRIG="__TRIG_TOPIC__",PROG="__PROG_TOPIC__";
 var STEPS=["收到请求","拉取行情","筛选","拉取K线","上传","等待页面生效","完成"];
