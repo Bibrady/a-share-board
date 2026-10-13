@@ -85,6 +85,9 @@ details summary{cursor:pointer;color:var(--acc);padding:4px 0}
 .kx{border:0;background:var(--grid);border-radius:50%;width:36px;height:36px;font-size:18px;color:var(--mut);cursor:pointer;flex:none}
 .kmeta{font-size:13px;color:var(--mut);margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline}
 .kmeta .px{font-size:20px;font-weight:700}
+.kdesc{font-size:12.5px;color:var(--mut);line-height:1.55;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.kdesc[hidden]{display:none}
+.kdesc.open{-webkit-line-clamp:unset;overflow:visible;color:var(--fg)}
 .kbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .kbtns a,.kbtns button{display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--bd);background:var(--pn);color:var(--fg);text-decoration:none;font:inherit;font-size:13.5px;cursor:pointer}
 .kbtns a.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
@@ -180,6 +183,7 @@ td.nm b,td.ind{font-family:inherit}
 <div class="kov" id="kov" hidden><div class="ksheet" role="dialog" aria-modal="true">
  <div class="khd"><div class="t"><b id="kname"></b><span id="kcode"></span></div><button class="kx" id="kx" aria-label="关闭">✕</button></div>
  <div class="kmeta" id="kmeta"></div>
+ <div class="kdesc" id="kdesc" hidden></div>
  <div class="kbtns"><a class="pri" id="ktv">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
   <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120" class="on">6个月</button><button data-n="240">12个月</button></span></div>
  <div class="kinfo" id="kinfo">加载中…</div>
@@ -309,6 +313,7 @@ function showK(c){var r=null;D.rows.forEach(function(x){if(x.c===c)r=x});if(!r)r
  if(K.i>0)kget(K.list[K.i-1]).catch(function(){});if(K.i>=0&&K.i<N-1)kget(K.list[K.i+1]).catch(function(){});
  $("#kname").textContent=r.n;$("#kcode").textContent=c+" · "+(r.b||"");
  $("#kmeta").innerHTML='<span class="px '+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</span><span class="'+cls(r.chg)+'">'+sg(r.chg,2)+'%</span><span>'+esc(r.ind)+(r.g&&r.g!==base(r.ind)?" · "+esc(r.g):"")+'</span>'+(r.ex!=null?'<span>超额 <b class="'+cls(r.ex)+'">'+sg(r.ex,2)+'</b></span>':"")+'<span>交易日 '+esc(D.date)+'</span>';
+ var kd=$("#kdesc");if(r.d){kd.hidden=false;kd.textContent=r.d;kd.classList.remove("open")}else{kd.hidden=true;kd.textContent=""}
  var a=$("#ktv"),w=$("#ktvw");a.hidden=w.hidden=!t;if(t){a.href=tvsy(t);w.href=tvweb(t)}
  $("#kths").href=url(c);$("#kinfo").textContent="加载中…";
  clearCv();
@@ -404,6 +409,7 @@ window.addEventListener("pointerup",function(){kd=false});
 $("#krg").addEventListener("click",function(e){var bt=e.target.closest("button");if(!bt)return;K.n=+bt.getAttribute("data-n");
  [].forEach.call(this.querySelectorAll("button"),function(x){x.className=x===bt?"on":""});drawK()});
 $("#kx").addEventListener("click",function(){closeK()});
+$("#kdesc").addEventListener("click",function(){this.classList.toggle("open")});
 $("#kov").addEventListener("click",function(e){if(e.target===this)closeK()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeK();
  else if(K.open&&(e.key==="ArrowRight"||e.key==="ArrowLeft")){e.preventDefault();navK(e.key==="ArrowRight"?1:-1)}});
