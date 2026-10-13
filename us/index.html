@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>美股复盘</title>
+<title>朔元 · 美股复盘</title>
 <meta name="description" content="美股自选股每日复盘：大盘、板块强弱、重点异动、存储板块、财报日历（自动更新）">
 <meta name="theme-color" content="#F7F5F0">
-<link rel="icon" href="/a-share-board/favicon.ico?v=4" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=4"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=4"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=4"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=4"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="A股看板"><meta name="application-name" content="A股看板"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{color-scheme:light;--up:#1A1A1A;--down:#B71C1C;--flat:#888888;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
 *{box-sizing:border-box}
@@ -246,7 +246,7 @@ function renderHead(){
  var w=[];if(D.holiday)w.push("昨夜美股休市，以下为上一交易日复盘。");
  if(D.failed&&D.failed.length)w.push("未取到："+D.failed.join("、"));
  $("#warn").hidden=!w.length;$("#warn").textContent=w.join(" ");
- document.title="美股复盘 "+s.slice(5);
+ document.title="朔元 · 美股复盘 "+s.slice(5);
  var sn=D.snap,se=$("#snap");
  if(sn){var at=String(sn.at||""),ny=String(sn.ny||"");se.hidden=false;
   se.textContent="⚠ "+sn.k+"快照（非收盘数据）· 截至北京时间 "+at.slice(5,10)+" "+at.slice(11,16)+"（美东 "+ny.slice(11,16)+"）"+(sn.k==="盘中"?"，价格与涨跌随盘变化，量能对比已关闭":"，价格为盘前成交价，指数无盘前报价");
@@ -336,7 +336,7 @@ $("#datesel").addEventListener("change",function(){var t=this.value;history.repl
 document.addEventListener("visibilitychange",function(){if(document.hidden||!D)return;if($("#datesel").selectedIndex>0)return;
  get("data/dates.json",true).then(function(ds){if(ds&&ds[0]&&(ds[0].d!==D.tag||ds[0].v!==DV[ds[0].d])){dates(ds);load("")}}).catch(function(){})});
 // ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"us"} -> box reruns review.py --live + publish.py; progress back via ntfy ----------
-var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-u-41AyXErhMAXcJugzilCBq8vrnF",GH="Bibrady/a-share-board";
+var NT="https://ntfy.sh/",TRIG="__TRIG_TOPIC__",PROG="__PROG_TOPIC__",GH="Bibrady/a-share-board";
 var STEPS=["收到请求","拉取行情","计算异动","查新闻","上传","等待页面生效","完成"];
 var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,tick:null,passive:false};
 function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
