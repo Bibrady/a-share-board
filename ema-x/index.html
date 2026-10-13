@@ -180,7 +180,7 @@ td.nm b,td.ind{font-family:inherit}
 <div class="kov" id="kov" hidden><div class="ksheet" role="dialog" aria-modal="true">
  <div class="khd"><div class="t"><b id="kname"></b><span id="kcode"></span></div><button class="kx" id="kx" aria-label="关闭">✕</button></div>
  <div class="kmeta" id="kmeta"></div>
- <div class="kbtns"><a class="pri" id="ktv" target="_blank" rel="noopener">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
+ <div class="kbtns"><a class="pri" id="ktv">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
   <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120" class="on">6个月</button><button data-n="240">12个月</button></span></div>
  <div class="kinfo" id="kinfo">加载中…</div>
  <canvas id="kcv"></canvas>
@@ -226,7 +226,7 @@ function toast(m){var d=document.getElementById("toast");if(!d){d=document.creat
 function copyTxt(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);return}}catch(e){}var a=document.createElement("textarea");a.value=t;a.setAttribute("readonly","");a.style.cssText="position:fixed;top:-99px;opacity:0";document.body.appendChild(a);a.select();a.setSelectionRange(0,99);try{document.execCommand("copy")}catch(e){}document.body.removeChild(a)}
 function tvGo(t){if(!t)return;if(FINE){window.open(tvweb(t),"_blank","noopener");return}var c=t.split(":")[1]||t;copyTxt(c);toast("已复制 "+c+"，在 TradingView 里点搜索粘贴即可");setTimeout(function(){location.href=tvapp(t)},700)}
 var COLS=[
- {k:"n",t:"名称<br>代码",td:function(r){var t=tvsym(r.c);return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small>'+(t?'<a class="tv" href="'+tvhref(t)+'" target="_blank" rel="noopener" data-sym="'+t+'" title="TradingView '+t+'">TV</a>':'')+'</td>'}},
+ {k:"n",t:"名称<br>代码",td:function(r){var t=tvsym(r.c);return '<td class="nm"><b>'+esc(r.n)+'</b><small>'+esc(r.c)+'</small>'+(t?'<a class="tv" href="'+tvhref(t)+'" data-sym="'+t+'" title="TradingView '+t+'">TV</a>':'')+'</td>'}},
  {k:"chg",t:"涨幅%",td:function(r){return '<td class="big '+cls(r.chg)+'">'+sg(r.chg,2)+'</td>'}},
  {k:"p",t:"收盘",td:function(r){return '<td class="'+cls(r.chg)+'">'+(r.p==null?"—":r.p)+'</td>'}},
  {k:"amt",t:"成交额<br>(亿)",td:function(r){return '<td>'+fx(r.amt,1)+'</td>'}},
