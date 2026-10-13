@@ -127,6 +127,14 @@ select,input{background:#FFFFFF;border-color:var(--bd);color:var(--fg)}
 td,.meta b,.kbig,.udn b,.tile b,.ix .p,.ix .c,.ir .v,.kmeta .px,.kinfo,.stk,.dist em,.hsel b,.cmp b,#funnel{font-family:var(--mono);font-variant-numeric:tabular-nums}
 td.nm b,td.ind{font-family:inherit}
 .st.live,.st.done{color:#fff}
+.xg{display:grid;grid-template-columns:1fr;gap:10px}
+.xc{border:1px solid var(--grid);border-radius:6px;padding:8px 8px 6px;background:#FFFFFF}
+.xh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:13px}
+.xh b{color:var(--acc)}.xh span{font-size:12px;color:var(--mut);font-family:var(--mono)}.xh span b{color:var(--fg)}
+.xcv{height:120px;margin-top:4px}.xcv.s{height:80px}
+.xl{font-size:11.5px;color:var(--mut);font-family:var(--mono);min-height:16px;line-height:1.45}
+.xl i{display:inline-block;width:10px;height:2px;vertical-align:middle;margin:0 3px 0 6px}
+@media (min-width:760px){.xg{grid-template-columns:1fr 1fr}.xcv{height:140px}}
 </style>
 </head>
 <body>
@@ -222,6 +230,19 @@ td.nm b,td.ind{font-family:inherit}
  <div class="hsel" id="hsel"></div>
  <div class="ht">情绪图 · 上：上涨家数占比 %　下：涨停 − 跌停 家数</div><canvas class="hc emo" id="h2"></canvas>
  <div class="note" id="hnote"></div>
+</section>
+
+<section class="card" id="c-x" hidden>
+ <h2>市场温度与结构 <span class="seg" id="xrng"><button type="button" data-n="60" class="on">60日</button><button type="button" data-n="120">120日</button><button type="button" data-n="250">1年</button></span></h2>
+ <div class="xg">
+  <div class="xc"><div class="xh"><b>情绪温度</b><span id="xemo"></span></div><canvas class="xcv" id="xc1"></canvas><div class="xl" id="xl1"></div>
+   <canvas class="xcv s" id="xc2"></canvas><div class="xl" id="xl2"></div></div>
+  <div class="xc"><div class="xh"><b>站上 EMA144/169 占比</b><span id="xema"></span></div><canvas class="xcv" id="xc3"></canvas><div class="xl" id="xl3"></div></div>
+  <div class="xc"><div class="xh"><b>行业扩散（细分）</b><span id="xdiff"></span></div><canvas class="xcv" id="xc6"></canvas><div class="xl" id="xl6"></div></div>
+  <div class="xc"><div class="xh"><b>宽基 ETF 净申购（国家队参考）</b><span id="xetf"></span></div><canvas class="xcv" id="xc4"></canvas><div class="xl" id="xl4"></div></div>
+  <div class="xc"><div class="xh"><b>风格强弱</b><span id="xsty"></span></div><canvas class="xcv" id="xc5"></canvas><div class="xl" id="xl5"></div></div>
+ </div>
+ <div class="note" id="xnote"></div>
 </section>
 
 <section class="card">
@@ -456,7 +477,53 @@ function dates(ds){DV={};ds.forEach(function(x){if(x.v)DV[x.d]=x.v});
  $("#datesel").innerHTML=ds.map(function(x){return '<option value="'+x.d+'">'+pd(x.d)+(x.p?'（盘中）':'（收盘）')+'</option>'}).join("")}
 var m=/d=(\d{8})/.exec(location.hash);
 get("data/dates.json",true).then(dates).catch(function(){}).then(function(){load(m?m[1]:"")});
-mgload();
+// ---------- 市场温度与结构 (extra.json) ----------
+var XD=null,XN=60,XS={};
+function xload(){return get("data/extra.json",true).then(function(d){XD=d;xrender()}).catch(function(){})}
+function xf(v,d){return v==null?"—":Number(v).toFixed(d==null?0:d)}
+// series: [{k:key,c:color,bar:bool,dash:[]}]; rows: [{d:..}], fmt for axis
+function xchart(id,lid,rows,ser,o){o=o||{};var cv=$("#"+id),g=setupCv(cv),x=g.x,n=rows.length;if(!n){$("#"+lid).textContent="暂无数据";return}
+ var L=2,R=40,T=6,B=14,pw=g.W-L-R,ph=g.H-T-B,lo=o.lo!=null?o.lo:1e18,hi=-1e18;
+ rows.forEach(function(r){ser.forEach(function(s){var v=r[s.k];if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v)}})});
+ if(o.zero){lo=Math.min(lo,0);hi=Math.max(hi,0)}if(hi<=lo)hi=lo+1;var pad=(hi-lo)*.06;if(o.lo==null)lo-=pad;hi+=pad;
+ var X=function(i){return L+pw*(i+.5)/n},Y=function(v){return T+ph*(1-(v-lo)/(hi-lo))};
+ x.strokeStyle="#E5E2DA";x.lineWidth=1;x.fillStyle="#666666";x.textBaseline="middle";x.textAlign="left";
+ for(var i=0;i<=2;i++){var v=lo+(hi-lo)*i/2,y=Math.round(Y(v))+.5;x.beginPath();x.moveTo(L,y);x.lineTo(L+pw,y);x.stroke();x.fillText((o.fmt||xf)(v),L+pw+3,y)}
+ if(o.ref!=null){var yr=Math.round(Y(o.ref))+.5;x.strokeStyle="#888888";x.setLineDash([3,3]);x.beginPath();x.moveTo(L,yr);x.lineTo(L+pw,yr);x.stroke();x.setLineDash([])}
+ x.textBaseline="alphabetic";[0,n-1].forEach(function(i,j){x.textAlign=j?"right":"left";x.fillText(md(rows[i].d),j?L+pw:L,g.H-2)});
+ var bw=Math.max(1,pw/n*.66);
+ ser.forEach(function(s){if(s.bar){rows.forEach(function(r,i){var v=r[s.k];if(v==null)return;var y0=Y(Math.max(lo,0)),y1=Y(v);x.fillStyle=s.c2&&v<0?s.c2:s.c;x.fillRect(X(i)-bw/2,Math.min(y0,y1),bw,Math.max(1,Math.abs(y1-y0)))});return}
+  x.strokeStyle=s.c;x.lineWidth=s.w||1.6;x.setLineDash(s.dash||[]);x.beginPath();var st=false;rows.forEach(function(r,i){var v=r[s.k];if(v==null){st=false;return}st?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v));st=true});x.stroke();x.setLineDash([])});
+ var si=XS[id];if(si==null||si>=n)si=n-1;var cx=Math.round(X(si))+.5;x.strokeStyle="rgba(26,58,107,.40)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,T+ph);x.stroke();x.setLineDash([]);
+ var r=rows[si];$("#"+lid).innerHTML='<b>'+md(r.d)+'</b>'+ser.map(function(s){return '<i style="background:'+s.c+'"></i>'+s.t+' <b>'+(s.f||xf)(r[s.k])+'</b>'}).join("")+(o.extra?o.extra(r):"");
+ cv.onpointerdown=cv.onpointermove=function(ev){if(ev.type==="pointermove"&&ev.pointerType!=="mouse"&&!ev.buttons)return;var rc=cv.getBoundingClientRect(),j=Math.floor((ev.clientX-rc.left-L)/((rc.width-L-R)/n));XS[id]=Math.max(0,Math.min(n-1,j));xrender(1)}}
+function xrender(keep){var d=XD;if(!d)return;$("#c-x").hidden=false;if(!keep)XS={};
+ var em=(d.emo||[]).slice(-XN),last=em[em.length-1]||{};
+ $("#xemo").innerHTML=last.d?'涨停 <b>'+xf(last.zt)+'</b> 跌停 <b>'+xf(last.dt)+'</b> 炸板率 <b>'+xf(last.zbr,1)+'%</b> 连板 <b>'+xf(last.lb)+'</b> 涨跌比 <b>'+xf(last.adr,2)+'</b>':"";
+ xchart("xc1","xl1",em,[{k:"zt",c:"#1A1A1A",t:"涨停"},{k:"dt",c:"#B71C1C",t:"跌停"},{k:"lb",c:"#C77C02",t:"最高连板",dash:[4,3]}],{lo:0});
+ // adr is scaled for display (×10) so it shares the 0-100 axis with 炸板率
+ var em2=em.map(function(r){return{d:r.d,zbr:r.zbr,adr10:r.adr==null?null:Math.min(100,r.adr*10),adr:r.adr}});
+ xchart("xc2","xl2",em2,[{k:"zbr",c:"#1A3A6B",t:"炸板率",f:function(v){return xf(v,1)+"%"}},{k:"adr10",c:"#7B1FA2",t:"涨跌比",f:function(v){return v==null?"—":(v/10).toFixed(2)},dash:[4,3]}],{lo:0,ref:10,fmt:function(v){return xf(v)}});
+ var eb=(d.ema||[]).map(function(a){return{d:a[0],p:a[3],n:a[1],N:a[2]}}).slice(-XN),el=eb[eb.length-1];
+ if(el){var e5=eb[eb.length-6],e20=eb[eb.length-21];$("#xema").innerHTML='<b>'+xf(el.p,1)+'%</b>（'+el.n+'/'+el.N+'）'+(e5?' 5日 '+sg(el.p-e5.p,1):"")+(e20?' 20日 '+sg(el.p-e20.p,1):"")}
+ xchart("xc3","xl3",eb,[{k:"p",c:"#2E7D32",t:"占比",f:function(v){return xf(v,1)+"%"},w:2}],{ref:50,fmt:function(v){return xf(v)+"%"},extra:function(r){return '（'+r.n+'/'+r.N+'）'}});
+ var df=(d.diff||[]).map(function(a){return{d:a[0],up:a[1],dn:a[2],flat:a[3],net:a[4],n:a[5]}}).slice(-XN),dl=df[df.length-1];
+ if(dl)$("#xdiff").innerHTML='扩散 <b class="up">'+dl.up+'</b> 收缩 <b class="down">'+dl.dn+'</b> 净 <b class="'+cls(dl.net)+'">'+sg(dl.net,0)+'</b>（'+dl.n+'个细分）';
+ xchart("xc6","xl6",df,[{k:"up",c:"#1A1A1A",t:"扩散",f:xf},{k:"dn",c:"#B71C1C",t:"收缩",f:xf},{k:"net",c:"#1A3A6B",t:"净扩散",f:function(v){return sg(v,0)},dash:[4,3]}],{zero:1,fmt:xf,extra:function(r){return ' · 持平 '+r.flat}});
+ var et=(d.etf||[]).slice(-XN),cum=0;et=et.map(function(r){cum+=r.tot||0;var o={d:r.d,tot:r.tot,cum:cum};(d.etf_groups||[]).forEach(function(g){o[g[0]]=r[g[0]]});return o});
+ if(et.length){var s20=0;et.slice(-20).forEach(function(r){s20+=r.tot||0});$("#xetf").innerHTML=md(et[et.length-1].d)+' <b class="'+cls(et[et.length-1].tot)+'">'+sg(et[et.length-1].tot,1)+'亿</b> · 近20日 <b class="'+cls(s20)+'">'+sg(s20,0)+'亿</b>'}
+ xchart("xc4","xl4",et,[{k:"tot",c:"#1A1A1A",c2:"#B71C1C",bar:1,t:"合计",f:function(v){return sg(v,1)+"亿"}}],{zero:1,fmt:function(v){return xf(v)},
+  extra:function(r){return '<br>'+(d.etf_groups||[]).map(function(g){return g[0]+' '+sg(r[g[0]],1)}).join(" · ")+' · 区间累计 '+sg(r.cum,0)+'亿'}});
+ var sy=d.sty||{},lg=(sy.lg||[]).slice(-XN),vg=(sy.vg||[]).slice(-XN),mp={};
+ lg.forEach(function(a){mp[a[0]]={d:a[0],lg:a[1]}});vg.forEach(function(a){(mp[a[0]]=mp[a[0]]||{d:a[0]}).vg=a[1]});
+ var sr=Object.keys(mp).sort().map(function(k){return mp[k]});
+ if(sr.length){var a0=sr[0],a1=sr[sr.length-1];sr.forEach(function(r){r.lgN=r.lg!=null&&a0.lg?r.lg/a0.lg*100:null;r.vgN=r.vg!=null&&a0.vg?r.vg/a0.vg*100:null});
+  $("#xsty").innerHTML='大/小 <b class="'+cls(a1.lgN-100)+'">'+sg(a1.lgN-100,1)+'%</b> · 价值/成长 <b class="'+cls(a1.vgN-100)+'">'+sg(a1.vgN-100,1)+'%</b>'}
+ xchart("xc5","xl5",sr,[{k:"lgN",c:"#1A3A6B",t:"沪深300/中证1000",f:function(v){return xf(v,1)}},{k:"vgN",c:"#C77C02",t:"国证价值/成长",f:function(v){return xf(v,1)}}],{ref:100,fmt:function(v){return xf(v,1)}});
+ $("#xnote").textContent="情绪：涨停/跌停/炸板来自同花顺 Fuyao 股票池，最高连板 = 涨停池最大连板数，炸板率 = 炸板 ÷（涨停 + 炸板），涨跌比 = 上涨 ÷ 下跌家数（虚线参考 1.0）。EMA 占比：与「10日新高」同口径（剔 ST/停牌、总市值 > 60 亿、成交额 ≥ 2 亿、日K ≥ 170 根），收盘同时高于 EMA144 与 EMA169 的比例；历史日用当前股本 × 前复权收盘估算市值，股票池为今日在市股票（存在幸存者偏差）。行业扩散：同口径下，各细分行业「站上 EMA144/169」的股票只数较前一交易日增加＝扩散、减少＝收缩，净扩散＝扩散−收缩。ETF：上交所公布的 ETF 份额变化 × 当日收盘价估算净申购，含 300（510300/510310/510330）、50（510050/510100）、500（510500/512500）、1000（512100/560010），深市 ETF（如 159919）交易所不提供历史份额，未计入；T 日份额通常晚间或次日公布。北向资金自 2024 年 8 月起不再公布每日净买入，故不展示。风格：区间起点 = 100，向上 = 大盘 / 价值占优。"}
+$("#xrng").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;XN=+b.getAttribute("data-n");[].forEach.call(this.querySelectorAll("button"),function(y){y.className=y===b?"on":""});xrender()});
+window.addEventListener("resize",function(){if(XD)xrender(1)});
+mgload();xload();
 ["#mg1","#mg2"].forEach(function(s){var dn=false,el=$(s);el.addEventListener("pointerdown",function(e){dn=true;mgpick(e)});el.addEventListener("pointermove",function(e){if(dn||e.pointerType==="mouse")mgpick(e)});window.addEventListener("pointerup",function(){dn=false})});
 $("#datesel").addEventListener("change",function(){var t=this.value;history.replaceState(null,"","#d="+t);load(t)});
 var c1d=false;$("#cv1").addEventListener("pointerdown",function(e){c1d=true;pick1(e)});$("#cv1").addEventListener("pointermove",function(e){if(c1d||e.pointerType==="mouse")pick1(e)});
@@ -467,7 +534,7 @@ Array.prototype.forEach.call(document.querySelectorAll("#rng button"),function(b
 var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(D){drawCurve();ldraw();hdraw()}mgdraw()},120)});
 // auto-refresh while the market is open (page visible, latest date shown)
 setInterval(function(){if(document.hidden||!D||D.final||R.on)return;if($("#datesel").value&&$("#datesel").selectedIndex>0)return;
- mgload();get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
+ mgload();xload();get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
 // ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"market"} -> box re-samples + publishes; progress back via ntfy ----------
 var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-m-zVPIyuWWhWpEGLKuxH8rk84zTNES";
 var STEPS=["收到请求","拉取行情","计算","上传","等待页面生效","完成"];
@@ -502,7 +569,7 @@ function onMsg(ev){if(!ev||ev.event!=="message"||R.seen[ev.id])return;R.seen[ev.
 function fresh(m){if(R.passive&&D&&D.run_at===m.run_at){rfEnd();$("#rfp").hidden=true;return}SHA=m.sha||"";var tries=0;
  function go(){return get("data/dates.json",true).then(dates).catch(function(){}).then(function(){return get("data/latest.json",true)}).then(function(d){
    if(d.run_at!==m.run_at){if(++tries<36){rfUI("等待页面生效",93,"GitHub Pages 部署中…（"+tries*5+" 秒）");return new Promise(function(r){setTimeout(r,5000)}).then(go)}throw new Error("页面数据未更新")}
-   D=d;history.replaceState(null,"",location.pathname);render();mgload();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
+   D=d;history.replaceState(null,"",location.pathname);render();mgload();xload();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms();
    rfUI("完成",100,d.status+" · 数据截至 "+bj(d.asof||d.data_ts).t+" · 用时 "+((Date.now()-R.t0)/1000).toFixed(0)+" 秒"+(m.text?" · "+m.text:""),"ok");elapsed();rfEnd();
    setTimeout(function(){if(!R.on)$("#rfp").hidden=true},8000);setTimeout(function(){if(SHA===m.sha)SHA=""},120000)})}
  go().catch(function(e){rfFail("数据已更新但读取失败（"+e.message+"），请下拉刷新页面")})}
