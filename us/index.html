@@ -336,7 +336,7 @@ $("#datesel").addEventListener("change",function(){var t=this.value;history.repl
 document.addEventListener("visibilitychange",function(){if(document.hidden||!D)return;if($("#datesel").selectedIndex>0)return;
  get("data/dates.json",true).then(function(ds){if(ds&&ds[0]&&(ds[0].d!==D.tag||ds[0].v!==DV[ds[0].d])){dates(ds);load("")}}).catch(function(){})});
 // ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"us"} -> box reruns review.py --live + publish.py; progress back via ntfy ----------
-var NT="https://ntfy.sh/",TRIG="__TRIG_TOPIC__",PROG="__PROG_TOPIC__",GH="Bibrady/a-share-board";
+var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-u-41AyXErhMAXcJugzilCBq8vrnF",GH="Bibrady/a-share-board";
 var STEPS=["收到请求","拉取行情","计算异动","查新闻","上传","等待页面生效","完成"];
 var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,tick:null,passive:false};
 function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
