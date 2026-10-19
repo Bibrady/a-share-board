@@ -248,7 +248,7 @@ td.nm b,td.ind{font-family:inherit}
 <section class="card">
  <details><summary>口径说明</summary>
  <p style="margin:6px 0">成交额：沪市用上证综指成交额（全部沪市股票，含极少量 B 股）、深市用深证综指成交额（全部深市股票）、北交所用北证50指数所报北交所全市场成交额，三者相加；不含基金、债券、回购。“较20日均值”为与此前 20 个交易日（不含当日）平均成交额相比。<br>
- 盘中成交额曲线：交易时段每分钟在本机采样一次（09:30–11:30、13:00–15:00）；与前一交易日同一时刻的累计成交额对比。<br>
+ 盘中成交额曲线：交易时段每分钟在本机采样一次（09:30–11:30、13:00–15:00）；与前一交易日同一时刻的累计成交额对比。若本机休眠导致上午漏采样，收盘定稿/刷新时用新浪 1 分钟 K 线回补上证综指＋深证综指＋北证50 的累计成交额（与上方口径一致）；曲线大缺口不再直线硬连。<br>
  涨跌家数：全部沪深京 A 股（按代码去重），以最新价对比昨收；停牌或当日无成交不计入涨跌平。涨停/跌停/炸板来自同花顺 Fuyao 涨停池、跌停池、炸板池；炸板率 = 炸板 ÷（涨停 + 炸板）。<br>
  两融：上交所、深交所、北交所官网每日公布的融资融券交易总量（交易所口径，含 ETF 等基金的两融），T 日数据于下一交易日早上约 08:00–09:00 公布；同花顺 Fuyao 接口无两融数据。融资买入额占比 = 融资买入额 ÷ 当日沪深京股票成交额（分子含 ETF，略偏高）。融资余额占流通市值为估算：流通股本（同花顺 Fuyao）× 当日收盘价。<br>
  成交额走势（半年/1年）：同花顺 Fuyao 指数日线，上证综指＋深证综指＋北证50 成交额相加（与上方口径一致），本机缓存约 1 年，每日收盘后追加。<br>近30日：成交额来自指数日线；历史涨跌家数由本机缓存的全市场收盘价计算（最新交易日为实时行情）；涨跌停、炸板数为 Fuyao 当日股票池。情绪图：上涨占比 = 上涨家数 ÷（上涨 + 下跌），不含平盘/停牌；柱子 = 涨停家数 − 跌停家数。<br>
@@ -298,9 +298,9 @@ function drawCurve(){var c=D.curve||{},t=c.today||[],p=c.prev||[],cv=$("#cv1"),e
  for(var i=0;i<=4;i++){var v=top*i/4,yy=Math.round(Y(v))+.5;x.beginPath();x.moveTo(L,yy);x.lineTo(L+pw,yy);x.stroke();x.fillText(v>=10000?+(v/10000).toFixed(2)+"万亿":v?Math.round(v)+"亿":"0",L+pw+3,yy)}
  x.setLineDash([2,3]);x.beginPath();x.moveTo(Math.round(X(120))+.5,T);x.lineTo(Math.round(X(120))+.5,T+ph);x.stroke();x.setLineDash([]);
  x.textBaseline="alphabetic";[[0,"9:30","left"],[60,"10:30","center"],[120,"11:30/13:00","center"],[180,"14:00","center"],[240,"15:00","right"]].forEach(function(a){x.textAlign=a[2];x.fillText(a[1],X(a[0]),H-4)});
- function line(a,col,dash,w){if(a.length<2)return;x.strokeStyle=col;x.lineWidth=w;x.setLineDash(dash||[]);x.beginPath();a.forEach(function(q,i){var px=X(q[0]),py=Y(q[1]);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.setLineDash([])}
+ function line(a,col,dash,w){if(a.length<2)return;x.strokeStyle=col;x.lineWidth=w;x.setLineDash(dash||[]);var pen=false;a.forEach(function(q,i){var px=X(q[0]),py=Y(q[1]);if(!i||q[0]-a[i-1][0]>15){if(pen)x.stroke();x.beginPath();x.moveTo(px,py);pen=true}else x.lineTo(px,py)});if(pen)x.stroke();x.setLineDash([])}
  line(p,"#888888",[5,4],1.5);
- if(t.length>=2){x.beginPath();t.forEach(function(q,i){var px=X(q[0]),py=Y(q[1]);i?x.lineTo(px,py):x.moveTo(px,py)});x.lineTo(X(t[t.length-1][0]),T+ph);x.lineTo(X(t[0][0]),T+ph);x.closePath();x.fillStyle="rgba(26,58,107,.12)";x.fill()}
+ if(t.length>=2){var segs=[],cur=[];t.forEach(function(q,i){if(i&&q[0]-t[i-1][0]>15){if(cur.length>=2)segs.push(cur);cur=[q]}else cur.push(q)});if(cur.length>=2)segs.push(cur);segs.forEach(function(s){x.beginPath();s.forEach(function(q,i){var px=X(q[0]),py=Y(q[1]);i?x.lineTo(px,py):x.moveTo(px,py)});x.lineTo(X(s[s.length-1][0]),T+ph);x.lineTo(X(s[0][0]),T+ph);x.closePath();x.fillStyle="rgba(26,58,107,.12)";x.fill()})}
  line(t,"#1A3A6B",null,2);
  var s=C1.sel>=0?C1.sel:(t.length?t[t.length-1][0]:0),tv=at(t,s),pv=at(p,s),cx=Math.round(X(s))+.5;
  x.strokeStyle="rgba(26,58,107,.45)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,T+ph);x.stroke();x.setLineDash([]);
@@ -321,6 +321,7 @@ function renderAmt(){var a=D.amt||{};$("#amt").innerHTML=yiH(a.total);
  $("#amtcomp").textContent="沪市 "+Math.round(a.sh)+"亿 · 深市 "+Math.round(a.sz)+"亿 · 北交所 "+Math.round(a.bj)+"亿";
  var c=D.curve||{};$("#lgp").textContent="前一交易日"+(c.prev_date?"（"+md(c.prev_date)+"）":"");$("#lgt").textContent="当日（"+md(D.date)+"）";
  var n=[];if(!(c.prev&&c.prev.length>=2)&&((c.today||[]).length>=2||!D.final))n.push("前一交易日盘中曲线暂无（盘中采样自 2026-09-29 开始，同一时刻对比将从 2026-09-30 起提供）。");
+ if(c.fill==="sina")n.push("盘中曲线已用新浪分钟线回补累计成交额（本机采样不足/箱体休眠漏点时）；口径仍为上证综指＋深证综指＋北证50。");
  $("#amtnote").textContent=n.join("");drawCurve()}
 function renderBr(){var b=D.breadth||{},tot=(b.up||0)+(b.down||0)+(b.flat||0);
  $("#nup").textContent=b.up;$("#ndn").textContent=b.down;$("#nflat").textContent=b.flat;
