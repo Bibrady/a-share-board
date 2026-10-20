@@ -105,6 +105,7 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 <script>
 (function(){"use strict";
 var MIN_YM=202610,MAX_YM=202712;
+var START="2026-10-20"; /* plan + checklist begin here; nothing before */
 var viewY=2026,viewM=10;
 var WD=["日","一","二","三","四","五","六"];
 var $=function(id){return document.getElementById(id)};
@@ -131,6 +132,8 @@ function todayStr(){
 function parseYMD(s){var p=s.split("-");return{y:+p[0],m:+p[1],d:+p[2]}}
 function ymd(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
 function planFor(key){
+  // No type skeleton before START (user had not trained yet).
+  if(key<START)return null;
   // JS Date: getDay Sun=0..Sat=6. Skeleton only — no durations/distances.
   var p=parseYMD(key),dt=new Date(p.y,p.m-1,p.d),dow=dt.getDay();
   if(dow===0)return{kind:"rest",cls:"rest",short:"休息",type:"休息或轻松游",place:"—",typeCls:"type-rest"};
@@ -146,16 +149,23 @@ function renderCal(){
   var first=new Date(viewY,viewM-1,1);
   var start=(first.getDay()+6)%7; // Mon=0
   var dim=new Date(viewY,viewM,0).getDate();
-  var html="",i,day,key,pl,cls;
+  var html="",i,day,key,pl,cls,mk;
   for(i=0;i<start;i++)html+='<div class="cell empty"></div>';
   for(day=1;day<=dim;day++){
     key=ymd(viewY,viewM,day);
     pl=planFor(key);
     var lg=LOG[key];
+    if(!pl){
+      cls="cell";
+      if(key===td)cls+=" today";
+      html+='<div class="'+cls+'"><span class="d">'+day+'</span></div>';
+      continue;
+    }
     cls="cell "+pl.cls;
     if(key===td)cls+=" today";
     if(lg&&lg.done)cls+=" done";
-    html+='<div class="'+cls+'"><span class="d">'+day+'</span><span class="mk">'+(lg&&lg.done?"✓ "+pl.short:pl.short)+'</span></div>';
+    mk=(lg&&lg.done)?"✓ "+pl.short:pl.short;
+    html+='<div class="'+cls+'"><span class="d">'+day+'</span><span class="mk">'+mk+'</span></div>';
   }
   $("calGrid").innerHTML=html;
 }
@@ -169,6 +179,7 @@ function renderList(){
   for(day=1;day<=dim;day++){
     key=ymd(viewY,viewM,day);
     pl=planFor(key);
+    if(!pl)continue; /* no checklist rows before START */
     lg=LOG[key]||null;
     dt=new Date(viewY,viewM-1,day);
     diet=(lg&&lg.diet)?'<span class="diet">饮食：'+lg.diet+'</span>':"";
