@@ -63,6 +63,9 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 .list .type-swim{color:var(--acc);font-weight:600}
 .list .type-str{color:#6B5A3A;font-weight:600}
 .list .type-rest{color:#888}
+.list .done{color:var(--acc);font-weight:700}
+.list .diet{display:block;margin-top:2px;font-family:var(--sans);font-size:11px;color:#666;white-space:normal;line-height:1.35}
+.cell.done .d::after{content:"";position:absolute;right:3px;top:3px;width:5px;height:5px;border-radius:50%;background:var(--acc)}
 .foot{margin:8px 2px 0;font-size:12px;color:#888;line-height:1.6;text-align:center}
 @media (max-width:380px){
   .cell{min-height:48px}
@@ -74,8 +77,8 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 <body>
 <style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pos/">仓位管理</a><a href="../fitness/" class="on" aria-current="page">生活</a></div></nav>
 <div class="wrap">
-  <div class="top"><h1>健身</h1><span class="chip">日历 · 打卡</span></div>
-  <p class="note">框架页，数值稍后填写。主项游泳，辅项在家力量。</p>
+  <div class="top"><h1>健身</h1><span class="chip" id="streakChip">Day 1 · 已打卡</span></div>
+  <p class="note">主项游泳（蛙泳），辅项在家力量。今日起計 Day 1；空字段待填写。</p>
   <div class="card">
     <div class="cal-hd">
       <button type="button" class="navbtn" id="prevM" aria-label="上一月">‹</button>
@@ -97,7 +100,7 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
     </tr></thead>
     <tbody id="listBody"></tbody>
   </table></div></div>
-  <p class="foot">仅供个人训练记录 · 空字段待填写</p>
+  <p class="foot">仅供个人训练记录 · 有打卡的日期显示实际值，其余空字段待填写</p>
 </div>
 <script>
 (function(){"use strict";
@@ -105,6 +108,17 @@ var MIN_YM=202610,MAX_YM=202712;
 var viewY=2026,viewM=10;
 var WD=["日","一","二","三","四","五","六"];
 var $=function(id){return document.getElementById(id)};
+/* Check-ins only — do not invent other days. Keys: YYYY-MM-DD */
+var LOG={
+  "2026-10-20":{
+    planMin:45, planKm:1,
+    actMin:45, actKm:1,
+    rpe:"",
+    done:true,
+    diet:"早餐健康餐 · 晚餐健康餐",
+    note:"南山文体中心 · 蛙泳 1km / 45min"
+  }
+};
 function pad(n){return n<10?"0"+n:""+n}
 function todayStr(){
   try{
@@ -137,30 +151,49 @@ function renderCal(){
   for(day=1;day<=dim;day++){
     key=ymd(viewY,viewM,day);
     pl=planFor(key);
+    var lg=LOG[key];
     cls="cell "+pl.cls;
     if(key===td)cls+=" today";
-    html+='<div class="'+cls+'"><span class="d">'+day+'</span><span class="mk">'+pl.short+'</span></div>';
+    if(lg&&lg.done)cls+=" done";
+    html+='<div class="'+cls+'"><span class="d">'+day+'</span><span class="mk">'+(lg&&lg.done?"✓ "+pl.short:pl.short)+'</span></div>';
   }
   $("calGrid").innerHTML=html;
 }
+function cellOrPh(v,suf){
+  if(v===null||v===undefined||v==="")return '<span class="ph">—</span>';
+  return v+(suf||"");
+}
 function renderList(){
   var td=todayStr(),dim=new Date(viewY,viewM,0).getDate();
-  var html="",day,key,pl,dt,ph='<span class="ph">—</span>';
+  var html="",day,key,pl,dt,lg,diet;
   for(day=1;day<=dim;day++){
     key=ymd(viewY,viewM,day);
     pl=planFor(key);
+    lg=LOG[key]||null;
     dt=new Date(viewY,viewM-1,day);
+    diet=(lg&&lg.diet)?'<span class="diet">饮食：'+lg.diet+'</span>':"";
     html+='<tr'+(key===td?' class="today"':'')+'>'+
-      '<td>'+key.slice(5)+'</td>'+
+      '<td>'+key.slice(5)+diet+'</td>'+
       '<td>'+WD[dt.getDay()]+'</td>'+
       '<td class="'+pl.typeCls+'">'+pl.type+'</td>'+
       '<td>'+pl.place+'</td>'+
-      '<td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td>'+
+      '<td>'+cellOrPh(lg&&lg.planMin,"′")+'</td>'+
+      '<td>'+cellOrPh(lg&&lg.planKm!=null?lg.planKm+" km":"")+'</td>'+
+      '<td>'+cellOrPh(lg&&lg.actMin,"′")+'</td>'+
+      '<td>'+cellOrPh(lg&&lg.actKm!=null?lg.actKm+" km":"")+'</td>'+
+      '<td>'+cellOrPh(lg&&lg.rpe)+'</td>'+
+      '<td>'+(lg&&lg.done?'<span class="done">✓</span>':'<span class="ph">—</span>')+'</td>'+
       '</tr>';
   }
   $("listBody").innerHTML=html;
 }
-function refresh(){renderCal();renderList()}
+function updateChip(){
+  var n=0,k;for(k in LOG){if(LOG[k]&&LOG[k].done)n++}
+  var el=$("streakChip");
+  if(!el)return;
+  el.textContent=n?("Day "+n+" · 已打卡"):"日历 · 打卡";
+}
+function refresh(){renderCal();renderList();updateChip()}
 function boot(){
   var t=parseYMD(todayStr());
   viewY=t.y;viewM=t.m;
