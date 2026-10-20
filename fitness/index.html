@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="color-scheme" content="light">
+<title>朔元 · 健身</title>
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{--bg:#F7F5F0;--tx:#333333;--ink:#1A1A1A;--acc:#1A3A6B;--dn:#B71C1C;--grid:#E5E2DA;
+--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,Menlo,"Roboto Mono",Consolas,monospace;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+--swim:rgba(26,58,107,.14);--str:rgba(107,90,58,.16);--rest:rgba(136,136,136,.12)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:16px;line-height:1.45}
+body .stab{background:#FFFFFF;border-bottom:1px solid var(--grid)}
+body .stab a{color:#666666;font-weight:600}
+body .stab a.on{color:var(--acc);border-bottom-color:var(--acc)}
+.wrap{max-width:720px;margin:0 auto;padding:16px max(14px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px}
+h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em}
+.chip{font-family:var(--mono);font-size:12px;color:var(--acc);border:1px solid rgba(26,58,107,.35);background:rgba(26,58,107,.08);padding:2px 8px;border-radius:3px;white-space:nowrap}
+.note{margin:0 0 12px;font-size:13px;color:#666;line-height:1.55;background:#fff;border:1px solid var(--grid);border-radius:5px;padding:10px 12px}
+.card{background:#fff;border:1px solid var(--grid);border-radius:5px;overflow:hidden;margin:0 0 12px}
+.cal-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 10px 8px;border-bottom:1px solid var(--grid);background:#FBF9F4}
+.cal-hd h2{margin:0;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.navbtn{appearance:none;border:1px solid var(--grid);background:#fff;color:var(--acc);width:36px;height:32px;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
+.navbtn:disabled{opacity:.35;cursor:default}
+.navbtn:not(:disabled):active{background:rgba(26,58,107,.08)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 6px 0;gap:2px}
+.dow span{text-align:center;font-size:11px;font-weight:600;color:#888;letter-spacing:.04em;padding:4px 0}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);padding:2px 6px 8px;gap:2px}
+.cell{position:relative;min-height:54px;border-radius:4px;padding:4px 2px 3px;text-align:center;font-variant-numeric:tabular-nums}
+.cell.empty{visibility:hidden}
+.cell .d{display:inline-block;width:26px;height:26px;line-height:26px;border-radius:50%;font-size:13px;font-weight:600;color:var(--ink)}
+.cell.today .d{background:var(--acc);color:#fff}
+.cell .mk{display:block;margin-top:1px;font-family:var(--mono);font-size:9.5px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.swim{background:var(--swim)}.cell.swim .mk{color:var(--acc)}
+.cell.str{background:var(--str)}.cell.str .mk{color:#6B5A3A}
+.cell.rest{background:var(--rest)}.cell.rest .mk{color:#888;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:10px 14px;padding:0 10px 10px;font-size:12px;color:#666}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.legend .sw{background:var(--swim);box-shadow:inset 0 0 0 1px rgba(26,58,107,.35)}
+.legend .st{background:var(--str);box-shadow:inset 0 0 0 1px rgba(107,90,58,.35)}
+.legend .rs{background:var(--rest);border:1px solid var(--grid)}
+.list{background:#fff;border:1px solid var(--grid);border-radius:5px;overflow:hidden}
+.list .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.list table{width:100%;min-width:640px;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--ink)}
+.list th{color:#666666;font-weight:600;font-size:11px;letter-spacing:.04em;padding:7px 6px;border-bottom:1px solid var(--grid);text-align:right;background:#FBF9F4;white-space:nowrap}
+.list td{padding:7px 6px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
+.list th:nth-child(1),.list td:nth-child(1){text-align:left}
+.list th:nth-child(2),.list td:nth-child(2){text-align:center;color:#666}
+.list th:nth-child(3),.list td:nth-child(3),.list th:nth-child(4),.list td:nth-child(4){text-align:left;color:var(--tx);font-family:var(--sans);font-size:12.5px}
+.list tbody tr:last-child td{border-bottom:0}
+.list tr.today td{background:rgba(26,58,107,.08)}
+.list tr.today td:first-child{box-shadow:inset 3px 0 0 var(--acc);font-weight:700;color:var(--acc)}
+.list .ph{color:#bbb}
+.list .type-swim{color:var(--acc);font-weight:600}
+.list .type-str{color:#6B5A3A;font-weight:600}
+.list .type-rest{color:#888}
+.foot{margin:8px 2px 0;font-size:12px;color:#888;line-height:1.6;text-align:center}
+@media (max-width:380px){
+  .cell{min-height:48px}
+  .cell .d{width:22px;height:22px;line-height:22px;font-size:12px}
+  .cell .mk{font-size:9px}
+}
+</style>
+</head>
+<body>
+<style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pos/">仓位管理</a><a href="../fitness/" class="on" aria-current="page">生活</a></div></nav>
+<div class="wrap">
+  <div class="top"><h1>健身</h1><span class="chip">日历 · 打卡</span></div>
+  <p class="note">框架页，数值稍后填写。主项游泳，辅项在家力量。</p>
+  <div class="card">
+    <div class="cal-hd">
+      <button type="button" class="navbtn" id="prevM" aria-label="上一月">‹</button>
+      <h2 id="calTitle">—</h2>
+      <button type="button" class="navbtn" id="nextM" aria-label="下一月">›</button>
+    </div>
+    <div class="dow"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+    <div class="grid" id="calGrid"></div>
+    <div class="legend">
+      <span><i class="sw"></i>游泳</span>
+      <span><i class="st"></i>力量</span>
+      <span><i class="rs"></i>休息</span>
+    </div>
+  </div>
+  <div class="list"><div class="tw"><table>
+    <thead><tr>
+      <th>日期</th><th>星期</th><th>类型</th><th>地点</th>
+      <th>计划时长</th><th>计划距离</th><th>实际时长</th><th>实际距离</th><th>RPE</th><th>完成</th>
+    </tr></thead>
+    <tbody id="listBody"></tbody>
+  </table></div></div>
+  <p class="foot">仅供个人训练记录 · 空字段待填写</p>
+</div>
+<script>
+(function(){"use strict";
+var MIN_YM=202610,MAX_YM=202712;
+var viewY=2026,viewM=10;
+var WD=["日","一","二","三","四","五","六"];
+var $=function(id){return document.getElementById(id)};
+function pad(n){return n<10?"0"+n:""+n}
+function todayStr(){
+  try{
+    return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+  }catch(e){
+    var d=new Date(Date.now()+8*3600*1000);
+    return d.getUTCFullYear()+"-"+pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate());
+  }
+}
+function parseYMD(s){var p=s.split("-");return{y:+p[0],m:+p[1],d:+p[2]}}
+function ymd(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
+function planFor(key){
+  // JS Date: getDay Sun=0..Sat=6. Skeleton only — no durations/distances.
+  var p=parseYMD(key),dt=new Date(p.y,p.m-1,p.d),dow=dt.getDay();
+  if(dow===0)return{kind:"rest",cls:"rest",short:"休息",type:"休息或轻松游",place:"—",typeCls:"type-rest"};
+  if(dow===5)return{kind:"str",cls:"str",short:"游+力",type:"游泳+力量",place:"南山文体中心 / 在家",typeCls:"type-str"};
+  return{kind:"swim",cls:"swim",short:"游泳",type:"游泳（蛙泳）",place:"南山文体中心",typeCls:"type-swim"};
+}
+function renderCal(){
+  var td=todayStr();
+  $("calTitle").textContent=viewY+"年"+viewM+"月";
+  var ym=viewY*100+viewM;
+  $("prevM").disabled=ym<=MIN_YM;
+  $("nextM").disabled=ym>=MAX_YM;
+  var first=new Date(viewY,viewM-1,1);
+  var start=(first.getDay()+6)%7; // Mon=0
+  var dim=new Date(viewY,viewM,0).getDate();
+  var html="",i,day,key,pl,cls;
+  for(i=0;i<start;i++)html+='<div class="cell empty"></div>';
+  for(day=1;day<=dim;day++){
+    key=ymd(viewY,viewM,day);
+    pl=planFor(key);
+    cls="cell "+pl.cls;
+    if(key===td)cls+=" today";
+    html+='<div class="'+cls+'"><span class="d">'+day+'</span><span class="mk">'+pl.short+'</span></div>';
+  }
+  $("calGrid").innerHTML=html;
+}
+function renderList(){
+  var td=todayStr(),dim=new Date(viewY,viewM,0).getDate();
+  var html="",day,key,pl,dt,ph='<span class="ph">—</span>';
+  for(day=1;day<=dim;day++){
+    key=ymd(viewY,viewM,day);
+    pl=planFor(key);
+    dt=new Date(viewY,viewM-1,day);
+    html+='<tr'+(key===td?' class="today"':'')+'>'+
+      '<td>'+key.slice(5)+'</td>'+
+      '<td>'+WD[dt.getDay()]+'</td>'+
+      '<td class="'+pl.typeCls+'">'+pl.type+'</td>'+
+      '<td>'+pl.place+'</td>'+
+      '<td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td><td>'+ph+'</td>'+
+      '</tr>';
+  }
+  $("listBody").innerHTML=html;
+}
+function refresh(){renderCal();renderList()}
+function boot(){
+  var t=parseYMD(todayStr());
+  viewY=t.y;viewM=t.m;
+  var ym=viewY*100+viewM;
+  if(ym<MIN_YM){viewY=2026;viewM=10}
+  if(ym>MAX_YM){viewY=2027;viewM=12}
+  $("prevM").addEventListener("click",function(){
+    if(viewM===1){viewY--;viewM=12}else viewM--;
+    refresh();
+  });
+  $("nextM").addEventListener("click",function(){
+    if(viewM===12){viewY++;viewM=1}else viewM++;
+    refresh();
+  });
+  refresh();
+}
+boot();
+})();
+</script>
+</body>
+</html>
