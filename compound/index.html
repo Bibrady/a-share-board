@@ -90,7 +90,7 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 <style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pos/" class="on">仓位管理</a><a href="../fitness/">生活</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="../pos/">仓位</a><a href="../be/">持仓保本</a><a href="../compound/" class="on" aria-current="page">复利计算</a><a href="../pyramid/">倒金字塔</a></div></nav>
 <div class="wrap">
   <div class="top"><h1>复利</h1><span class="chip">17 次 · 约 10.8 倍</span></div>
-  <p class="line">起点 18,200 U，从 2026-10-09 起每两周 15%。</p>
+  <p class="line">起点 5,500 U，从 2026-10-09 起每两周 15%。</p>
   <div class="prog" id="prog">暂无账户数据</div>
   <div class="next" id="nextBox">
     <div>
@@ -121,26 +121,26 @@ h1{margin:0;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.02em
 </div>
 <script>
 (function(){"use strict";
-var SALT="VetqMVAh3xDaR5KRV4vbqA==",IT=600000,VER="9b36db1dfd2c58db",NT="https://ntfy.sh/",LSK="be2_mk",BASE=18200;
+var SALT="VetqMVAh3xDaR5KRV4vbqA==",IT=600000,VER="9b36db1dfd2c58db",NT="https://ntfy.sh/",LSK="be2_mk",BASE=5500;
 var TE=new TextEncoder(),K=null,TD="";
 var NODES=[
-  {n:1,d:"2026-10-23",u:20930,gain:2730},
-  {n:2,d:"2026-11-06",u:24069,gain:3139},
-  {n:3,d:"2026-11-20",u:27680,gain:3611},
-  {n:4,d:"2026-12-04",u:31832,gain:4152},
-  {n:5,d:"2026-12-18",u:36607,gain:4775},
-  {n:6,d:"2027-01-01",u:42098,gain:5491},
-  {n:7,d:"2027-01-15",u:48412,gain:6314},
-  {n:8,d:"2027-01-29",u:55674,gain:7262},
-  {n:9,d:"2027-02-12",u:64025,gain:8351},
-  {n:10,d:"2027-02-26",u:73629,gain:9604},
-  {n:11,d:"2027-03-12",u:84674,gain:11045},
-  {n:12,d:"2027-03-26",u:97375,gain:12701},
-  {n:13,d:"2027-04-09",u:111981,gain:14606},
-  {n:14,d:"2027-04-23",u:128778,gain:16797},
-  {n:15,d:"2027-05-07",u:148095,gain:19317},
-  {n:16,d:"2027-05-21",u:170309,gain:22214},
-  {n:17,d:"2027-06-04",u:195855,gain:25546}
+  {n:1,d:"2026-10-23",u:6325,gain:825},
+  {n:2,d:"2026-11-06",u:7274,gain:949},
+  {n:3,d:"2026-11-20",u:8365,gain:1091},
+  {n:4,d:"2026-12-04",u:9620,gain:1255},
+  {n:5,d:"2026-12-18",u:11063,gain:1443},
+  {n:6,d:"2027-01-01",u:12722,gain:1659},
+  {n:7,d:"2027-01-15",u:14630,gain:1908},
+  {n:8,d:"2027-01-29",u:16824,gain:2194},
+  {n:9,d:"2027-02-12",u:19348,gain:2524},
+  {n:10,d:"2027-02-26",u:22250,gain:2902},
+  {n:11,d:"2027-03-12",u:25587,gain:3337},
+  {n:12,d:"2027-03-26",u:29425,gain:3838},
+  {n:13,d:"2027-04-09",u:33839,gain:4414},
+  {n:14,d:"2027-04-23",u:38915,gain:5076},
+  {n:15,d:"2027-05-07",u:44752,gain:5837},
+  {n:16,d:"2027-05-21",u:51465,gain:6713},
+  {n:17,d:"2027-06-04",u:59185,gain:7720}
 ];
 var MIN_YM=202610,MAX_YM=202706;
 var viewY=2026,viewM=10,eqState=null,hlN=null;
@@ -182,7 +182,7 @@ function updateNext(){
   box.className="next";
   if(!nx){
     when.textContent="全部完成";
-    meta.textContent="目标约 195,855 U · 10.8 倍";
+    meta.textContent="目标约 59,185 U · 10.8 倍";
     days.innerHTML="✓<small>已达成</small>";
     box.className="next done";
     return;
