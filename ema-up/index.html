@@ -153,9 +153,22 @@ footer a{color:var(--mut)}
 
 
 
-.sumy .bars-full .br{grid-template-columns:minmax(72px,0.7fr) minmax(120px,3fr) auto}
-.sumy .bars-full .br .tr{height:12px}
-.sumy .bars-full .br .tr i{min-width:2px}
+
+
+.sumy .vbars{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;width:100%;height:148px;padding:4px 2px 0;box-sizing:border-box}
+.sumy .vcol{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
+.sumy .vcol .vval{font-family:var(--mono);font-size:11.5px;color:var(--mut);text-align:center;line-height:1.15;flex:0 0 auto}
+.sumy .vcol .vval b{display:block;color:var(--fg);font-weight:600;font-size:13px}
+.sumy .vcol .vval small{font-size:10.5px;color:var(--mut)}
+.sumy .vcol .vbar{flex:1 1 auto;width:100%;max-width:56px;min-height:8px;background:var(--grid);border-radius:6px 6px 3px 3px;overflow:hidden;display:flex;align-items:flex-end;position:relative}
+.sumy .vcol .vbar i{display:block;width:100%;background:var(--acc);border-radius:6px 6px 0 0;min-height:0}
+.sumy .vcol .vlbl{flex:0 0 auto;font-size:11px;color:var(--fg);text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 1px}
+@media (max-width:420px){
+ .sumy .vbars{height:132px;gap:4px}
+ .sumy .vcol .vval{font-size:10.5px}
+ .sumy .vcol .vval b{font-size:12px}
+ .sumy .vcol .vlbl{font-size:10px}
+}
 
 /* ---- Bloomberg-terminal theme (2026-09-30) ---- */
 body{-webkit-font-smoothing:antialiased}
@@ -310,8 +323,8 @@ function sumy(){
  mcs.forEach(function(m){for(var i=0;i<BKS.length;i++)if(m>=BKS[i].a&&m<BKS[i].b){BKS[i].n++;break}});
  var mcN=mcs.length,maxB=Math.max.apply(null,BKS.map(function(x){return x.n}).concat([1]));
  var mbars=BKS.map(function(x){
-  var p=pctn(x.n,mcN||N),w=mcN&&x.n?Math.max(3,100*x.n/maxB):0;
-  return '<div class="br"><div class="nm">'+esc(x.l)+'</div><div class="tr"><i style="width:'+w.toFixed(1)+'%"></i></div><div class="meta"><b>'+x.n+'</b> · '+p+'%</div></div>';
+  var p=pctn(x.n,mcN||N),hgt=mcN&&x.n?Math.max(4,Math.round(100*x.n/maxB)):0;
+  return '<div class="vcol"><div class="vval"><b>'+x.n+'</b><small>'+p+'%</small></div><div class="vbar"><i style="height:'+hgt+'%"></i></div><div class="vlbl">'+esc(x.l)+'</div></div>';
  }).join("");
  var bKeys=bOrd.concat(Object.keys(bM).filter(function(k){return bOrd.indexOf(k)<0}));
  var pills=bKeys.filter(function(k){return bM[k]}).map(function(k){
@@ -323,7 +336,7 @@ function sumy(){
  if(tos.length)extras.push("换手中位 <b>"+fx(med(tos),2)+"%</b>");
  var h='<div class="sh">'+N+'只 · 细分行业 '+Object.keys(uI).length+' 个 · 二级 '+Object.keys(uG).length+' 个'+(filt?'<small>基于当前筛选</small>':'')+'</div>';
  h+='<div class="blk"><h3>行业占比 · '+lvName+'（Top '+(top.length)+'）</h3><div class="bars">'+bars+'</div>'+more+'</div>';
- h+='<div class="blk"><h3>市值分布</h3><div class="bars bars-full">'+mbars+'</div>';
+ h+='<div class="blk"><h3>市值分布</h3><div class="vbars">'+mbars+'</div>';
  if(mcN)h+='<div class="kv" style="margin-top:6px"><span>中位市值 <b>'+fx(med(mcs),1)+'亿</b></span><span>平均市值 <b>'+fx(avg(mcs),1)+'亿</b></span><span>有市值 '+mcN+'/'+N+'</span></div>';
  h+='</div>';
  h+='<div class="blk"><h3>板块结构</h3><div class="pills">'+pills+'</div></div>';
