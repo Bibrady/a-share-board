@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>朔元 · 题材</title>
+<meta name="description" content="A股当日活跃题材：涨停原因聚合 + 概念板块成分（自动更新）">
+<meta name="theme-color" content="#F7F5F0">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{color-scheme:light;--up:#1A1A1A;--down:#B71C1C;--flat:#888888;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 10px 28px}
+header{background:var(--pn);border-bottom:1px solid var(--bd);padding:12px 12px 10px;margin:0 -10px 10px}
+h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .cnt{background:var(--acc);color:#fff;border-radius:12px;padding:1px 10px;font-size:14px;font-weight:600}
+.meta{color:var(--mut);font-size:12.5px;display:flex;flex-wrap:wrap;gap:2px 12px}
+.meta b{color:var(--fg);font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,input{font:inherit;font-size:15px;height:40px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:var(--pn);color:var(--fg);min-width:0}
+.datebar{margin-top:8px}.datebar label{font-size:13px;color:var(--mut)}
+#datesel{flex:0 1 200px}
+.tabs{display:inline-flex;border:1px solid var(--bd);border-radius:9px;overflow:hidden;margin:8px 0 0}
+.tabs button{border:0;background:var(--pn);font:inherit;font-size:13.5px;height:34px;padding:0 14px;color:var(--mut);cursor:pointer;touch-action:manipulation;-webkit-appearance:none}
+.tabs button.on{background:var(--acc);color:#fff;font-weight:600}
+.note{font-size:12px;color:var(--mut);line-height:1.55;margin:8px 2px 10px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ctl input{flex:1;min-width:140px}
+.ctl select{flex:0 1 140px}
+.stat{font-size:12.5px;color:var(--mut);margin:0 2px 8px}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--flat)}
+.empty{padding:36px 12px;text-align:center;color:var(--mut);background:var(--pn);border:1px solid var(--bd);border-radius:12px}
+.tlist{display:flex;flex-direction:column;gap:8px}
+.tc{background:var(--pn);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.th{display:flex;align-items:flex-start;gap:10px;padding:12px 12px 10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.th:active{background:rgba(26,58,107,.06)}
+.rk{flex:none;width:28px;height:28px;border-radius:8px;background:var(--pn2);color:var(--mut);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rk.t3{background:rgba(26,58,107,.14);color:var(--acc)}
+.tm{flex:1;min-width:0}
+.tm .nm{font-size:16px;font-weight:700;color:var(--ttl);line-height:1.25}
+.tm .bd{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:4px;font-size:12.5px;color:var(--mut)}
+.tm .bd b{color:var(--fg);font-weight:700}
+.chev{flex:none;color:var(--mut);font-size:18px;line-height:28px;transition:transform .15s}
+.tc.open .chev{transform:rotate(90deg)}
+.tb{display:none;border-top:1px solid var(--bd);background:var(--pn2)}
+.tc.open .tb{display:block}
+.tb table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tb th,.tb td{padding:0 10px;height:42px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap;font-size:13.5px}
+.tb th{font-size:12px;font-weight:600;color:var(--mut);background:var(--pn2);height:36px;text-align:right}
+.tb th.l,.tb td.l{text-align:left}
+.tb tr:last-child td{border-bottom:0}
+.tb .nm b{display:block;font-size:14.5px;font-weight:600;color:var(--fg)}
+.tb .nm small{color:var(--mut);font-size:11.5px}
+.tb .rs{max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--mut);text-align:left}
+.stk{display:inline-block;min-width:28px;border-radius:10px;padding:0 7px;background:rgba(183,28,28,.10);color:var(--up);font-weight:700;text-align:center;font-size:12.5px}
+.more{display:block;width:100%;border:0;background:none;color:var(--acc);font:inherit;font-size:13px;padding:10px;cursor:pointer}
+details.help{font-size:12.5px;color:var(--mut);margin-top:14px}
+details.help summary{cursor:pointer;color:var(--acc)}
+@media (max-width:520px){
+  .tb .rs,.tb .hid{display:none}
+  .tm .nm{font-size:15px}
+  .tb th,.tb td{padding:0 8px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../" class="on">选股</a><a href="../pos/">仓位管理</a><a href="../fitness/">生活</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="../">10日新高</a><a href="../ema-x/">上穿EMA</a><a href="../ema-up/">EMA上方</a><a href="../theme/" class="on" aria-current="page">题材</a></div></nav>
+<div class="wrap">
+<header>
+  <h1>A股题材 <span class="cnt" id="cnt">—</span></h1>
+  <div class="meta">
+    <span>交易日 <b id="td">—</b></span>
+    <span>涨停 <b id="nlu">—</b></span>
+    <span>更新 <b id="run">—</b></span>
+  </div>
+  <div class="row datebar">
+    <label for="datesel">日期</label>
+    <select id="datesel"></select>
+  </div>
+  <div class="tabs" role="tablist" aria-label="题材视图">
+    <button type="button" class="on" data-mode="zt" id="tab-zt">涨停题材</button>
+    <button type="button" data-mode="bk" id="tab-bk">概念板块</button>
+  </div>
+</header>
+
+<p class="note" id="srcnote">涨停题材按同花顺涨停原因标签聚合；概念板块来自东方财富概念涨幅榜。</p>
+
+<div class="ctl">
+  <input id="q" type="search" placeholder="搜索题材 / 股票 / 代码" autocomplete="off">
+  <select id="sort">
+    <option value="n">按家数</option>
+    <option value="board">按最高连板</option>
+    <option value="seal">按封单</option>
+    <option value="chg">按涨幅</option>
+  </select>
+</div>
+<div class="stat" id="stat"></div>
+<div id="list" class="tlist"></div>
+<div id="empty" class="empty" hidden>暂无数据</div>
+
+<details class="help">
+  <summary>数据说明</summary>
+  <p id="helptext" style="margin:8px 0 0;line-height:1.6"></p>
+</details>
+</div>
+<script>
+(function(){
+var D=null, MODE="zt", OPEN={}, DV={};
+var $=function(s){return document.querySelector(s)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function sg(v,d){if(v==null||v===""||isNaN(v))return "—";var n=Number(v),s=(n>0?"+":"")+n.toFixed(d==null?2:d);var cls=n>0?"up":n<0?"down":"flat";return '<span class="'+cls+'">'+s+(d===0?"":"")+"%</span>"}
+function hms(iso){if(!iso)return "—";var m=String(iso).match(/T(\d{2}:\d{2})/);return m?m[1]:iso}
+function get(u,fresh){return fetch(fresh?u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now():u,{cache:fresh?"no-store":"no-cache"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+
+function setTabs(){
+  document.querySelectorAll(".tabs button").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-mode")===MODE)});
+  var sort=$("#sort");
+  if(MODE==="zt"){
+    sort.innerHTML='<option value="n">按家数</option><option value="board">按最高连板</option><option value="seal">按封单</option>';
+  }else{
+    sort.innerHTML='<option value="chg">按涨幅</option><option value="n">按成分数</option><option value="up">按上涨家数</option>';
+  }
+}
+
+function items(){
+  if(!D) return [];
+  return MODE==="zt" ? (D.themes||[]) : (D.concepts||[]);
+}
+
+function filtered(){
+  var q=($("#q").value||"").trim().toLowerCase();
+  var key=$("#sort").value;
+  var arr=items().slice();
+  if(q){
+    arr=arr.filter(function(t){
+      if((t.name||"").toLowerCase().indexOf(q)>=0) return true;
+      return (t.stocks||[]).some(function(s){
+        return (s.n||"").toLowerCase().indexOf(q)>=0 || (s.c||"").indexOf(q)>=0;
+      });
+    });
+  }
+  arr.sort(function(a,b){
+    if(MODE==="zt"){
+      if(key==="board") return (b.max_board||0)-(a.max_board||0) || (b.n||0)-(a.n||0);
+      if(key==="seal") return (b.seal||0)-(a.seal||0) || (b.n||0)-(a.n||0);
+      return (b.n||0)-(a.n||0) || (b.max_board||0)-(a.max_board||0) || (b.seal||0)-(a.seal||0);
+    }
+    if(key==="n") return (b.n||0)-(a.n||0) || (b.chg||0)-(a.chg||0);
+    if(key==="up") return (b.up||0)-(a.up||0) || (b.chg||0)-(a.chg||0);
+    return (b.chg||0)-(a.chg||0) || (b.n||0)-(a.n||0);
+  });
+  return arr;
+}
+
+function stockRows(stocks, limit){
+  var rows=(stocks||[]).slice(0, limit||80);
+  return rows.map(function(s){
+    var board = s.board_t || (s.board? (s.board+"板"):"");
+    return '<tr>'+
+      '<td class="l nm"><b>'+esc(s.n)+'</b><small>'+esc(s.c)+'</small></td>'+
+      '<td class="big">'+(s.chg==null?"—":sg(s.chg,2))+'</td>'+
+      (MODE==="zt"
+        ? '<td>'+(board?'<span class="stk">'+esc(board)+'</span>':"—")+'</td><td>'+(s.seal!=null?s.seal:"—")+'</td><td class="hid">'+(s.t||"—")+'</td><td class="l rs hid" title="'+esc(s.reason||'')+'">'+esc(s.reason||"")+'</td>'
+        : '<td>'+(s.mc!=null?s.mc:"—")+'</td>')+
+      '</tr>';
+  }).join("");
+}
+
+function render(){
+  if(!D){ $("#empty").hidden=false; $("#list").innerHTML=""; return; }
+  $("#td").textContent=D.date||"—";
+  $("#nlu").textContent=D.n_limit_up!=null?D.n_limit_up:"—";
+  $("#run").textContent=hms(D.run_at);
+  var arr=filtered();
+  $("#cnt").textContent=arr.length;
+  $("#stat").textContent = MODE==="zt"
+    ? ("显示 "+arr.length+" 个题材 · 全日涨停 "+(D.n_limit_up||0)+" 家")
+    : ("显示 "+arr.length+" 个概念 · 源 "+(D.n_concepts||0)+" 个");
+  $("#srcnote").textContent = MODE==="zt"
+    ? "强度：涨停家数 → 最高连板 → 封单合计（亿）。点开看该题材下的涨停股。"
+    : "东方财富概念涨幅榜（已剔除昨日/连板等统计板）。点开看成份股（按涨幅）。";
+  $("#helptext").textContent = D.note || "";
+
+  if(!arr.length){ $("#empty").hidden=false; $("#empty").textContent = MODE==="bk" && !(D.concepts||[]).length ? "本日概念板块未取到（可看涨停题材）" : "无匹配题材"; $("#list").innerHTML=""; return; }
+  $("#empty").hidden=true;
+  var html="";
+  arr.forEach(function(t,i){
+    var id = (MODE==="zt"?"zt:":"bk:")+(t.code||t.name);
+    var open = !!OPEN[id];
+    var badges = MODE==="zt"
+      ? ('<span>涨停 <b>'+t.n+'</b></span><span>最高 <b>'+(t.max_board||0)+'</b> 连板</span><span>封单 <b>'+(t.seal||0)+'</b> 亿</span>')
+      : ('<span>涨幅 <b class="'+(t.chg>0?"up":t.chg<0?"down":"flat")+'">'+(t.chg==null?"—":((t.chg>0?"+":"")+Number(t.chg).toFixed(2)+"%"))+'</b></span><span>成份 <b>'+(t.n||0)+'</b></span><span>涨/跌 <b>'+(t.up||0)+'</b>/<b>'+(t.down||0)+'</b></span>'+(t.lead?'<span>领涨 <b>'+esc(t.lead)+'</b></span>':""));
+    var head = MODE==="zt"
+      ? '<th class="l">名称</th><th>涨跌幅</th><th>连板</th><th>封单(亿)</th><th class="hid">时间</th><th class="l hid">原因</th>'
+      : '<th class="l">名称</th><th>涨跌幅</th><th>市值(亿)</th>';
+    html += '<div class="tc'+(open?" open":"")+'" data-id="'+esc(id)+'">'+
+      '<div class="th" role="button" tabindex="0" aria-expanded="'+(open?"true":"false")+'">'+
+        '<div class="rk'+(i<3?" t3":"")+'">'+(i+1)+'</div>'+
+        '<div class="tm"><div class="nm">'+esc(t.name)+'</div><div class="bd">'+badges+'</div></div>'+
+        '<div class="chev">›</div>'+
+      '</div>'+
+      '<div class="tb"><table><thead><tr>'+head+'</tr></thead><tbody>'+stockRows(t.stocks)+'</tbody></table></div>'+
+    '</div>';
+  });
+  $("#list").innerHTML=html;
+}
+
+function bind(){
+  $("#list").addEventListener("click",function(e){
+    var th=e.target.closest(".th"); if(!th) return;
+    var tc=th.parentElement; var id=tc.getAttribute("data-id");
+    OPEN[id]=!OPEN[id]; tc.classList.toggle("open",!!OPEN[id]);
+    th.setAttribute("aria-expanded", OPEN[id]?"true":"false");
+  });
+  $("#q").addEventListener("input",render);
+  $("#sort").addEventListener("change",render);
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click",function(){ MODE=b.getAttribute("data-mode"); OPEN={}; setTabs(); render(); });
+  });
+  $("#datesel").addEventListener("change",function(){ load($("#datesel").value); });
+}
+
+function dates(list){
+  var sel=$("#datesel"); sel.innerHTML="";
+  (list||[]).forEach(function(x){
+    DV[x.d]=x.v||"";
+    var o=document.createElement("option");
+    o.value=x.d;
+    o.textContent=x.d.slice(0,4)+"-"+x.d.slice(4,6)+"-"+x.d.slice(6)+(x.lu!=null?(" · 涨停"+x.lu):"");
+    sel.appendChild(o);
+  });
+}
+
+function load(tag){
+  var u = tag ? ("data/"+tag+".json") : "data/latest.json";
+  var v = tag && DV[tag] ? ("?v="+DV[tag]) : "";
+  return get(u+v, !tag).then(function(d){
+    D=d; OPEN={};
+    if(tag) $("#datesel").value=tag;
+    else if(d.tag) $("#datesel").value=d.tag;
+    setTabs(); render();
+    document.title="朔元 · 题材 "+(d.date||"");
+  }).catch(function(e){
+    D=null; render();
+    $("#empty").hidden=false; $("#empty").textContent="加载失败："+e.message;
+  });
+}
+
+bind();
+get("data/dates.json",true).then(dates).catch(function(){}).then(function(){ return load(""); });
+})();
+</script>
+</body>
+</html>
