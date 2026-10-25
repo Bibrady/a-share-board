@@ -230,7 +230,7 @@ td.nm b,td.ind{font-family:inherit}
  <div class="khd"><div class="t"><b id="kname"></b><span id="kcode"></span></div><button class="kx" id="kx" aria-label="关闭">✕</button></div>
  <div class="kmeta" id="kmeta"></div>
  <div class="kbtns"><a class="pri" id="ktv">TradingView</a><a id="ktvw" target="_blank" rel="noopener">TV网页版</a><a id="kths" target="_blank" rel="noopener">同花顺</a>
-  <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120" class="on">6个月</button><button data-n="240">12个月</button></span></div>
+  <span class="rg" id="krg"><button data-n="60">3个月</button><button data-n="120">6个月</button><button data-n="240" class="on">12个月</button></span></div>
  <div class="kinfo" id="kinfo">加载中…</div>
  <canvas id="kcv"></canvas>
  <div class="kdw" id="kdw" hidden><button type="button" class="kdt" id="kdt">公司简介 ▸</button><div class="kdesc" id="kdesc" hidden></div></div>
@@ -402,7 +402,7 @@ $("#lvtabs").addEventListener("click",function(e){var b=e.target.closest("button
 $("#tb").addEventListener("click",function(e){if(e.target.closest("a.tv"))return;
  var tr=e.target.closest("tr[data-c]");if(tr)openK(tr.getAttribute("data-c"))});
 // ---------- K-line sheet (own canvas renderer, no external libs) ----------
-var K={r:null,bars:null,n:120,sel:-1,open:false,src:"",list:[],i:-1},KC={};
+var K={r:null,bars:null,n:240,sel:-1,open:false,src:"",list:[],i:-1},KC={};
 function kget(c){if(!KC[c])KC[c]=get(vq("data/k/"+c+".json",KV)).catch(function(e){delete KC[c];throw e});return KC[c]}
 // open from table: nav order = rows currently visible (sort + filter + search)
 function openK(c){K.list=rows().map(function(r){return r.c});showK(c);
