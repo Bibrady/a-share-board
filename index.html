@@ -130,6 +130,26 @@ footer a{color:var(--mut)}
  td.nm{max-width:none}
 }
 
+
+.sumy{display:flex;flex-direction:column;gap:10px}
+.sumy .sh{font-size:13.5px;color:var(--fg);font-weight:600}
+.sumy .sh small{font-weight:400;color:var(--mut);margin-left:6px;font-size:12px}
+.sumy .blk h3{font-size:12.5px;margin:0 0 6px;color:var(--mut);font-weight:600}
+.sumy .bars{display:flex;flex-direction:column;gap:5px}
+.sumy .br{display:grid;grid-template-columns:minmax(68px,1.15fr) minmax(70px,2fr) auto;gap:4px 8px;align-items:center;font-size:12.5px}
+.sumy .br .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)}
+.sumy .br .tr{height:8px;background:var(--grid);border-radius:4px;overflow:hidden}
+.sumy .br .tr i{display:block;height:100%;background:var(--acc);border-radius:4px;min-width:2px}
+.sumy .br .meta{font-family:var(--mono);font-size:11.5px;color:var(--mut);white-space:nowrap;text-align:right}
+.sumy .br .meta b{color:var(--fg);font-weight:600}
+.sumy .kv{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--mut)}
+.sumy .kv b{color:var(--fg);font-family:var(--mono);font-weight:600}
+.sumy .pills{display:flex;flex-wrap:wrap;gap:6px}
+.sumy .pill{display:inline-flex;align-items:baseline;gap:4px;background:var(--pn2);border:1px solid var(--bd);border-radius:14px;padding:3px 10px;font-size:12.5px;color:var(--fg)}
+.sumy .pill b{font-family:var(--mono);font-weight:600}
+.sumy .pill em{font-style:normal;color:var(--mut);font-size:11.5px;font-family:var(--mono)}
+@media (max-width:420px){.sumy .br{grid-template-columns:1fr auto;grid-template-rows:auto auto}.sumy .br .nm{grid-column:1}.sumy .br .meta{grid-column:2;grid-row:1}.sumy .br .tr{grid-column:1 / -1}}
+
 /* ---- Bloomberg-terminal theme (2026-09-30) ---- */
 body{-webkit-font-smoothing:antialiased}
 h1{color:var(--ttl);letter-spacing:.02em}.card h2{color:var(--acc)}
@@ -159,6 +179,11 @@ td.nm b,td.ind{font-family:inherit}
   <div class="rft"><span id="rft"></span><span id="rfe"></span></div><div class="rsteps" id="rsteps"></div></div>
  <div class="warn" id="warn" hidden></div>
 </header>
+
+<section class="card" id="sumycard">
+ <h2>综合分析 <small id="sumyscope">全部</small></h2>
+ <div class="sumy" id="sumy"><div class="empty" style="padding:8px">加载中…</div></div>
+</section>
 
 <section class="card">
  <h2>行业分布 <span class="tabs" id="lvtabs"><button data-lv="k" class="on">细分行业</button><button data-lv="g">二级行业</button></span></h2>
@@ -241,6 +266,63 @@ var COLS=[
  {k:"ex",t:"相对板块<br>超额%",ex:1,td:function(r){return '<td class="'+cls(r.ex)+'">'+sg(r.ex,2)+'</td>'}},
  {k:"s",t:"连续<br>上榜",td:function(r){return '<td><span class="stk'+(r.s>1?" h":"")+'">'+r.s+'天</span></td>'}}
 ];
+
+function med(a){if(!a||!a.length)return null;a=a.slice().sort(function(x,y){return x-y});var m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
+function avg(a){if(!a||!a.length)return null;for(var i=0,s=0;i<a.length;i++)s+=a[i];return s/a.length}
+function pctn(n,t){if(!t)return "0";var p=Math.round(1000*n/t)/10;return (p%1?p.toFixed(1):String(p|0))}
+function stripL(x){var m=/^(.*?)（(细分|行业)）$/.exec(String(x||""));return m?m[1]:String(x||"未分类")}
+function sumy(){
+ var el=$("#sumy"),sc=$("#sumyscope");if(!el)return;
+ if(!D||!D.rows){el.innerHTML='<div class="empty" style="padding:8px">暂无数据</div>';if(sc)sc.textContent="全部";return}
+ var a=rows(),N=a.length,filt=!!(S.ind||String(S.q||"").trim());
+ if(sc)sc.textContent=filt?"当前筛选":"全部";
+ if(!N){el.innerHTML='<div class="empty" style="padding:8px">当前筛选无股票</div>';return}
+ var f=S.lv==="k"?"ind":"g",lvName=S.lv==="k"?"细分行业":"二级行业";
+ var cnt={},amtBy={},bOrd=["沪主板","深主板","创业板","科创板","北交所"],bM={};bOrd.forEach(function(x){bM[x]=0});
+ var uI={},uG={},mcs=[],chgs=[],amts=[],tos=[],amtT=0;
+ a.forEach(function(r){
+  var k=r[f]||"未分类";cnt[k]=(cnt[k]||0)+1;amtBy[k]=(amtBy[k]||0)+(+r.amt||0);
+  if(r.ind)uI[r.ind]=1;if(r.g)uG[r.g]=1;
+  var b=r.b||"其他";if(bM[b]==null)bM[b]=0;bM[b]++;
+  if(r.mc!=null&&!isNaN(+r.mc))mcs.push(+r.mc);
+  if(r.chg!=null&&!isNaN(+r.chg))chgs.push(+r.chg);
+  if(r.amt!=null&&!isNaN(+r.amt)){amts.push(+r.amt);amtT+=+r.amt}
+  if(r.to!=null&&!isNaN(+r.to))tos.push(+r.to);
+ });
+ var pairs=Object.keys(cnt).map(function(k){return[k,cnt[k]]});
+ pairs.sort(function(x,y){return y[1]-x[1]||String(x[0]).localeCompare(y[0],"zh-CN")});
+ var top=pairs.slice(0,10),maxC=top.length?top[0][1]:1;
+ var bars=top.map(function(t){
+  var c=t[1],p=pctn(c,N),ap=amtT?pctn(amtBy[t[0]]||0,amtT):null,w=Math.max(3,100*c/maxC);
+  return '<div class="br"><div class="nm" title="'+esc(t[0])+'">'+esc(stripL(t[0]))+'</div><div class="tr"><i style="width:'+w.toFixed(1)+'%"></i></div><div class="meta"><b>'+c+'</b> · '+p+'%'+(ap!=null?' · 额'+ap+'%':'')+'</div></div>';
+ }).join("");
+ var more=pairs.length>10?'<div style="font-size:11.5px;color:var(--mut);margin-top:2px">其余 '+(pairs.length-10)+' 个'+lvName+'合计 '+pairs.slice(10).reduce(function(s,t){return s+t[1]},0)+' 只</div>':"";
+ var BKS=[{l:"<50亿",a:-1e99,b:50},{l:"50–100亿",a:50,b:100},{l:"100–300亿",a:100,b:300},{l:"300–1000亿",a:300,b:1000},{l:"≥1000亿",a:1000,b:1e99}];
+ BKS.forEach(function(x){x.n=0});
+ mcs.forEach(function(m){for(var i=0;i<BKS.length;i++)if(m>=BKS[i].a&&m<BKS[i].b){BKS[i].n++;break}});
+ var mcN=mcs.length,maxB=Math.max.apply(null,BKS.map(function(x){return x.n}).concat([1]));
+ var mbars=BKS.map(function(x){
+  var p=pctn(x.n,mcN||N),w=mcN?Math.max(x.n?3:0,100*x.n/maxB):0;
+  return '<div class="br"><div class="nm">'+esc(x.l)+'</div><div class="tr"><i style="width:'+w.toFixed(1)+'%"></i></div><div class="meta"><b>'+x.n+'</b> · '+p+'%</div></div>';
+ }).join("");
+ var bKeys=bOrd.concat(Object.keys(bM).filter(function(k){return bOrd.indexOf(k)<0}));
+ var pills=bKeys.filter(function(k){return bM[k]}).map(function(k){
+  return '<span class="pill">'+esc(k)+' <b>'+bM[k]+'</b><em>'+pctn(bM[k],N)+'%</em></span>';
+ }).join("");
+ var extras=[];
+ if(chgs.length)extras.push("涨跌中位 <b>"+sg(med(chgs),2)+"%</b>");
+ if(amts.length)extras.push("成交额中位 <b>"+fx(med(amts),2)+"亿</b>");
+ if(tos.length)extras.push("换手中位 <b>"+fx(med(tos),2)+"%</b>");
+ var h='<div class="sh">'+N+'只 · 细分行业 '+Object.keys(uI).length+' 个 · 二级 '+Object.keys(uG).length+' 个'+(filt?'<small>基于当前筛选</small>':'')+'</div>';
+ h+='<div class="blk"><h3>行业占比 · '+lvName+'（Top '+(top.length)+'）</h3><div class="bars">'+bars+'</div>'+more+'</div>';
+ h+='<div class="blk"><h3>市值分布</h3><div class="bars">'+mbars+'</div>';
+ if(mcN)h+='<div class="kv" style="margin-top:6px"><span>中位市值 <b>'+fx(med(mcs),1)+'亿</b></span><span>平均市值 <b>'+fx(avg(mcs),1)+'亿</b></span><span>有市值 '+mcN+'/'+N+'</span></div>';
+ h+='</div>';
+ h+='<div class="blk"><h3>板块结构</h3><div class="pills">'+pills+'</div></div>';
+ if(extras.length)h+='<div class="blk"><h3>其他中位</h3><div class="kv">'+extras.map(function(x){return "<span>"+x+"</span>"}).join("")+'</div></div>';
+ el.innerHTML=h;
+}
+
 function cols(){return COLS.filter(function(c){return !c.ex||(D&&D.has_excess)})}
 function head(){
  $("#thr").innerHTML=cols().map(function(c){var on=S.k===c.k;return '<th data-k="'+c.k+'" class="'+(on?"on":"")+(c.k==="ind"?" l":"")+'">'+c.t+(on?'<span class="ar">'+(S.dir<0?"▼":"▲")+'</span>':"")+'</th>'}).join("");
@@ -264,6 +346,7 @@ function body(){
  $("#clr").hidden=!(S.ind||S.q);
  $("#defsort").className=S.k==="o"?"on":"";
  $("#sortinfo").textContent=S.k==="o"?"行业分组 → 组内按总市值降序；点表头可改排序":"当前：按"+(cols().filter(function(c){return c.k===S.k})[0]||{t:""}).t.replace("<br>","")+(S.dir<0?"降序":"升序")+"，点左侧按钮恢复默认";
+ sumy();
 }
 function chipl(x){var m=/^(.*?)（(细分|行业)）$/.exec(x);return m?esc(m[1])+'<em>'+m[2]+'</em>':esc(x)}
 function tl(){return S.lv==="k"?(D.groups||[]):D.tally}
