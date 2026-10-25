@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>朔元 · 题材</title>
-<meta name="description" content="A股当日活跃题材：涨停原因聚合 + 概念板块成分（自动更新）">
+<meta name="description" content="A股当日活跃题材：朔元叙事归类（涨停池原料，非同花顺/东财概念）">
 <meta name="theme-color" content="#F7F5F0">
 <link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
@@ -23,9 +23,6 @@ h1 .cnt{background:var(--acc);color:#fff;border-radius:12px;padding:1px 10px;fon
 select,input{font:inherit;font-size:15px;height:40px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:var(--pn);color:var(--fg);min-width:0}
 .datebar{margin-top:8px}.datebar label{font-size:13px;color:var(--mut)}
 #datesel{flex:0 1 200px}
-.tabs{display:inline-flex;border:1px solid var(--bd);border-radius:9px;overflow:hidden;margin:8px 0 0}
-.tabs button{border:0;background:var(--pn);font:inherit;font-size:13.5px;height:34px;padding:0 14px;color:var(--mut);cursor:pointer;touch-action:manipulation;-webkit-appearance:none}
-.tabs button.on{background:var(--acc);color:#fff;font-weight:600}
 .note{font-size:12px;color:var(--mut);line-height:1.55;margin:8px 2px 10px}
 .ctl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .ctl input{flex:1;min-width:140px}
@@ -54,13 +51,13 @@ select,input{font:inherit;font-size:15px;height:40px;border:1px solid var(--bd);
 .tb tr:last-child td{border-bottom:0}
 .tb .nm b{display:block;font-size:14.5px;font-weight:600;color:var(--fg)}
 .tb .nm small{color:var(--mut);font-size:11.5px}
-.tb .rs{max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--mut);text-align:left}
+.tb .rs{max-width:280px;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--mut);text-align:left;white-space:nowrap}
 .stk{display:inline-block;min-width:28px;border-radius:10px;padding:0 7px;background:rgba(183,28,28,.10);color:var(--up);font-weight:700;text-align:center;font-size:12.5px}
-.more{display:block;width:100%;border:0;background:none;color:var(--acc);font:inherit;font-size:13px;padding:10px;cursor:pointer}
 details.help{font-size:12.5px;color:var(--mut);margin-top:14px}
 details.help summary{cursor:pointer;color:var(--acc)}
 @media (max-width:520px){
-  .tb .rs,.tb .hid{display:none}
+  .tb .hid{display:none}
+  .tb .rs{max-width:140px;display:table-cell}
   .tm .nm{font-size:15px}
   .tb th,.tb td{padding:0 8px;font-size:13px}
 }
@@ -80,21 +77,16 @@ details.help summary{cursor:pointer;color:var(--acc)}
     <label for="datesel">日期</label>
     <select id="datesel"></select>
   </div>
-  <div class="tabs" role="tablist" aria-label="题材视图">
-    <button type="button" class="on" data-mode="zt" id="tab-zt">涨停题材</button>
-    <button type="button" data-mode="bk" id="tab-bk">概念板块</button>
-  </div>
 </header>
 
-<p class="note" id="srcnote">涨停题材按同花顺涨停原因标签聚合；概念板块来自东方财富概念涨幅榜。</p>
+<p class="note" id="srcnote">题材为朔元叙事归类（涨停池原料）；强度：涨停家数 → 最高连板 → 封单合计。点开看个股及涨停原因。</p>
 
 <div class="ctl">
-  <input id="q" type="search" placeholder="搜索题材 / 股票 / 代码" autocomplete="off">
+  <input id="q" type="search" placeholder="搜索题材 / 股票 / 代码 / 原因" autocomplete="off">
   <select id="sort">
     <option value="n">按家数</option>
     <option value="board">按最高连板</option>
     <option value="seal">按封单</option>
-    <option value="chg">按涨幅</option>
   </select>
 </div>
 <div class="stat" id="stat"></div>
@@ -108,49 +100,31 @@ details.help summary{cursor:pointer;color:var(--acc)}
 </div>
 <script>
 (function(){
-var D=null, MODE="zt", OPEN={}, DV={};
+var D=null, OPEN={}, DV={};
 var $=function(s){return document.querySelector(s)};
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
-function sg(v,d){if(v==null||v===""||isNaN(v))return "—";var n=Number(v),s=(n>0?"+":"")+n.toFixed(d==null?2:d);var cls=n>0?"up":n<0?"down":"flat";return '<span class="'+cls+'">'+s+(d===0?"":"")+"%</span>"}
+function sg(v,d){if(v==null||v===""||isNaN(v))return "—";var n=Number(v),s=(n>0?"+":"")+n.toFixed(d==null?2:d);var cls=n>0?"up":n<0?"down":"flat";return '<span class="'+cls+'">'+s+"%</span>"}
 function hms(iso){if(!iso)return "—";var m=String(iso).match(/T(\d{2}:\d{2})/);return m?m[1]:iso}
 function get(u,fresh){return fetch(fresh?u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now():u,{cache:fresh?"no-store":"no-cache"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
-
-function setTabs(){
-  document.querySelectorAll(".tabs button").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-mode")===MODE)});
-  var sort=$("#sort");
-  if(MODE==="zt"){
-    sort.innerHTML='<option value="n">按家数</option><option value="board">按最高连板</option><option value="seal">按封单</option>';
-  }else{
-    sort.innerHTML='<option value="chg">按涨幅</option><option value="n">按成分数</option><option value="up">按上涨家数</option>';
-  }
-}
-
-function items(){
-  if(!D) return [];
-  return MODE==="zt" ? (D.themes||[]) : (D.concepts||[]);
-}
 
 function filtered(){
   var q=($("#q").value||"").trim().toLowerCase();
   var key=$("#sort").value;
-  var arr=items().slice();
+  var arr=(D&&D.themes||[]).slice();
   if(q){
     arr=arr.filter(function(t){
       if((t.name||"").toLowerCase().indexOf(q)>=0) return true;
       return (t.stocks||[]).some(function(s){
-        return (s.n||"").toLowerCase().indexOf(q)>=0 || (s.c||"").indexOf(q)>=0;
+        return (s.n||"").toLowerCase().indexOf(q)>=0
+          || (s.c||"").indexOf(q)>=0
+          || (s.reason||"").toLowerCase().indexOf(q)>=0;
       });
     });
   }
   arr.sort(function(a,b){
-    if(MODE==="zt"){
-      if(key==="board") return (b.max_board||0)-(a.max_board||0) || (b.n||0)-(a.n||0);
-      if(key==="seal") return (b.seal||0)-(a.seal||0) || (b.n||0)-(a.n||0);
-      return (b.n||0)-(a.n||0) || (b.max_board||0)-(a.max_board||0) || (b.seal||0)-(a.seal||0);
-    }
-    if(key==="n") return (b.n||0)-(a.n||0) || (b.chg||0)-(a.chg||0);
-    if(key==="up") return (b.up||0)-(a.up||0) || (b.chg||0)-(a.chg||0);
-    return (b.chg||0)-(a.chg||0) || (b.n||0)-(a.n||0);
+    if(key==="board") return (b.max_board||0)-(a.max_board||0) || (b.n||0)-(a.n||0);
+    if(key==="seal") return (b.seal||0)-(a.seal||0) || (b.n||0)-(a.n||0);
+    return (b.n||0)-(a.n||0) || (b.max_board||0)-(a.max_board||0) || (b.seal||0)-(a.seal||0);
   });
   return arr;
 }
@@ -161,10 +135,11 @@ function stockRows(stocks, limit){
     var board = s.board_t || (s.board? (s.board+"板"):"");
     return '<tr>'+
       '<td class="l nm"><b>'+esc(s.n)+'</b><small>'+esc(s.c)+'</small></td>'+
-      '<td class="big">'+(s.chg==null?"—":sg(s.chg,2))+'</td>'+
-      (MODE==="zt"
-        ? '<td>'+(board?'<span class="stk">'+esc(board)+'</span>':"—")+'</td><td>'+(s.seal!=null?s.seal:"—")+'</td><td class="hid">'+(s.t||"—")+'</td><td class="l rs hid" title="'+esc(s.reason||'')+'">'+esc(s.reason||"")+'</td>'
-        : '<td>'+(s.mc!=null?s.mc:"—")+'</td>')+
+      '<td>'+(s.chg==null?"—":sg(s.chg,2))+'</td>'+
+      '<td>'+(board?'<span class="stk">'+esc(board)+'</span>':"—")+'</td>'+
+      '<td>'+(s.seal!=null?s.seal:"—")+'</td>'+
+      '<td class="hid">'+(s.t||"—")+'</td>'+
+      '<td class="l rs" title="'+esc(s.reason||'')+'">'+esc(s.reason||"—")+'</td>'+
       '</tr>';
   }).join("");
 }
@@ -176,26 +151,18 @@ function render(){
   $("#run").textContent=hms(D.run_at);
   var arr=filtered();
   $("#cnt").textContent=arr.length;
-  $("#stat").textContent = MODE==="zt"
-    ? ("显示 "+arr.length+" 个题材 · 全日涨停 "+(D.n_limit_up||0)+" 家")
-    : ("显示 "+arr.length+" 个概念 · 源 "+(D.n_concepts||0)+" 个");
-  $("#srcnote").textContent = MODE==="zt"
-    ? "强度：涨停家数 → 最高连板 → 封单合计（亿）。点开看该题材下的涨停股。"
-    : "东方财富概念涨幅榜（已剔除昨日/连板等统计板）。点开看成份股（按涨幅）。";
+  $("#stat").textContent="显示 "+arr.length+" 个叙事题材 · 全日涨停 "+(D.n_limit_up||0)+" 家";
+  $("#srcnote").textContent="题材为朔元叙事归类（非同花顺标签/东财概念）；强度：涨停家数 → 最高连板 → 封单合计。点开看个股及原始涨停原因。";
   $("#helptext").textContent = D.note || "";
 
-  if(!arr.length){ $("#empty").hidden=false; $("#empty").textContent = MODE==="bk" && !(D.concepts||[]).length ? "本日概念板块未取到（可看涨停题材）" : "无匹配题材"; $("#list").innerHTML=""; return; }
+  if(!arr.length){ $("#empty").hidden=false; $("#empty").textContent="无匹配题材"; $("#list").innerHTML=""; return; }
   $("#empty").hidden=true;
   var html="";
+  var head='<th class="l">名称</th><th>涨跌幅</th><th>连板</th><th>封单(亿)</th><th class="hid">时间</th><th class="l">涨停原因</th>';
   arr.forEach(function(t,i){
-    var id = (MODE==="zt"?"zt:":"bk:")+(t.code||t.name);
+    var id = "zt:"+(t.name||"");
     var open = !!OPEN[id];
-    var badges = MODE==="zt"
-      ? ('<span>涨停 <b>'+t.n+'</b></span><span>最高 <b>'+(t.max_board||0)+'</b> 连板</span><span>封单 <b>'+(t.seal||0)+'</b> 亿</span>')
-      : ('<span>涨幅 <b class="'+(t.chg>0?"up":t.chg<0?"down":"flat")+'">'+(t.chg==null?"—":((t.chg>0?"+":"")+Number(t.chg).toFixed(2)+"%"))+'</b></span><span>成份 <b>'+(t.n||0)+'</b></span><span>涨/跌 <b>'+(t.up||0)+'</b>/<b>'+(t.down||0)+'</b></span>'+(t.lead?'<span>领涨 <b>'+esc(t.lead)+'</b></span>':""));
-    var head = MODE==="zt"
-      ? '<th class="l">名称</th><th>涨跌幅</th><th>连板</th><th>封单(亿)</th><th class="hid">时间</th><th class="l hid">原因</th>'
-      : '<th class="l">名称</th><th>涨跌幅</th><th>市值(亿)</th>';
+    var badges = '<span>涨停 <b>'+t.n+'</b></span><span>最高 <b>'+(t.max_board||0)+'</b> 连板</span><span>封单 <b>'+(t.seal||0)+'</b> 亿</span>';
     html += '<div class="tc'+(open?" open":"")+'" data-id="'+esc(id)+'">'+
       '<div class="th" role="button" tabindex="0" aria-expanded="'+(open?"true":"false")+'">'+
         '<div class="rk'+(i<3?" t3":"")+'">'+(i+1)+'</div>'+
@@ -217,9 +184,6 @@ function bind(){
   });
   $("#q").addEventListener("input",render);
   $("#sort").addEventListener("change",render);
-  document.querySelectorAll(".tabs button").forEach(function(b){
-    b.addEventListener("click",function(){ MODE=b.getAttribute("data-mode"); OPEN={}; setTabs(); render(); });
-  });
   $("#datesel").addEventListener("change",function(){ load($("#datesel").value); });
 }
 
@@ -241,7 +205,7 @@ function load(tag){
     D=d; OPEN={};
     if(tag) $("#datesel").value=tag;
     else if(d.tag) $("#datesel").value=d.tag;
-    setTabs(); render();
+    render();
     document.title="朔元 · 题材 "+(d.date||"");
   }).catch(function(e){
     D=null; render();
