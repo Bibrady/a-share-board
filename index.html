@@ -151,14 +151,11 @@ footer a{color:var(--mut)}
 @media (max-width:420px){.sumy .br{grid-template-columns:1fr auto;grid-template-rows:auto auto}.sumy .br .nm{grid-column:1}.sumy .br .meta{grid-column:2;grid-row:1}.sumy .br .tr{grid-column:1 / -1}}
 
 
-.sumy .pie-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.sumy .pie-svg{flex:0 0 auto;width:148px;height:148px;max-width:42vw}
-.sumy .pie-leg{flex:1 1 160px;display:flex;flex-direction:column;gap:6px;min-width:0}
-.sumy .pie-row{display:flex;align-items:center;gap:8px;font-size:12.5px;min-width:0}
-.sumy .pie-row i{flex:0 0 10px;width:10px;height:10px;border-radius:2px}
-.sumy .pie-row .nm{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)}
-.sumy .pie-row .meta{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--mut);white-space:nowrap}
-.sumy .pie-row .meta b{color:var(--fg);font-weight:600}
+
+
+.sumy .bars-full .br{grid-template-columns:minmax(72px,0.7fr) minmax(120px,3fr) auto}
+.sumy .bars-full .br .tr{height:12px}
+.sumy .bars-full .br .tr i{min-width:2px}
 
 /* ---- Bloomberg-terminal theme (2026-09-30) ---- */
 body{-webkit-font-smoothing:antialiased}
@@ -281,23 +278,6 @@ function med(a){if(!a||!a.length)return null;a=a.slice().sort(function(x,y){retu
 function avg(a){if(!a||!a.length)return null;for(var i=0,s=0;i<a.length;i++)s+=a[i];return s/a.length}
 function pctn(n,t){if(!t)return "0";var p=Math.round(1000*n/t)/10;return (p%1?p.toFixed(1):String(p|0))}
 function stripL(x){var m=/^(.*?)（(细分|行业)）$/.exec(String(x||""));return m?m[1]:String(x||"未分类")}
-function pieSVG(items,size){
- size=size||148;var R=size/2,r=R-1.5,cx=R,cy=R,tot=0,i;
- for(i=0;i<items.length;i++)tot+=items[i].n||0;
- if(!tot)return "";
- var cols=["#1A3A6B","#4A7AB0","#8FA8C8","#C4784A","#B71C1C"],a0=-Math.PI/2,paths=[];
- for(i=0;i<items.length;i++){
-  var it=items[i],n=it.n||0;if(!n)continue;
-  it.c=it.c||cols[i%cols.length];
-  var a1=a0+2*Math.PI*(n/tot),large=(a1-a0)>Math.PI?1:0;
-  var x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),d;
-  if(n===tot)d="M "+cx+" "+(cy-r)+" A "+r+" "+r+" 0 1 1 "+cx+" "+(cy+r)+" A "+r+" "+r+" 0 1 1 "+cx+" "+(cy-r)+" Z";
-  else d="M "+cx+" "+cy+" L "+x0.toFixed(2)+" "+y0.toFixed(2)+" A "+r+" "+r+" 0 "+large+" 1 "+x1.toFixed(2)+" "+y1.toFixed(2)+" Z";
-  paths.push('<path d="'+d+'" fill="'+it.c+'" stroke="#F7F5F0" stroke-width="1.5"/>');
-  a0=a1;
- }
- return '<svg class="pie-svg" viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" role="img" aria-label="市值分布饼图">'+paths.join("")+'</svg>';
-}
 function sumy(){
  var el=$("#sumy"),sc=$("#sumyscope");if(!el)return;
  if(!D||!D.rows){el.innerHTML='<div class="empty" style="padding:8px">暂无数据</div>';if(sc)sc.textContent="全部";return}
@@ -327,14 +307,11 @@ function sumy(){
  var BKS=[{l:"<50亿",a:-1e99,b:50},{l:"50–100亿",a:50,b:100},{l:"100–300亿",a:100,b:300},{l:"300–1000亿",a:300,b:1000},{l:"≥1000亿",a:1000,b:1e99}];
  BKS.forEach(function(x){x.n=0});
  mcs.forEach(function(m){for(var i=0;i<BKS.length;i++)if(m>=BKS[i].a&&m<BKS[i].b){BKS[i].n++;break}});
- var mcN=mcs.length;
- var mpieItems=BKS.filter(function(x){return x.n>0});
- var mpie=mcN?pieSVG(mpieItems):"";
- var mleg=mpieItems.map(function(x){
-  var p=pctn(x.n,mcN);
-  return '<div class="pie-row"><i style="background:'+x.c+'"></i><span class="nm">'+esc(x.l)+'</span><span class="meta"><b>'+x.n+'</b> · '+p+'%</span></div>';
+ var mcN=mcs.length,maxB=Math.max.apply(null,BKS.map(function(x){return x.n}).concat([1]));
+ var mbars=BKS.map(function(x){
+  var p=pctn(x.n,mcN||N),w=mcN&&x.n?Math.max(3,100*x.n/maxB):0;
+  return '<div class="br"><div class="nm">'+esc(x.l)+'</div><div class="tr"><i style="width:'+w.toFixed(1)+'%"></i></div><div class="meta"><b>'+x.n+'</b> · '+p+'%</div></div>';
  }).join("");
- var mbars=mcN?'<div class="pie-wrap">'+mpie+'<div class="pie-leg">'+mleg+'</div></div>':'<div class="empty" style="padding:4px 0">无市值数据</div>';
  var bKeys=bOrd.concat(Object.keys(bM).filter(function(k){return bOrd.indexOf(k)<0}));
  var pills=bKeys.filter(function(k){return bM[k]}).map(function(k){
   return '<span class="pill">'+esc(k)+' <b>'+bM[k]+'</b><em>'+pctn(bM[k],N)+'%</em></span>';
@@ -345,7 +322,7 @@ function sumy(){
  if(tos.length)extras.push("换手中位 <b>"+fx(med(tos),2)+"%</b>");
  var h='<div class="sh">'+N+'只 · 细分行业 '+Object.keys(uI).length+' 个 · 二级 '+Object.keys(uG).length+' 个'+(filt?'<small>基于当前筛选</small>':'')+'</div>';
  h+='<div class="blk"><h3>行业占比 · '+lvName+'（Top '+(top.length)+'）</h3><div class="bars">'+bars+'</div>'+more+'</div>';
- h+='<div class="blk"><h3>市值分布</h3>'+mbars;
+ h+='<div class="blk"><h3>市值分布</h3><div class="bars bars-full">'+mbars+'</div>';
  if(mcN)h+='<div class="kv" style="margin-top:6px"><span>中位市值 <b>'+fx(med(mcs),1)+'亿</b></span><span>平均市值 <b>'+fx(avg(mcs),1)+'亿</b></span><span>有市值 '+mcN+'/'+N+'</span></div>';
  h+='</div>';
  h+='<div class="blk"><h3>板块结构</h3><div class="pills">'+pills+'</div></div>';
