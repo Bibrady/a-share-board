@@ -176,7 +176,7 @@ td.nm b,td.ind{font-family:inherit}
 
 <section class="card" style="margin-top:10px">
  <details><summary>筛选规则与漏斗</summary>
-  <p style="margin:6px 0">规则：收盘同时高于 EMA144 与 EMA169（含当日上穿），EMA 用同花顺 Fuyao 前复权日收盘（约 400 根）计算，不足 170 根不计；剔除 ST / *ST / 退市整理、停牌；总市值 &gt; 60 亿；成交额 ≥ 2 亿。<br>
+  <p style="margin:6px 0">规则：收盘同时高于 EMA144 与 EMA169（含当日上穿），EMA 用同花顺 Fuyao 前复权日收盘（约 400 根）计算，不足 170 根不计；剔除 ST / *ST / 退市整理、停牌；成交额 ≥ 2 亿（无市值门槛）。<br>
   相对板块超额 = 个股涨幅 − 所属同花顺行业指数涨幅（未分类显示“—”）。默认排序：按“行业”列分组，组按当日上榜只数降序（同数按组成交额），未分类置后，组内按总市值降序。连续上榜天数按本看板历史中连续交易日上榜计算。点按个股查看近 3/6/12 个月日K（前复权，数据来源同花顺 Fuyao）；TV 按钮直接打开 TradingView 个股页（手机上会直接跳到 App 对应代码）（北交所个股 TradingView 暂无行情，不显示）。</p>
   <p id="funnel" style="margin:6px 0;color:var(--mut)"></p>
  </details>
@@ -283,7 +283,7 @@ function render(){
  var pv=$("#prov");pv.hidden=!D.prov;pv.textContent=D.prov?"盘中临时 "+bj(D.run_at).slice(11):"";
  document.title="朔元 · 运行在EMA144/169上方 "+D.date+" · "+D.count+"只";
  var f=D.funnel||{};
- $("#funnel").textContent=f.universe?("全市场 "+f.universe+"（含北交所 "+f.bse_in_universe+"）→ 剔ST "+f.after_st+" → 剔停牌 "+f.after_suspended+" → 市值>60亿 "+f.after_mcap+" → 成交额≥2亿 "+f.after_amount+" → 日K≥170根 "+f.after_history+" → 入选 "+f.final):"";
+ $("#funnel").textContent=f.universe?("全市场 "+f.universe+"（含北交所 "+f.bse_in_universe+"）→ 剔ST "+f.after_st+" → 剔停牌 "+f.after_suspended+" → 成交额≥2亿 "+f.after_amount+" → 日K≥170根 "+f.after_history+" → 入选 "+f.final):"";
  var w=$("#warn");w.hidden=!D.fallback;w.textContent=D.fallback?"⚠️ 当日部分数据来自备用数据源":"";
  if(S.ind&&!tl().some(function(t){return t[0]===S.ind}))S.ind="";
  if(S.k==="ex"&&!D.has_excess){S.k="o";S.dir=1}
