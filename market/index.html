@@ -7,7 +7,7 @@
 <title>朔元 · 大盘盘面</title>
 <meta name="description" content="A股大盘盘面：成交额、涨跌家数、涨跌停、涨跌幅分布、主要指数、行业涨跌（自动更新）">
 <meta name="theme-color" content="#F7F5F0">
-<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!--SITE_HEAD-->
 <style>
 :root{color-scheme:light;--up:#1A1A1A;--down:#B71C1C;--flat:#888888;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
 *{box-sizing:border-box}
@@ -138,7 +138,7 @@ td.nm b,td.ind{font-family:inherit}
 </style>
 </head>
 <body>
-<style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/" class="on" aria-current="page">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pos/">仓位管理</a><a href="../fitness/">生活</a></div></nav>
+<!--SITE_NAV-->
 <div class="wrap">
 <header>
  <h1>A股大盘盘面 <span class="st" id="st">…</span></h1>
@@ -491,12 +491,12 @@ function xchart(id,lid,rows,ser,o){o=o||{};var cv=$("#"+id),g=setupCv(cv),x=g.x,
  x.strokeStyle="#E5E2DA";x.lineWidth=1;x.fillStyle="#666666";x.textBaseline="middle";x.textAlign="left";
  for(var i=0;i<=2;i++){var v=lo+(hi-lo)*i/2,y=Math.round(Y(v))+.5;x.beginPath();x.moveTo(L,y);x.lineTo(L+pw,y);x.stroke();x.fillText((o.fmt||xf)(v),L+pw+3,y)}
  if(o.ref!=null){var yr=Math.round(Y(o.ref))+.5;x.strokeStyle="#888888";x.setLineDash([3,3]);x.beginPath();x.moveTo(L,yr);x.lineTo(L+pw,yr);x.stroke();x.setLineDash([])}
- x.textBaseline="alphabetic";[0,n-1].forEach(function(i,j){x.textAlign=j?"right":"left";x.fillText(md(rows[i].d),j?L+pw:L,g.H-2)});
+ x.textBaseline="alphabetic";[0,n-1].forEach(function(i,j){x.textAlign=j?"right":"left";x.fillText(rows[i].d,j?L+pw:L,g.H-2)});
  var bw=Math.max(1,pw/n*.66);
  ser.forEach(function(s){if(s.bar){rows.forEach(function(r,i){var v=r[s.k];if(v==null)return;var y0=Y(Math.max(lo,0)),y1=Y(v);x.fillStyle=s.c2&&v<0?s.c2:s.c;x.fillRect(X(i)-bw/2,Math.min(y0,y1),bw,Math.max(1,Math.abs(y1-y0)))});return}
   x.strokeStyle=s.c;x.lineWidth=s.w||1.6;x.setLineDash(s.dash||[]);x.beginPath();var st=false;rows.forEach(function(r,i){var v=r[s.k];if(v==null){st=false;return}st?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v));st=true});x.stroke();x.setLineDash([])});
  var si=XS[id];if(si==null||si>=n)si=n-1;var cx=Math.round(X(si))+.5;x.strokeStyle="rgba(26,58,107,.40)";x.setLineDash([3,3]);x.beginPath();x.moveTo(cx,T);x.lineTo(cx,T+ph);x.stroke();x.setLineDash([]);
- var r=rows[si];$("#"+lid).innerHTML='<b>'+md(r.d)+'</b>'+ser.map(function(s){return '<i style="background:'+s.c+'"></i>'+s.t+' <b>'+(s.f||xf)(r[s.k])+'</b>'}).join("")+(o.extra?o.extra(r):"");
+ var r=rows[si];$("#"+lid).innerHTML='<b>'+r.d+'</b>'+ser.map(function(s){return '<i style="background:'+s.c+'"></i>'+s.t+' <b>'+(s.f||xf)(r[s.k])+'</b>'}).join("")+(o.extra?o.extra(r):"");
  cv.onpointerdown=cv.onpointermove=function(ev){if(ev.type==="pointermove"&&ev.pointerType!=="mouse"&&!ev.buttons)return;var rc=cv.getBoundingClientRect(),j=Math.floor((ev.clientX-rc.left-L)/((rc.width-L-R)/n));XS[id]=Math.max(0,Math.min(n-1,j));xrender(1)}}
 function xrender(keep){var d=XD;if(!d)return;$("#c-x").hidden=false;if(!keep)XS={};
  var em=(d.emo||[]).slice(-XN),last=em[em.length-1]||{};
@@ -512,7 +512,7 @@ function xrender(keep){var d=XD;if(!d)return;$("#c-x").hidden=false;if(!keep)XS=
  if(dl)$("#xdiff").innerHTML='扩散 <b class="up">'+dl.up+'</b> 收缩 <b class="down">'+dl.dn+'</b> 净 <b class="'+cls(dl.net)+'">'+sg(dl.net,0)+'</b>（'+dl.n+'个细分）';
  xchart("xc6","xl6",df,[{k:"up",c:"#1A1A1A",t:"扩散",f:xf},{k:"dn",c:"#B71C1C",t:"收缩",f:xf},{k:"net",c:"#1A3A6B",t:"净扩散",f:function(v){return sg(v,0)},dash:[4,3]}],{zero:1,fmt:xf,extra:function(r){return ' · 持平 '+r.flat}});
  var et=(d.etf||[]).slice(-XN),cum=0;et=et.map(function(r){cum+=r.tot||0;var o={d:r.d,tot:r.tot,cum:cum};(d.etf_groups||[]).forEach(function(g){o[g[0]]=r[g[0]]});return o});
- if(et.length){var s20=0;et.slice(-20).forEach(function(r){s20+=r.tot||0});var sc=et[et.length-1].cum||0;var wl=XN>=700?'近3年':XN>=200?'近1年':XN>=100?'近6月':'近'+et.length+'日';$("#xetf").innerHTML=md(et[et.length-1].d)+' <b class="'+cls(et[et.length-1].tot)+'">'+sg(et[et.length-1].tot,1)+'亿</b> · 近20日 <b class="'+cls(s20)+'">'+sg(s20,0)+'亿</b> · '+wl+'累计 <b class="'+cls(sc)+'">'+sg(sc,0)+'亿</b>'}
+ if(et.length){var s20=0;et.slice(-20).forEach(function(r){s20+=r.tot||0});var sc=et[et.length-1].cum||0;var wl=XN>=700?'近3年':XN>=200?'近1年':XN>=100?'近6月':'近'+et.length+'日';$("#xetf").innerHTML=et[et.length-1].d+' <b class="'+cls(et[et.length-1].tot)+'">'+sg(et[et.length-1].tot,1)+'亿</b> · 近20日 <b class="'+cls(s20)+'">'+sg(s20,0)+'亿</b> · '+wl+'累计 <b class="'+cls(sc)+'">'+sg(sc,0)+'亿</b>'}
  xchart("xc4","xl4",et,[{k:"tot",c:"#1A1A1A",c2:"#B71C1C",bar:1,t:"合计",f:function(v){return sg(v,1)+"亿"}}],{zero:1,fmt:function(v){return xf(v)},
   extra:function(r){return '<br>'+(d.etf_groups||[]).map(function(g){return g[0]+' '+sg(r[g[0]],1)}).join(" · ")+' · 区间累计 '+sg(r.cum,0)+'亿'}});
  var sy=d.sty||{},lg=(sy.lg||[]).slice(-XN),vg=(sy.vg||[]).slice(-XN),mp={};
@@ -537,7 +537,7 @@ var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeou
 setInterval(function(){if(document.hidden||!D||D.final||R.on)return;if($("#datesel").value&&$("#datesel").selectedIndex>0)return;
  mgload();xload();get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
 // ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"market"} -> box re-samples + publishes; progress back via ntfy ----------
-var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-m-zVPIyuWWhWpEGLKuxH8rk84zTNES";
+var NT="https://ntfy.sh/",TRIG="__TRIG_TOPIC__",PROG="__PROG_TOPIC__";
 var STEPS=["收到请求","拉取行情","计算","上传","等待页面生效","完成"];
 var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,tick:null,passive:false};
 function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
