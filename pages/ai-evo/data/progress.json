@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-11-01 11:54:58 CST",
+  "updated_at": "2026-11-01 18:35:36 CST",
   "status": "running",
-  "note": "loop 23.3/s reward_v5",
-  "evals_done": 26500,
-  "evals_per_sec": 23.279,
-  "reward_version": 5,
-  "reward_formula": "v5 EQUITY-MAX from 1000 USDT: compound OOS margin_net (L*price_net after fees; liq→-1) in chronological order; reward≈log(end_equity/start) + light_n_bonus - thin_pen - soft_IS/OOS_loggap - liq_pen - busted_pen; SOLE OBJECTIVE=maximize ending equity / profit; free entry+exit invention; FORCE_TAKER_V1=True; LIQUIDATION_PROXY=True (adverse>=1/L → full margin loss)",
+  "note": "loop 2.0/s reward_v7 single-position",
+  "evals_done": 40500,
+  "evals_per_sec": 1.956,
+  "reward_version": 7,
+  "reward_formula": "v7 EQUITY-MAX from 1000 USDT: IS=BTCUSDT only; OOS=mixed basket BTC+SOXL+MU+SNDK+NVDA+AMD — each symbol compounds OOS margin_net (L*price_net after fees; liq→-1) from 1000U; ranking equity=geometric mean of per-symbol end equities (basket-equivalent wealth; still maximize money); reward≈log(geo_mean/start) + light_n_bonus - thin_pen - soft_IS/OOS_loggap - liq_pen - busted_pen - soft_coverage_pen; equity legs use same taker 5bps/side; SOLE OBJECTIVE=maximize basket ending equity / profit; free entry+exit invention; SINGLE-POSITION sequential fills (flat before next entry; no overlapping full-equity compounds); FORCE_TAKER_V1=True; LIQUIDATION_PROXY=True (adverse>=1/L → full margin loss)",
   "symbol": "BTCUSDT",
   "mode": "infinite_free_entry_exit_invention",
   "fee": {
@@ -18,193 +18,193 @@
     "force_taker_v1": true,
     "liquidation_proxy": true,
     "liquidation_rule": "Crude isolated: if adverse high/low path move from entry during hold >= 1/L on ANY tranche leg, mark the whole trade unit liquidated → margin_net=-1 (full bankroll wipe), price_net≈-1/L - entry_fee. equity_path then busts (end≈0).",
-    "application": "Per fill: fee = notional * rate. price_net = price_ret - entry_fee - exit_fee*exit/entry. margin_net = L * price_net; ANY tranche liq forces margin_net=-1 for that signal. PRIMARY reward v5: start START_EQUITY USDT, compound OOS margin_nets in time order → end_equity; first full wipe stops the path (oos_busted). FORCE_TAKER_V1: taker/taker fees (maker disabled as free edge in bar BT).",
+    "application": "Per fill: fee = notional * rate. price_net = price_ret - entry_fee - exit_fee*exit/entry. margin_net = L * price_net; ANY tranche liq forces margin_net=-1 for that signal. PRIMARY reward v7: IS=BTCUSDT; OOS basket BTC+SOXL+MU+SNDK+NVDA+AMD each compound from START_EQUITY via single-position sequential fills (must exit before next entry); ranking end_equity=geometric mean of per-symbol ends (basket wealth); first full wipe stops the path (oos_busted). FORCE_TAKER_V1: taker/taker fees (maker disabled as free edge in bar BT).",
     "start_equity_usdt": 1000.0,
-    "reward_version": 5,
+    "reward_version": 7,
     "force_taker": true
   },
   "best_so_far": {
-    "label": "4h|short|L19|tr1g0eq|t/t|X[tp%0.15+rev+time10+trA14x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-    "oos_n": 973,
-    "oos_wr": 0.5355,
-    "oos_mean_price": 0.003195,
-    "oos_mean_margin": 0.060696,
+    "label": "1h|long|L5|tr1g1eq|t/t|X[tpA21x0.5+sl%0.015+time12+trA21x1.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag1",
+    "oos_n": 1816,
+    "oos_wr": 0.6112,
+    "oos_mean_price": 0.005759,
+    "oos_mean_margin": 0.028793,
     "oos_liq_rate": 0.0,
-    "leverage": 19,
-    "side": "short",
-    "tf": "4h",
-    "oos_end_equity": 1.6438522249608808e+24,
-    "oos_profit": 1.6438522249608808e+24,
-    "oos_mean_net": 0.003195,
+    "leverage": 5,
+    "side": "long",
+    "tf": "1h",
+    "oos_end_equity": 2810189.2705,
+    "oos_profit": 2809189.2705,
+    "oos_mean_net": 0.005759,
     "oos_busted": false,
-    "reward": 48.768804,
-    "horizon": 10,
+    "reward": 7.934312,
+    "horizon": 12,
     "exit_components": [
-      "pct_tp",
-      "reverse_signal",
+      "atr_tp",
+      "pct_sl",
       "time_stop",
       "trail_atr",
       "trail_pct"
     ],
-    "gene_id": "6fb08214d3709e18",
-    "reward_version": 5
+    "gene_id": "7eee3645b9b81b52",
+    "reward_version": 7
   },
   "top5": [
     {
-      "label": "4h|short|L19|tr1g0eq|t/t|X[tp%0.15+rev+time10+trA14x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": 0.003195,
-      "oos_wr": 0.5355,
-      "oos_n": 973,
-      "oos_mean_margin": 0.060696,
+      "label": "1h|long|L5|tr1g1eq|t/t|X[tpA21x0.5+sl%0.015+time12+trA21x1.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag1",
+      "oos_mean_price": 0.005759,
+      "oos_wr": 0.6112,
+      "oos_n": 1816,
+      "oos_mean_margin": 0.028793,
       "oos_liq_rate": 0.0,
-      "leverage": 19,
-      "oos_end_equity": 1.6438522249608808e+24,
-      "reward": 48.768804
+      "leverage": 5,
+      "oos_end_equity": 2810189.2705,
+      "reward": 7.934312
     },
     {
-      "label": "4h|short|L19|tr1g4fr|t/t|X[sl%0.01+time10+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": 0.003188,
-      "oos_wr": 0.5355,
-      "oos_n": 973,
-      "oos_mean_margin": 0.060574,
+      "label": "1h|long|L5|tr1g0ba|t/t|X[slA14x4.0+tpA14x4.0+sl%0.02+time12+trA14x5.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag1",
+      "oos_mean_price": 0.005759,
+      "oos_wr": 0.6112,
+      "oos_n": 1816,
+      "oos_mean_margin": 0.028793,
       "oos_liq_rate": 0.0,
-      "leverage": 19,
-      "oos_end_equity": 1.4509170232258375e+24,
-      "reward": 48.643958
+      "leverage": 5,
+      "oos_end_equity": 2810189.2705,
+      "reward": 7.934312
     },
     {
-      "label": "4h|short|L19|tr4g0ba|t/t|X[slA7x2.0+sl%0.005+tp%0.008+time30+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": 0.003168,
-      "oos_wr": 0.5362,
-      "oos_n": 968,
-      "oos_mean_margin": 0.060201,
+      "label": "1h|long|L5|tr1g1eq|t/t|X[sl%0.015+tp%0.005+time25+trA7x4.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag1",
+      "oos_mean_price": 0.005777,
+      "oos_wr": 0.6119,
+      "oos_n": 1809,
+      "oos_mean_margin": 0.028884,
       "oos_liq_rate": 0.0,
-      "leverage": 19,
-      "oos_end_equity": 8.681647739773565e+23,
-      "reward": 48.130187
+      "leverage": 5,
+      "oos_end_equity": 2793720.9224,
+      "reward": 7.927318
     },
     {
-      "label": "4h|short|L19|tr2g0eq|t/t|X[slA21x2.0+sl%0.005+tp%0.08+time40+trA21x0.8+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": 0.003174,
-      "oos_wr": 0.5362,
-      "oos_n": 966,
-      "oos_mean_margin": 0.060301,
+      "label": "1h|long|L5|tr1g0eq|t/t|X[sl%0.015+tp%0.005+time25+trA7x4.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag1",
+      "oos_mean_price": 0.005777,
+      "oos_wr": 0.6119,
+      "oos_n": 1809,
+      "oos_mean_margin": 0.028884,
       "oos_liq_rate": 0.0,
-      "leverage": 19,
-      "oos_end_equity": 8.542302151952602e+23,
-      "reward": 48.113926
+      "leverage": 5,
+      "oos_end_equity": 2793720.9224,
+      "reward": 7.927318
     },
     {
-      "label": "4h|short|L19|tr2g0eq|t/t|X[tp%0.15+time50+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": 0.003175,
-      "oos_wr": 0.5363,
-      "oos_n": 964,
-      "oos_mean_margin": 0.06032,
+      "label": "1h|long|L5|tr1g3fr|t/t|X[time25+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag1",
+      "oos_mean_price": 0.005777,
+      "oos_wr": 0.6119,
+      "oos_n": 1809,
+      "oos_mean_margin": 0.028884,
       "oos_liq_rate": 0.0,
-      "leverage": 19,
-      "oos_end_equity": 7.748934725763392e+23,
-      "reward": 48.01637
+      "leverage": 5,
+      "oos_end_equity": 2793720.9224,
+      "reward": 7.927318
     }
   ],
   "recent_trials": [
     {
-      "label": "4h|short|L3|tr1g5ba|t/t|X[slA7x5.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": -0.004181
+      "label": "30m|long|L19|tr1g0eq|t/t|X[tpA21x4.0+tp%0.02]|roc_thresh(len=3,thr=0.005)|F[roc_pos:3+rsi_os:21]|lag1",
+      "oos_mean_price": -0.008485
     },
     {
-      "label": "30m|long|L1|tr2g0fr|t/t|X[sl%0.005]|hist_flip|F[below_sma:5+dn_bar+vol_high:10]|lag1",
+      "label": "15m|short|L17|tr2g2eq|t/t|X[tpA14x2.0+tr%0.02arm0.01]|breakout_don(len=10)|F[none]|lag0",
+      "oos_mean_price": -0.006283
+    },
+    {
+      "label": "15m|long|L2|tr2g1ba|t/t|X[tp%0.12+trA7x5.0]|breakdown_don(len=55)|F[rsi_os:14+vol_high:50+roc_pos:10]|lag1",
       "oos_mean_price": 0.0
     },
     {
-      "label": "15m|short|L50|tr4g1fr|t/t|X[tpA21x2.0]|atr_expansion(len=7,mult=2.0)|F[none]|lag2",
-      "oos_mean_price": -0.005715
+      "label": "1h|long|L5|tr1g0ba|t/t|X[tpA14x4.0+sl%0.005+tp%0.12+rev+time20+trA14x2.5+tr%0.003arm0.0]|atr_expansion(len=7,mult=2.0)|F[none]|lag0",
+      "oos_mean_price": 0.011479
     },
     {
-      "label": "4h|short|L50|tr4g0ba|t/t|X[slA14x0.5+tpA14x2.5+sl%0.05+rev+time25+trA14x2.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.03+trend_align]|lag0",
-      "oos_mean_price": 0.012887
+      "label": "1h|long|L5|tr1g0eq|t/t|X[slA21x2.5+rev+time25+tr%0.003arm0.0]|roc_thresh(len=5,thr=0.02)|F[atr_pct_gt:7@0.01]|lag0",
+      "oos_mean_price": 0.007552
     },
     {
-      "label": "1d|long|L13|tr4g3eq|t/t|X[tr%0.003arm0.015]|rsi_exit_ob(len=14,level=75.0)|F[none]|lag0",
-      "oos_mean_price": -0.040278
+      "label": "1d|short|L16|tr1g0eq|t/t|X[tr%0.003arm0.02]|roc_thresh(len=5,thr=0.005)|F[roc_neg:1+dn_bar]|lag1",
+      "oos_mean_price": 0.009199
     },
     {
-      "label": "4h|short|L19|tr1g4eq|t/t|X[tp%0.15+rev]|rsi_exit_os(len=21,level=30.0)|F[none]|lag0",
-      "oos_mean_price": -0.000741
+      "label": "1h|short|L5|tr1g3ba|t/t|X[tp%0.008+time15+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag0",
+      "oos_mean_price": 0.006203
     },
     {
-      "label": "1h|long|L9|tr3g1eq|t/t|X[slA7x2.0+sl%0.03+tr%0.05arm0.02]|roc_thresh(len=3,thr=0.003)|F[trend_align+volz_pos:20+roc_neg:10]|lag2",
-      "oos_mean_price": 0.000522
+      "label": "15m|short|L7|tr2g2ba|t/t|X[slA14x5.0+sl%0.05+trA14x0.5]|mean_revert_z(len=200,z=1.5)|F[volz_pos:50]|lag1",
+      "oos_mean_price": -0.001086
     },
     {
-      "label": "4h|short|L18|tr4g0eq|t/t|X[trA14x1.0]|macd_cross|F[none]|lag0",
-      "oos_mean_price": -0.003404
+      "label": "1h|long|L40|tr1g0ba|t/t|X[trA14x2.0+tr%0.008arm0.015]|breakout_don(len=10)|F[volz_pos:20]|lag1",
+      "oos_mean_price": 0.000689
     },
     {
-      "label": "1d|short|L2|tr5g0eq|t/t|X[tp%0.15+rev+time10+trA14x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[vol_high:10]|lag0",
+      "label": "1h|short|L16|tr1g0eq|t/t|X[slA21x3.0+rev+tr%0.02arm0.005]|rsi_exit_ob(len=21,level=65.0)|F[below_sma:100+volz_pos:50]|lag1",
+      "oos_mean_price": -0.001823
+    },
+    {
+      "label": "1h|short|L5|tr1g2eq|t/t|X[slA14x1.5+sl%0.005+tp%0.12+time20+trA14x2.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag0",
+      "oos_mean_price": 0.006209
+    },
+    {
+      "label": "4h|short|L2|tr2g2eq|t/t|X[sl%0.08]|rsi_exit_ob(len=21,level=65.0)|F[vol_high:10+dn_bar]|lag0",
       "oos_mean_price": 0.0
     },
     {
-      "label": "4h|short|L10|tr2g3fr|t/t|X[tp%0.01]|roc_thresh(len=1,thr=0.003)|F[none]|lag0",
-      "oos_mean_price": -0.006278
+      "label": "15m|long|L6|tr4g1ba|t/t|X[tpA21x0.8+sl%0.08+trA21x1.0]|vol_spike(len=20,z=2.5)|F[volz_pos:20]|lag0",
+      "oos_mean_price": -0.001718
     },
     {
-      "label": "15m|short|L6|tr2g2ba|t/t|X[tpA14x4.0]|consec_bars(n=5)|F[none]|lag2",
-      "oos_mean_price": -0.003924
+      "label": "1h|long|L2|tr1g0fr|t/t|X[slA21x2.0+tpA21x1.5+sl%0.005]|reclaim_sma(bars=3,len=100)|F[none]|lag1",
+      "oos_mean_price": -0.000415
     },
     {
-      "label": "1h|long|L1|tr3g5eq|t/t|X[tpA14x3.0]|vol_spike(len=20,z=2.0)|F[above_ema:20]|lag0",
-      "oos_mean_price": 0.001707
+      "label": "4h|long|L6|tr1g0ba|t/t|X[rev]|inside_bar_break|F[up_bar+volz_pos:50]|lag2",
+      "oos_mean_price": 0.003352
     },
     {
-      "label": "4h|short|L14|tr1g0eq|t/t|X[time60+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[none]|lag0",
-      "oos_mean_price": 0.003182
+      "label": "15m|long|L9|tr3g5ba|t/t|X[slA21x2.5+rev]|reclaim_sma(bars=5,len=100)|F[volz_pos:20]|lag0",
+      "oos_mean_price": 0.009004
     },
     {
-      "label": "4h|long|L30|tr2g4fr|t/t|X[tpA7x0.8+sl%0.005+tp%0.08+tr%0.02arm0.005]|vwap_proxy_cross(len=100)|F[rsi_ob:14+vol_high:50]|lag0",
+      "label": "4h|short|L6|tr3g2eq|t/t|X[tpA14x2.5+sl%0.005+tp%0.015+rev+time20+trA14x2.5+tr%0.003arm0.0]|vwap_proxy_cross(len=50)|F[atr_pct_gt:7@0.01+above_ema:10+below_ema:20+rsi_ob:14]|lag0",
       "oos_mean_price": 0.0
     },
     {
-      "label": "1h|short|L14|tr1g1eq|t/t|X[time8+trA14x1.5+tr%0.05arm0.003]|macd_cross|F[none]|lag0",
-      "oos_mean_price": -0.003063
+      "label": "1h|short|L16|tr5g0ba|t/t|X[rev]|hist_flip|F[atr_pct_gt:7@0.01]|lag0",
+      "oos_mean_price": -0.007835
     },
     {
-      "label": "4h|long|L15|tr3g1eq|t/t|X[tpA7x2.5+sl%0.02]|sma_cross(len=5)|F[vol_high:10+below_ema:5+above_ema:20]|lag2",
-      "oos_mean_price": 0.0
+      "label": "15m|long|L11|tr4g0fr|t/t|X[tp%0.005]|macd_cross|F[above_sma:10+trend_align]|lag1",
+      "oos_mean_price": -0.001711
     },
     {
-      "label": "4h|short|L19|tr2g0eq|t/t|X[tpA21x2.5+sl%0.02]|range_pos_flip(thr=0.7)|F[dn_bar+atr_pct_gt:21@0.02+rsi_ob:14]|lag1",
-      "oos_mean_price": 0.018369
+      "label": "1h|long|L5|tr2g0eq|t/t|X[sl%0.03+time15+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01]|lag0",
+      "oos_mean_price": 0.006529
     },
     {
-      "label": "4h|short|L19|tr4g1ba|t/t|X[slA14x4.0+sl%0.008]|range_pos_flip(thr=0.7)|F[below_sma:5+rsi_ob:14+roc_neg:20]|lag0",
-      "oos_mean_price": 0.0
+      "label": "1h|short|L1|tr1g3eq|t/t|X[sl%0.05+rev]|range_pos_flip(thr=0.7)|F[volz_pos:50+below_sma:20+roc_neg:20]|lag0",
+      "oos_mean_price": -0.001975
     },
     {
-      "label": "4h|short|L4|tr4g5ba|t/t|X[tpA21x2.0+sl%0.05+tp%0.015]|vwap_proxy_cross(len=5)|F[below_sma:5]|lag0",
-      "oos_mean_price": -0.002217
+      "label": "30m|long|L3|tr4g5ba|t/t|X[rev+time8+trA14x3.0]|breakdown_don(len=20)|F[trend_align]|lag0",
+      "oos_mean_price": -0.000931
     },
     {
-      "label": "1h|short|L15|tr3g0eq|t/t|X[sl%0.01+tr%0.003arm0.0]|rsi_exit_os(len=14,level=20.0)|F[none]|lag0",
-      "oos_mean_price": 0.001495
+      "label": "1h|short|L5|tr1g2ba|t/t|X[tp%0.12+rev]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01+below_ema:20]|lag0",
+      "oos_mean_price": -0.004088
     },
     {
-      "label": "4h|short|L18|tr5g0eq|t/t|X[slA7x2.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[dn_bar+rsi_ob:14]|lag0",
-      "oos_mean_price": 0.001938
+      "label": "1h|short|L17|tr1g0fr|t/t|X[tr%0.03arm0.01]|rsi_exit_os(len=21,level=25.0)|F[roc_neg:5]|lag0",
+      "oos_mean_price": -0.004894
     },
     {
-      "label": "30m|long|L15|tr1g5eq|t/t|X[sl%0.05+time60]|range_pos_flip(thr=0.7)|F[rsi_mid:14+above_sma:100+vol_high:10]|lag0",
-      "oos_mean_price": 0.0
-    },
-    {
-      "label": "1d|long|L15|tr3g1eq|t/t|X[tpA14x0.8+rev+tr%0.005arm0.02]|roc_thresh(len=3,thr=0.03)|F[above_sma:100]|lag0",
-      "oos_mean_price": -0.008601
-    },
-    {
-      "label": "1h|long|L7|tr4g2ba|t/t|X[slA7x4.0+sl%0.015+trA7x1.0]|hist_flip|F[above_ema:50]|lag0",
-      "oos_mean_price": -0.002337
-    },
-    {
-      "label": "1h|short|L13|tr2g2eq|t/t|X[tr%0.008arm0.0]|reclaim_sma(bars=10,len=50)|F[rsi_ob:14]|lag0",
+      "label": "15m|short|L9|tr1g2eq|t/t|X[rev]|inside_bar_break|F[dn_bar+vol_high:20+rsi_ob:7]|lag1",
       "oos_mean_price": 0.0
     }
   ]
