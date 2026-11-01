@@ -1,0 +1,5 @@
+{
+  "updated_at": "2026-11-01 11:00 Asia/Shanghai",
+  "note": "可选片段。探索器可覆盖本文件；页面优先用这里的 trials，否则用 progress.json 的 recent_trials。",
+  "trials": []
+}
