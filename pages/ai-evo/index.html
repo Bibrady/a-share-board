@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>朔元 · 模型/AI探索</title>
+<meta name="description" content="无限策略进化 / AI 探索进度：运行状态、当前最优、排行与最近试验">
+<meta name="theme-color" content="#F7F5F0">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{color-scheme:light;--up:#1A1A1A;--down:#B71C1C;--flat:#888888;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 10px 24px}
+header{background:var(--pn);border-bottom:1px solid var(--bd);padding:12px 12px 10px;margin:0 -10px 10px}
+h1{font-size:18px;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--ttl);letter-spacing:.02em}
+.st{border-radius:12px;padding:1px 10px;font-size:13px;font-weight:600;color:#fff;background:var(--acc);font-family:var(--mono)}
+.st.restart{background:#666666}
+.st.stop,.st.idle{background:#888888}
+.st.err{background:#B71C1C}
+.meta{color:var(--mut);font-size:12.5px;display:flex;flex-wrap:wrap;gap:2px 12px}
+.meta b{color:var(--fg);font-weight:600;font-family:var(--mono)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.rfb{margin-left:auto;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;white-space:nowrap}
+.rfb:disabled{background:#C8C4BA;border-color:#C8C4BA;color:#666666;cursor:default}
+.warn{background:rgba(26,58,107,.10);color:var(--ttl);border-radius:8px;padding:6px 10px;font-size:12.5px;margin-top:8px}
+.warn.err{background:rgba(183,28,28,.10);color:#B71C1C}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:6px;padding:12px;margin-bottom:10px}
+.card h2{font-size:15px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:var(--acc)}
+.card h2 small{font-weight:400;color:var(--mut);font-size:12px;text-align:right}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--flat)}
+.mono,td,th,.kv b,.blabel,.mx b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.note{font-size:11.5px;color:var(--mut);margin-top:8px;line-height:1.55}
+a{color:var(--acc)}
+.empty{padding:22px 8px;text-align:center;color:var(--mut);font-size:13px;background:var(--pn2);border-radius:8px}
+.statg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--pn2);border:1px solid var(--grid);border-radius:6px;padding:8px 10px;min-width:0}
+.stat .l{font-size:11.5px;color:var(--mut)}
+.stat .v{font-size:18px;font-weight:700;color:var(--ttl);font-family:var(--mono);line-height:1.35;word-break:break-all}
+.stat .s{font-size:11.5px;color:var(--dim);margin-top:2px;line-height:1.4}
+.fee{margin-top:10px;font-size:12.5px;color:var(--fg);background:var(--pn2);border-left:3px solid var(--acc);padding:7px 10px;border-radius:0 6px 6px 0;line-height:1.55}
+.fee b{font-family:var(--mono)}
+.blabel{font-size:15px;font-weight:700;color:var(--fg);word-break:break-all;line-height:1.4;margin:0 0 10px;padding:8px 10px;background:var(--pn2);border-radius:6px}
+.mx{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mx div{background:var(--pn2);border-radius:6px;padding:8px 10px;min-width:0}
+.mx span{display:block;font-size:11.5px;color:var(--mut);margin-bottom:2px}
+.mx b{display:block;font-size:18px;font-weight:700;color:var(--ttl);line-height:1.3}
+.extra{margin-top:10px;font-size:12.5px;color:var(--mut);display:flex;flex-wrap:wrap;gap:4px 14px}
+.extra b{color:var(--fg);font-family:var(--mono)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--grid);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{color:var(--mut);font-weight:600;text-align:right;padding:8px 10px;border-bottom:1px solid var(--bd);background:var(--pn2);font-size:12px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
+td.nm{white-space:normal;word-break:break-all;max-width:420px}
+tr:last-child td{border-bottom:0}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}
+footer a{color:var(--mut)}
+@media (max-width:759px){
+ .statg,.mx{grid-template-columns:1fr 1fr}
+ .stat .v,.mx b{font-size:16px}
+}
+@media (min-width:760px){
+ body{font-size:14.5px}
+ header{margin:0 0 12px;border:1px solid var(--bd);border-top:0;border-radius:0 0 14px 14px;padding:16px 18px 12px}
+ h1{font-size:21px}
+}
+</style>
+</head>
+<body>
+<!--SITE_NAV--><style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../../market/">A股</a><a href="../../us/">美股</a><a href="../../">选股</a><a href="./" class="on">研究</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="./" class="on" aria-current="page">模型/AI探索</a></div></nav>
+<div class="wrap">
+<header>
+ <h1>模型 / AI 探索 <span class="st" id="st">…</span></h1>
+ <div class="meta">
+  <span>更新 <b id="upd">—</b></span>
+  <span>奖励 <b id="rv">—</b></span>
+ </div>
+ <div class="row"><span style="font-size:12.5px;color:var(--mut)">覆盖 progress.json 后本页自动更新</span><button class="rfb" id="rf" type="button">刷新</button></div>
+ <div class="warn" id="note" hidden></div>
+ <div class="warn err" id="err" hidden></div>
+</header>
+
+<section class="card">
+ <h2>运行概览 <small>约 30 秒自动刷新</small></h2>
+ <div class="statg">
+  <div class="stat"><div class="l">运行状态</div><div class="v" id="sv">—</div><div class="s" id="ss"></div></div>
+  <div class="stat"><div class="l">已评估</div><div class="v" id="ev">—</div><div class="s">evals_done</div></div>
+  <div class="stat"><div class="l">速度</div><div class="v" id="sp">—</div><div class="s">evals / 秒</div></div>
+  <div class="stat"><div class="l">费率</div><div class="v" id="fv">—</div><div class="s" id="fs">币安 USDT-M</div></div>
+ </div>
+ <div class="fee" id="fee">加载中…</div>
+</section>
+
+<section class="card">
+ <h2>当前最优 <small>费用后均价收益为主，胜率为辅</small></h2>
+ <div class="blabel" id="bl">—</div>
+ <div class="mx">
+  <div><span>OOS 胜率</span><b id="bwr">—</b></div>
+  <div><span>费用后均价收益</span><b id="bpr">—</b></div>
+  <div><span>样本 n</span><b id="bn">—</b></div>
+  <div><span>杠杆</span><b id="blv">—</b></div>
+ </div>
+ <div class="extra" id="bx"></div>
+</section>
+
+<section class="card">
+ <h2>排行 <small id="topcap">按费用后均价收益</small></h2>
+ <div class="tw"><table><thead><tr><th>策略</th><th>费用后均价收益</th><th>OOS 胜率</th><th>n</th></tr></thead><tbody id="tb"><tr><td class="empty" colspan="4">加载中…</td></tr></tbody></table></div>
+</section>
+
+<section class="card">
+ <h2>最近试验 <small id="trcap">策略 · 收益</small></h2>
+ <div class="tw"><table><thead><tr><th>策略</th><th>收益</th></tr></thead><tbody id="trb"><tr><td class="empty" colspan="2">加载中…</td></tr></tbody></table></div>
+</section>
+
+<footer>无限策略进化进度 · 仅回测，无实盘下单 · 不构成投资建议<br>
+覆盖 <code>pages/ai-evo/data/progress.json</code> 后本页自动更新<br>
+<a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var PROG="data/progress.json", TRIALS="data/trials.json", POLL=30000;
+var ST={running:"运行中",restarting:"重启中",stopped:"已停止",stop:"已停止",idle:"空闲",error:"出错",failed:"出错"};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function get(u){return fetch(u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function num(x){return x==null||x===""||!isFinite(+x)?null:+x}
+function fmtN(x){x=num(x);return x==null?"—":Math.round(x).toLocaleString("en-US")}
+function fmtP(x,d){x=num(x);if(x==null)return "—";d=d==null?2:d;var s=(x*100).toFixed(d);return (x>0?"+":x<0?"":"")+s+"%"}
+function fmtW(x){x=num(x);return x==null?"—":(x<=1?x*100:x).toFixed(2)+"%"}
+function cls(x){x=num(x);return x==null||x===0?"flat":x>0?"up":"down"}
+function side(s){return s==="long"||s==="L"?"多":s==="short"||s==="S"?"空":(s||"—")}
+function stLabel(s){s=String(s||"").toLowerCase();return ST[s]||s||"—"}
+function stClass(s){s=String(s||"").toLowerCase();if(s==="running")return "";if(s==="restarting")return "restart";if(s==="error"||s==="failed")return "err";return "stop"}
+function feeNote(f){
+  f=f||{};
+  var venue=f.venue||"Binance USDT-M";
+  var tk=num(f.taker), mk=num(f.maker);
+  var tks=tk==null?"0.05%":(tk*100).toFixed(2)+"%";
+  var mks=mk==null?"0.02%":(mk*100).toFixed(2)+"%";
+  var force=f.force_taker!==false;
+  return venue+" · "+(force?"按吃单（taker）"+tks+" 实扣":"挂/吃 "+mks+" / "+tks)+"（VIP0 挂单 "+mks+" 仅对照）";
+}
+function trialRet(t){return t==null?null:num(t.oos_mean_price!=null?t.oos_mean_price:t.ret!=null?t.ret:t.return)}
+function trialLab(t){return t&& (t.label||t.strategy||t.name)||"—"}
+
+function paint(d, trials){
+  var status=d.status||"—";
+  $("#st").textContent=stLabel(status);
+  $("#st").className="st "+stClass(status);
+  $("#sv").textContent=stLabel(status);
+  $("#ss").textContent=d.status||"";
+  $("#upd").textContent=d.updated_at||"—";
+  $("#ev").textContent=fmtN(d.evals_done);
+  var sp=num(d.evals_per_sec);
+  $("#sp").textContent=sp==null?"—":sp.toFixed(sp>=10?0:1);
+  var f=d.fee||{};
+  var tk=num(f.taker);
+  $("#fv").textContent=tk==null?"0.05%":(tk*100).toFixed(2)+"%";
+  $("#fs").textContent=(f.force_taker!==false?"taker 实扣":"挂/吃")+" · "+(f.venue||"币安 USDT-M");
+  $("#fee").innerHTML=esc(feeNote(f));
+  var rv=[];
+  if(d.reward_version!=null)rv.push("v"+d.reward_version);
+  if(d.reward_formula)rv.push(d.reward_formula);
+  if(!d.reward_formula && d.reward_version==2)rv.push("收益优先");
+  $("#rv").textContent=rv.join(" · ")||"—";
+  var note=$("#note");
+  if(d.note){note.hidden=false;note.textContent=d.note}else note.hidden=true;
+
+  var b=d.best_so_far||{};
+  $("#bl").textContent=b.label||"—";
+  $("#bwr").textContent=fmtW(b.oos_wr);
+  var pr=num(b.oos_mean_price);
+  $("#bpr").textContent=fmtP(pr,2);
+  $("#bpr").className=cls(pr);
+  $("#bn").textContent=b.oos_n==null?"—":fmtN(b.oos_n);
+  $("#blv").textContent=b.leverage==null?"—":b.leverage+"x";
+  var extra=[];
+  if(b.side)extra.push("方向 <b>"+esc(side(b.side))+"</b>");
+  if(b.tf)extra.push("周期 <b>"+esc(b.tf)+"</b>");
+  if(b.oos_mean_margin!=null)extra.push("保证金收益 <b class='"+cls(b.oos_mean_margin)+"'>"+fmtP(b.oos_mean_margin,2)+"</b>");
+  if(b.oos_liq_rate!=null)extra.push("强平率 <b>"+fmtW(b.oos_liq_rate)+"</b>");
+  $("#bx").innerHTML=extra.map(function(s){return "<span>"+s+"</span>"}).join("");
+
+  var top=d.top5||d.top||[];
+  $("#topcap").textContent=top.length?"共 "+top.length+" 条 · 按费用后均价收益":"按费用后均价收益";
+  if(!top.length)$("#tb").innerHTML='<tr><td class="empty" colspan="4">暂无排行</td></tr>';
+  else $("#tb").innerHTML=top.map(function(r){
+    var ret=trialRet(r);
+    return "<tr><td class='nm'>"+esc(trialLab(r))+"</td><td class='"+cls(ret)+"'>"+fmtP(ret,2)+"</td><td>"+fmtW(r.oos_wr)+"</td><td>"+fmtN(r.oos_n)+"</td></tr>";
+  }).join("");
+
+  var rec=trials&&trials.length?trials:(d.recent_trials||[]);
+  $("#trcap").textContent=rec.length?"最近 "+rec.length+" 条":"策略 · 收益";
+  if(!rec.length)$("#trb").innerHTML='<tr><td class="empty" colspan="2">暂无最近试验</td></tr>';
+  else $("#trb").innerHTML=rec.map(function(r){
+    var ret=trialRet(r);
+    return "<tr><td class='nm'>"+esc(trialLab(r))+"</td><td class='"+cls(ret)+"'>"+fmtP(ret,2)+"</td></tr>";
+  }).join("");
+  document.title="朔元 · 模型/AI探索"+(d.evals_done!=null?" · "+fmtN(d.evals_done):"");
+}
+
+function load(){
+  $("#rf").disabled=true;
+  return Promise.all([
+    get(PROG),
+    get(TRIALS).catch(function(){return null})
+  ]).then(function(arr){
+    var d=arr[0], t=arr[1];
+    var trials=t&&(t.trials||t.recent_trials)||null;
+    $("#err").hidden=true;
+    paint(d, trials);
+  }).catch(function(e){
+    var box=$("#err");box.hidden=false;box.textContent="读取进度失败："+(e.message||e);
+  }).then(function(){$("#rf").disabled=false});
+}
+
+$("#rf").onclick=function(){load()};
+load();
+setInterval(function(){if(!document.hidden)$("#rf").disabled||load()},POLL);
+})();
+</script>
+</body>
+</html>

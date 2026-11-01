@@ -1,0 +1,46 @@
+{
+  "updated_at": "2026-11-01 11:00 Asia/Shanghai",
+  "status": "restarting",
+  "note": "自由进出场改版中；本文件由探索器同步。",
+  "evals_done": 21000,
+  "evals_per_sec": 135,
+  "reward_version": 2,
+  "fee": {
+    "maker": 0.0002,
+    "taker": 0.0005,
+    "force_taker": true,
+    "venue": "Binance USDT-M VIP0"
+  },
+  "best_so_far": {
+    "label": "4h|long|h40|L6|rsi_exit_ob(21,75)+filters",
+    "oos_n": 29,
+    "oos_wr": 0.6897,
+    "oos_mean_price": 0.036112,
+    "oos_mean_margin": 0.216674,
+    "oos_liq_rate": 0.0,
+    "leverage": 6,
+    "side": "long",
+    "tf": "4h"
+  },
+  "top5": [
+    {
+      "label": "4h long rsi_exit_ob",
+      "oos_mean_price": 0.0361,
+      "oos_wr": 0.69,
+      "oos_n": 29
+    },
+    {
+      "label": "1d long vwap_proxy_cross",
+      "oos_mean_price": 0.0387,
+      "oos_wr": 0.61,
+      "oos_n": 23
+    },
+    {
+      "label": "4h long vol_spike filters",
+      "oos_mean_price": 0.0189,
+      "oos_wr": 0.64,
+      "oos_n": 28
+    }
+  ],
+  "recent_trials": []
+}
