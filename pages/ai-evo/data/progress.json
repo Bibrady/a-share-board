@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-11-02 14:52:12 CST",
+  "updated_at": "2026-11-02 15:21:19 CST",
   "status": "running",
-  "note": "loop 1.1/s reward_v7 single-position",
-  "evals_done": 106000,
-  "evals_per_sec": 1.131,
+  "note": "loop 1.2/s reward_v7 single-position",
+  "evals_done": 117500,
+  "evals_per_sec": 1.231,
   "reward_version": 7,
   "reward_formula": "v7 EQUITY-MAX from 1000 USDT: IS=BTCUSDT only; OOS=mixed basket BTC+SOXL+MU+SNDK+NVDA+AMD — each symbol compounds OOS margin_net (L*price_net after fees; liq→-1) from 1000U; ranking equity=geometric mean of per-symbol end equities (basket-equivalent wealth; still maximize money); reward≈log(geo_mean/start) + light_n_bonus - thin_pen - soft_IS/OOS_loggap - liq_pen - busted_pen - soft_coverage_pen; equity legs use same taker 5bps/side; SOLE OBJECTIVE=maximize basket ending equity / profit; free entry+exit invention; SINGLE-POSITION sequential fills (flat before next entry; no overlapping full-equity compounds); FORCE_TAKER_V1=True; LIQUIDATION_PROXY=True (adverse>=1/L → full margin loss)",
   "symbol": "BTCUSDT",
@@ -24,33 +24,43 @@
     "force_taker": true
   },
   "best_so_far": {
-    "label": "1h|long|L5|tr1g0eq|t/t|X[slA7x4.0+tpA7x2.0+sl%0.003+time5+trA7x5.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
-    "oos_n": 1781,
-    "oos_wr": 0.6159,
-    "oos_mean_price": 0.00597,
-    "oos_mean_margin": 0.029849,
+    "label": "1h|long|L5|tr1g2fr|t/t|X[sl%0.003+tp%0.005+time5+trA7x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:21@0.01]|lag1",
+    "oos_n": 1759,
+    "oos_wr": 0.6123,
+    "oos_mean_price": 0.006092,
+    "oos_mean_margin": 0.030459,
     "oos_liq_rate": 0.0,
     "leverage": 5,
     "side": "long",
     "tf": "1h",
-    "oos_end_equity": 3231336.4256,
-    "oos_profit": 3230336.4256,
-    "oos_mean_net": 0.00597,
+    "oos_end_equity": 3408473.1281,
+    "oos_profit": 3407473.1281,
+    "oos_mean_net": 0.006092,
     "oos_busted": false,
-    "reward": 8.055671,
+    "reward": 8.101577,
     "horizon": 5,
     "exit_components": [
-      "atr_sl",
-      "atr_tp",
       "pct_sl",
+      "pct_tp",
       "time_stop",
       "trail_atr",
       "trail_pct"
     ],
-    "gene_id": "a8620f4b50b9e407",
+    "gene_id": "718b574343eb50e6",
     "reward_version": 7
   },
   "top5": [
+    {
+      "label": "1h|long|L5|tr1g2fr|t/t|X[sl%0.003+tp%0.005+time5+trA7x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:21@0.01]|lag1",
+      "oos_mean_price": 0.006092,
+      "oos_wr": 0.6123,
+      "oos_n": 1759,
+      "oos_mean_margin": 0.030459,
+      "oos_liq_rate": 0.0,
+      "leverage": 5,
+      "oos_end_equity": 3408473.1281,
+      "reward": 8.101577
+    },
     {
       "label": "1h|long|L5|tr1g0eq|t/t|X[slA7x4.0+tpA7x2.0+sl%0.003+time5+trA7x5.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
       "oos_mean_price": 0.00597,
@@ -94,119 +104,108 @@
       "leverage": 5,
       "oos_end_equity": 3231336.4256,
       "reward": 8.055671
-    },
-    {
-      "label": "1h|long|L5|tr1g0eq|t/t|X[time5+trA14x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
-      "oos_mean_price": 0.00597,
-      "oos_wr": 0.6159,
-      "oos_n": 1781,
-      "oos_mean_margin": 0.029849,
-      "oos_liq_rate": 0.0,
-      "leverage": 5,
-      "oos_end_equity": 3231336.4256,
-      "reward": 8.055671
     }
   ],
   "recent_trials": [
     {
-      "label": "1h|long|L17|tr1g0ba|t/t|X[tpA7x0.5]|inside_bar_break|F[above_ema:10+volz_pos:20]|lag0",
-      "oos_mean_price": 0.000328
-    },
-    {
-      "label": "30m|short|L2|tr2g0eq|t/t|X[sl%0.08+tp%0.12+tr%0.008arm0.0]|range_pos_flip(thr=0.7)|F[vol_high:10+roc_neg:20]|lag2",
+      "label": "1h|short|L6|tr1g0ba|t/t|X[slA21x3.0+sl%0.015]|macd_cross|F[rsi_ob:14+above_sma:20+below_ema:20]|lag0",
       "oos_mean_price": 0.0
     },
     {
-      "label": "1h|long|L5|tr1g0fr|t/t|X[tpA7x4.0+sl%0.01+trA7x1.5+tr%0.02arm0.01]|range_pos_flip(thr=0.7)|F[none]|lag1",
-      "oos_mean_price": -0.000973
+      "label": "4h|long|L5|tr1g0fr|t/t|X[sl%0.003+tp%0.01+rev]|range_pos_flip(thr=0.7)|F[none]|lag1",
+      "oos_mean_price": -0.001194
     },
     {
-      "label": "30m|long|L3|tr1g0ba|t/t|X[sl%0.01+tp%0.03]|breakout_don(len=55)|F[none]|lag1",
-      "oos_mean_price": -0.000691
+      "label": "1d|short|L30|tr2g2ba|t/t|X[tr%0.02arm0.015]|hist_flip|F[atr_pct_gt:21@0.02+volz_pos:20+dn_bar]|lag0",
+      "oos_mean_price": -0.010162
     },
     {
-      "label": "15m|long|L15|tr2g2ba|t/t|X[slA14x2.0+tpA14x1.5+time12+tr%0.01arm0.02]|rsi_exit_os(len=14,level=35.0)|F[up_bar]|lag0",
-      "oos_mean_price": -0.000198
-    },
-    {
-      "label": "30m|long|L18|tr1g0ba|t/t|X[sl%0.05+time15+trA7x4.0]|atr_expansion(len=14,mult=1.5)|F[roc_pos:20+vol_high:10]|lag1",
+      "label": "30m|long|L40|tr1g0fr|t/t|X[rev+tr%0.05arm0.003]|sma_cross(len=5)|F[above_sma:100+vol_low:20+roc_pos:3]|lag2",
       "oos_mean_price": 0.0
     },
     {
-      "label": "1h|short|L5|tr4g0fr|t/t|X[sl%0.03+tp%0.005+time5+trA21x5.0+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
-      "oos_mean_price": 0.006042
-    },
-    {
-      "label": "1h|long|L1|tr1g0fr|t/t|X[time3]|rsi_exit_os(len=14,level=25.0)|F[roc_pos:3+above_sma:5+above_ema:10]|lag0",
-      "oos_mean_price": 0.002356
-    },
-    {
-      "label": "1h|short|L5|tr2g3eq|t/t|X[sl%0.003+tp%0.05+rev+time60+trA21x5.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
-      "oos_mean_price": -0.000859
-    },
-    {
-      "label": "1d|long|L30|tr1g0ba|t/t|X[tp%0.05+time20]|rsi_exit_ob(len=21,level=80.0)|F[vol_high:50]|lag1",
+      "label": "1d|long|L12|tr1g1fr|t/t|X[tpA7x2.0+sl%0.008]|range_pos_flip(thr=0.7)|F[above_ema:10+rsi_os:21+vol_high:20]|lag1",
       "oos_mean_price": 0.0
     },
     {
-      "label": "1h|long|L7|tr1g0eq|t/t|X[tpA14x1.5+sl%0.015+tp%0.08+time10+trA14x4.0+tr%0.003arm0.003]|inside_bar_break|F[none]|lag1",
-      "oos_mean_price": 0.001124
+      "label": "15m|long|L2|tr3g0fr|t/t|X[sl%0.08+tp%0.005+time5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:21@0.01+volz_pos:20+below_ema:50]|lag1",
+      "oos_mean_price": 0.006972
     },
     {
-      "label": "1d|short|L50|tr4g5ba|t/t|X[trA14x2.0]|sma_cross(len=50)|F[rsi_mid:14]|lag1",
-      "oos_mean_price": -0.0205
+      "label": "1h|long|L5|tr1g0fr|t/t|X[tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
+      "oos_mean_price": 0.006027
     },
     {
-      "label": "1h|long|L11|tr1g0fr|t/t|X[sl%0.015]|sma_cross(len=200)|F[atr_pct_gt:14@0.01+above_sma:5+above_ema:100]|lag1",
-      "oos_mean_price": 0.019919
+      "label": "4h|short|L2|tr1g0fr|t/t|X[slA7x1.0+sl%0.003+tp%0.005+rev+time5+trA7x1.5+tr%0.003arm0.0]|inside_bar_break|F[above_sma:50+above_ema:200]|lag0",
+      "oos_mean_price": 0.00487
     },
     {
-      "label": "1d|long|L13|tr2g2ba|t/t|X[slA7x5.0+sl%0.005+time60]|roc_thresh(len=5,thr=0.015)|F[rsi_os:7+vol_high:20]|lag2",
+      "label": "1d|long|L30|tr4g2ba|t/t|X[time10+trA14x0.5]|inside_bar_break|F[rsi_ob:14+rsi_os:7+up_bar]|lag2",
       "oos_mean_price": 0.0
     },
     {
-      "label": "15m|short|L18|tr2g1ba|t/t|X[sl%0.02]|ema_cross(len=20)|F[none]|lag2",
-      "oos_mean_price": -0.008446
+      "label": "1h|long|L5|tr1g0eq|t/t|X[slA14x2.0+tpA14x1.5+sl%0.08+tp%0.15+time5+trA14x5.0+tr%0.003arm0.0]|inside_bar_break|F[atr_pct_gt:14@0.01]|lag1",
+      "oos_mean_price": 0.004363
     },
     {
-      "label": "1h|long|L6|tr1g0fr|t/t|X[rev]|reclaim_sma(bars=15,len=20)|F[up_bar]|lag1",
-      "oos_mean_price": 0.02041
+      "label": "1d|long|L14|tr4g3eq|t/t|X[slA14x1.5+trA14x0.5]|range_pos_flip(thr=0.8)|F[rsi_os:7]|lag2",
+      "oos_mean_price": -0.017133
     },
     {
-      "label": "1h|long|L5|tr3g2ba|t/t|X[tpA14x3.0+sl%0.08+tp%0.15+tr%0.03arm0.005]|roc_thresh(len=5,thr=0.015)|F[trend_align+rsi_os:7]|lag1",
+      "label": "1h|short|L3|tr4g2eq|t/t|X[slA14x1.0+time150]|vwap_proxy_cross(len=50)|F[below_sma:200+atr_pct_lt:14@0.03+volz_pos:50]|lag2",
+      "oos_mean_price": -0.003567
+    },
+    {
+      "label": "30m|long|L5|tr1g2eq|t/t|X[tpA21x2.0+sl%0.003+tp%0.08+rev+time10+trA21x3.0+tr%0.003arm0.005]|breakout_don(len=55)|F[none]|lag1",
+      "oos_mean_price": 0.000791
+    },
+    {
+      "label": "15m|long|L14|tr4g5ba|t/t|X[tpA14x2.0+tp%0.08+rev]|range_pos_flip(thr=0.7)|F[none]|lag0",
+      "oos_mean_price": -0.002193
+    },
+    {
+      "label": "15m|short|L1|tr2g0ba|t/t|X[trA7x4.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:7@0.01+below_ema:200+dn_bar]|lag0",
+      "oos_mean_price": -0.005512
+    },
+    {
+      "label": "1h|long|L5|tr1g5eq|t/t|X[time5+tr%0.003arm0.0]|rsi_exit_os(len=7,level=20.0)|F[atr_pct_gt:14@0.01]|lag1",
+      "oos_mean_price": 0.006023
+    },
+    {
+      "label": "4h|short|L2|tr1g0fr|t/t|X[slA7x2.5+sl%0.015+tp%0.015+rev+time5+trA7x2.5+tr%0.003arm0.0]|inside_bar_break|F[above_sma:50+above_ema:200+below_sma:20]|lag1",
+      "oos_mean_price": 0.009214
+    },
+    {
+      "label": "1h|long|L5|tr1g3ba|t/t|X[tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01+vol_high:20+trend_align+dn_bar]|lag1",
       "oos_mean_price": 0.0
     },
     {
-      "label": "1h|long|L3|tr1g1eq|t/t|X[time5+trA21x1.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[roc_pos:10+up_bar]|lag1",
-      "oos_mean_price": 0.001345
+      "label": "15m|short|L20|tr2g2eq|t/t|X[tpA7x1.0+tr%0.005arm0.015]|breakout_don(len=20)|F[none]|lag2",
+      "oos_mean_price": -0.000448
     },
     {
-      "label": "15m|long|L5|tr2g4ba|t/t|X[slA14x1.5+sl%0.08]|reclaim_sma(bars=15,len=5)|F[up_bar]|lag1",
-      "oos_mean_price": 0.075645
-    },
-    {
-      "label": "15m|short|L5|tr1g0eq|t/t|X[tpA21x2.5+sl%0.08+rev]|reclaim_sma(bars=15,len=100)|F[atr_pct_lt:14@0.02+rsi_ob:14+vol_high:50]|lag1",
+      "label": "4h|short|L2|tr1g2ba|t/t|X[slA7x0.8+sl%0.003+tp%0.005+time5+trA7x0.5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01+roc_pos:5+vol_high:20]|lag1",
       "oos_mean_price": 0.0
     },
     {
-      "label": "1h|long|L5|tr1g0fr|t/t|X[slA7x3.0+sl%0.05+tp%0.005+time5+trA7x1.5+tr%0.01arm0.003]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
-      "oos_mean_price": 0.001541
+      "label": "1d|long|L2|tr4g1ba|t/t|X[time60]|inside_bar_break|F[above_sma:200]|lag0",
+      "oos_mean_price": 0.401722
     },
     {
-      "label": "1d|short|L2|tr5g1eq|t/t|X[sl%0.08+tp%0.12+time5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[vol_high:10]|lag2",
+      "label": "15m|short|L40|tr1g0fr|t/t|X[time15]|reclaim_sma(bars=10,len=50)|F[volz_pos:50]|lag0",
+      "oos_mean_price": -0.00151
+    },
+    {
+      "label": "15m|short|L5|tr1g0eq|t/t|X[sl%0.003+tp%0.005+time5+trA7x1.0+tr%0.003arm0.02]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
+      "oos_mean_price": 0.004037
+    },
+    {
+      "label": "1h|long|L5|tr1g0ba|t/t|X[tp%0.01]|vol_spike(len=50,z=2.0)|F[atr_pct_gt:14@0.01+above_sma:50+vol_high:20+trend_align]|lag0",
       "oos_mean_price": 0.0
     },
     {
-      "label": "4h|long|L8|tr1g4ba|t/t|X[time5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[trend_align+up_bar+rsi_os:14+roc_pos:5]|lag0",
-      "oos_mean_price": 0.0
-    },
-    {
-      "label": "1d|short|L18|tr2g1fr|t/t|X[rev+time150]|rsi_exit_ob(len=21,level=65.0)|F[volz_pos:20]|lag1",
-      "oos_mean_price": -0.022465
-    },
-    {
-      "label": "1h|short|L5|tr4g0eq|t/t|X[slA7x4.0+time5+tr%0.003arm0.0]|range_pos_flip(thr=0.7)|F[atr_pct_gt:14@0.01]|lag1",
-      "oos_mean_price": 0.006042
+      "label": "1h|long|L18|tr1g0eq|t/t|X[trA21x4.0+tr%0.015arm0.0]|atr_expansion(len=7,mult=1.2)|F[above_ema:50]|lag1",
+      "oos_mean_price": -0.001823
     }
   ]
 }
