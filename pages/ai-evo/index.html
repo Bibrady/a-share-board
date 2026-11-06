@@ -58,6 +58,9 @@ td.nm{white-space:normal;word-break:break-all;max-width:420px}
 tr:last-child td{border-bottom:0}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px 0 6px;line-height:1.7}
 footer a{color:var(--mut)}
+.hint{font-size:12.5px;color:var(--mut);line-height:1.5;max-width:70%}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(26,26,26,.92);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:9999;max-width:88%;text-align:center;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.18);pointer-events:none}
+.warn.stale{background:rgba(183,28,28,.08);color:#8A3B12}
 @media (max-width:759px){
  .statg,.mx{grid-template-columns:1fr 1fr}
  .stat .v,.mx b{font-size:16px}
@@ -75,10 +78,12 @@ footer a{color:var(--mut)}
 <header>
  <h1>模型 / AI 探索 <span class="st" id="st">…</span></h1>
  <div class="meta">
-  <span>更新 <b id="upd">—</b></span>
+  <span>快照 <b id="upd">—</b></span>
+  <span>拉取 <b id="fetched">—</b></span>
   <span>奖励 <b id="rv">—</b></span>
  </div>
- <div class="row"><span style="font-size:12.5px;color:var(--mut)">覆盖 progress.json 后本页自动更新</span><button class="rfb" id="rf" type="button">刷新</button></div>
+ <div class="row"><span class="hint" id="rfhint">刷新会强拉仓库快照。探索器本地进度需先跑 <code>sync_ai_evo_dashboard</code>。</span><button class="rfb" id="rf" type="button">刷新</button></div>
+ <div class="warn stale" id="stale" hidden></div>
  <div class="warn" id="note" hidden></div>
  <div class="warn err" id="err" hidden></div>
 </header>
@@ -117,17 +122,96 @@ footer a{color:var(--mut)}
 </section>
 
 <footer>无限策略进化进度 · 仅回测，无实盘下单 · 不构成投资建议<br>
-覆盖 <code>pages/ai-evo/data/progress.json</code> 后本页自动更新<br>
+探索器请用 <code>sync_ai_evo_dashboard</code> 同步仓库；刷新只拉已提交的快照（可加 <code>?src=</code> 覆盖 progress.json）<br>
 <a href="https://github.com/Bibrady/a-share-board">github.com/Bibrady/a-share-board</a></footer>
+<div class="toast" id="toast" hidden></div>
 </div>
 <script>
 (function(){
 "use strict";
 var $=function(s){return document.querySelector(s)};
-var PROG="data/progress.json", TRIALS="data/trials.json", POLL=30000;
+var GH="Bibrady/a-share-board";
+var REPO_PROG="pages/ai-evo/data/progress.json";
+var REPO_TRIALS="pages/ai-evo/data/trials.json";
+var LOCAL_PROG="data/progress.json";
+var LOCAL_TRIALS="data/trials.json";
+var POLL=30000;
 var ST={running:"运行中",restarting:"重启中",stopped:"已停止",stop:"已停止",idle:"空闲",error:"出错",failed:"出错"};
+var lastStamp="";
+var SRC=resolveSrc();
+var POLL_MS=pollMs();
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function get(u){return fetch(u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function pollMs(){
+  var v;try{v=new URLSearchParams(location.search).get("poll")}catch(e){v=null}
+  if(v==null||v==="")return POLL;
+  if(v==="0"||/^off|false|no$/i.test(v))return 0;
+  var n=parseInt(v,10);
+  return isFinite(n)&&n>=0?n:POLL;
+}
+function resolveSrc(){
+  var raw;try{raw=new URLSearchParams(location.search).get("src")}catch(e){raw=null}
+  if(!raw)return{prog:LOCAL_PROG,trials:LOCAL_TRIALS,override:false};
+  raw=String(raw).trim();
+  if(!raw)return{prog:LOCAL_PROG,trials:LOCAL_TRIALS,override:false};
+  if(/\/$/.test(raw)||!/\.json(\?|#|$)/i.test(raw)){
+    var base=raw.replace(/\/?$/,"/");
+    return{prog:base+"progress.json",trials:base+"trials.json",override:true};
+  }
+  var trials=raw.replace(/progress\.json(\?[^#]*)?(#.*)?$/i,function(_,q,h){return"trials.json"+(q||"")+(h||"")});
+  if(trials===raw)trials=raw.replace(/[^/?#]+(\?[^#]*)?(#.*)?$/,function(_,q,h){return"trials.json"+(q||"")+(h||"")});
+  return{prog:raw,trials:trials,override:true};
+}
+function bust(u){var sep=u.indexOf("?")<0?"?":"&";return u+sep+"t="+Date.now()+"&r="+Math.random().toString(36).slice(2,10)}
+function fto(u,o,ms){
+  var c=window.AbortController?new AbortController():null,t=setTimeout(function(){if(c)c.abort()},ms||10000);
+  o=o||{};if(c)o.signal=c.signal;o.cache="no-store";
+  return fetch(u,o).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()},function(e){clearTimeout(t);throw e});
+}
+function getBusted(u){return fto(bust(u),{},12000)}
+function latestSha(path){
+  return fto("https://api.github.com/repos/"+GH+"/commits?path="+encodeURIComponent(path)+"&per_page=1",{headers:{Accept:"application/vnd.github+json"}},8000)
+    .then(function(arr){if(!arr||!arr[0]||!arr[0].sha)throw new Error("no sha");return arr[0].sha});
+}
+function getAtSha(path,sha){
+  return fto("https://raw.githubusercontent.com/"+GH+"/"+sha+"/"+path,{},7000).catch(function(){
+    return fto("https://api.github.com/repos/"+GH+"/contents/"+path+"?ref="+sha,{headers:{Accept:"application/vnd.github.raw+json"}},8000);
+  });
+}
+function pairLocal(){
+  return Promise.all([getBusted(SRC.prog),getBusted(SRC.trials).catch(function(){return null})]);
+}
+function pairGithub(){
+  return latestSha(REPO_PROG).then(function(sha){
+    return Promise.all([
+      getAtSha(REPO_PROG,sha),
+      getAtSha(REPO_TRIALS,sha).catch(function(){return null})
+    ]);
+  });
+}
+function loadPair(forceLive){
+  if(SRC.override)return pairLocal();
+  if(forceLive)return pairGithub().catch(function(){return pairLocal()});
+  return pairLocal();
+}
+function stamp(d){
+  if(!d)return"";
+  if(d.updated_at!=null&&String(d.updated_at)!=="")return String(d.updated_at);
+  return String(d.evals_done||"")+"|"+String((d.best_so_far&&d.best_so_far.gene_id)||"");
+}
+function nowCST(){
+  var t=new Date(Date.now()+288e5);
+  function p(n){return(n<10?"0":"")+n}
+  return t.getUTCFullYear()+"-"+p(t.getUTCMonth()+1)+"-"+p(t.getUTCDate())+" "+p(t.getUTCHours())+":"+p(t.getUTCMinutes())+":"+p(t.getUTCSeconds())+" CST";
+}
+function toast(m){
+  var d=$("#toast");d.hidden=false;d.setAttribute("role","status");d.textContent=m;d.style.opacity="1";
+  clearTimeout(d._t);d._t=setTimeout(function(){d.style.opacity="0";setTimeout(function(){if(d.style.opacity==="0")d.hidden=true},320)},6500);
+}
+function setStale(on,text){
+  var el=$("#stale");
+  if(!on){el.hidden=true;el.textContent="";return}
+  el.hidden=false;el.textContent=text||"站上数据未更新";
+}
 function num(x){return x==null||x===""||!isFinite(+x)?null:+x}
 function fmtN(x){x=num(x);return x==null?"—":Math.round(x).toLocaleString("en-US")}
 function fmtP(x,d){x=num(x);if(x==null)return "—";d=d==null?2:d;var s=(x*100).toFixed(d);return (x>0?"+":x<0?"":"")+s+"%"}
@@ -204,24 +288,46 @@ function paint(d, trials){
   document.title="朔元 · 模型/AI探索"+(d.evals_done!=null?" · "+fmtN(d.evals_done):"");
 }
 
-function load(){
-  $("#rf").disabled=true;
-  return Promise.all([
-    get(PROG),
-    get(TRIALS).catch(function(){return null})
-  ]).then(function(arr){
+function load(manual){
+  var btn=$("#rf");
+  btn.disabled=true;
+  if(manual)btn.textContent="刷新中…";
+  var prev=lastStamp;
+  return loadPair(!!manual).then(function(arr){
     var d=arr[0], t=arr[1];
     var trials=t&&(t.trials||t.recent_trials)||null;
     $("#err").hidden=true;
     paint(d, trials);
+    $("#fetched").textContent=nowCST();
+    var next=stamp(d);
+    var changed=!!next&&next!==prev;
+    lastStamp=next||prev;
+    if(manual){
+      if(prev&&!changed){
+        toast("数据仍是仓库快照；需同步探索器");
+        setStale(true, SRC.override?"数据源未更新":"站上数据未更新");
+      }else if(changed&&prev){
+        toast("数据已更新");
+        setStale(false);
+      }else setStale(false);
+    }else if(changed&&prev){
+      setStale(false);
+    }
   }).catch(function(e){
     var box=$("#err");box.hidden=false;box.textContent="读取进度失败："+(e.message||e);
-  }).then(function(){$("#rf").disabled=false});
+    if(manual)toast("刷新失败："+(e.message||e));
+  }).then(function(){
+    btn.disabled=false;
+    btn.textContent="刷新";
+  });
 }
 
-$("#rf").onclick=function(){load()};
-load();
-setInterval(function(){if(!document.hidden)$("#rf").disabled||load()},POLL);
+if(SRC.override){
+  $("#rfhint").innerHTML="已用 <code>?src=</code> 覆盖进度地址；刷新会强拉该地址（cache-bust）。";
+}
+$("#rf").onclick=function(){load(true)};
+load(false);
+if(POLL_MS)setInterval(function(){if(!document.hidden&&!$("#rf").disabled)load(false)},POLL_MS);
 })();
 </script>
 </body>
