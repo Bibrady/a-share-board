@@ -538,7 +538,7 @@ var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeou
 setInterval(function(){if(document.hidden||!D||D.final||R.on)return;if($("#datesel").value&&$("#datesel").selectedIndex>0)return;
  mgload();xload();get("data/latest.json",true).then(function(d){if(d.run_at!==D.run_at){D=d;render();var u=$("#upd");u.hidden=false;u.querySelector("b").textContent=hms()}}).catch(function(){})},120000);
 // ---------- 强制刷新: ntfy trigger {"a":"refresh","cid","b":"market"} -> box re-samples + publishes; progress back via ntfy ----------
-var NT="https://ntfy.sh/",TRIG="__TRIG_TOPIC__",PROG="__PROG_TOPIC__";
+var NT="https://ntfy.sh/",TRIG="asb-t-K0Sxhz9ApJ7XszSDLKJHvKMIAR0S",PROG="asb-m-zVPIyuWWhWpEGLKuxH8rk84zTNES";
 var STEPS=["收到请求","拉取行情","计算","上传","等待页面生效","完成"];
 var R={on:false,cid:"",rid:"",t0:0,last:"",seen:{},es:null,esok:false,pt:null,wd:null,tick:null,passive:false};
 function rcid(){var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",s="",u=new Uint32Array(16);(window.crypto||window.msCrypto).getRandomValues(u);for(var i=0;i<16;i++)s+=a[u[i]%a.length];return s}
