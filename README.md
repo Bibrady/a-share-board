@@ -19,4 +19,11 @@ A股每日收盘创10日新高突破筛选看板（自动更新，数据来源�
 python3 site_nav.py
 ```
 
-页面里的 `<!--SITE_NAV-->` 会被替换成与现有看板相同的浅色纸顶栏。
+页面里的 `<!--SITE_NAV-->` 会被替换成与现有看板相同的浅色纸顶栏。「题材」在 `GROUPS` 中保留但标记为隐藏，不会出现在可见导航。
+
+## 请假审批
+
+页面：<https://bibrady.github.io/a-share-board/leave/>  
+导航：顶栏「办公」→「请假审批」
+
+内部审批工作台：Google 账号登录后，经 Apps Script 校验邮箱白名单，再读写私有 Google 表。请假记录不进入本仓库。接入步骤见 `leave/apps-script/README.md`；前端把 Web App URL 与 OAuth Client ID 写在 `leave/config.js`（未配置时页面只显示「待完成接入」）。

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>朔元 · 请假审批</title>
+<meta name="description" content="朔元内部请假审批工作台">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{color-scheme:light;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--danger:#8A1F1F;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 40px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;background:var(--pn);border:1px solid var(--bd);border-top:0;padding:18px 20px 16px;margin:0 -16px 20px}
+.brand{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.mark{flex:none;background:var(--acc);color:#fff;font-size:13px;font-weight:700;letter-spacing:.18em;padding:7px 9px;line-height:1}
+.brand h1{margin:0;font-size:20px;font-weight:650;color:var(--ttl);letter-spacing:.02em}
+.sub{margin-top:3px;font-size:12.5px;color:var(--mut)}
+.who{display:flex;align-items:center;gap:10px}
+.who-t{text-align:right;min-width:0}
+.who-t b{display:block;font-size:13.5px;font-weight:650}
+.who-t span{display:block;font-size:12px;color:var(--mut);word-break:break-all}
+.panel{background:var(--pn);border:1px solid var(--bd);padding:22px 22px 20px;margin-bottom:16px}
+.panel h2{margin:0 0 14px;font-size:15px;font-weight:650;color:var(--ttl);letter-spacing:.02em;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 small{font-weight:400;color:var(--mut);font-size:12.5px}
+.gate{padding:28px 24px}
+.gate h2{font-size:18px;margin:0 0 8px}
+.lead{margin:0 0 16px;color:var(--mut);font-size:13.5px;line-height:1.65;max-width:46em}
+.steps{margin:0;padding-left:1.2em;color:var(--fg);font-size:13.5px;line-height:1.7}
+.steps li{margin:0 0 6px}
+.note{margin:16px 0 0;font-size:12.5px;color:var(--mut);line-height:1.6;background:var(--pn2);border:1px solid var(--bd);padding:10px 12px}
+.gsi{display:flex;justify-content:center;margin:18px 0 8px;min-height:44px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--pn);border:1px solid var(--bd);padding:14px 16px}
+.kpi .l{font-size:12px;color:var(--mut);letter-spacing:.04em}
+.kpi .v{margin-top:6px;font-size:28px;font-weight:700;color:var(--ttl);font-family:var(--mono);line-height:1.1;font-variant-numeric:tabular-nums}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.form .full{grid-column:1/-1}
+label.fld{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--mut)}
+label.fld span.req::after{content:" *";color:var(--danger)}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;border:1px solid var(--bd);background:#fff;color:var(--fg);border-radius:0;padding:0 10px;min-height:40px}
+textarea{padding:8px 10px;min-height:88px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.hint{font-size:12px;color:var(--mut);margin-top:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{height:40px;padding:0 14px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;border-radius:0}
+.btn:disabled{background:#C8C4BA;border-color:#C8C4BA;color:#666;cursor:default}
+.btn.ghost{background:#fff;color:var(--acc)}
+.btn.quiet{background:#fff;color:var(--mut);border-color:var(--bd)}
+.btn.warn{background:#fff;color:var(--danger);border-color:rgba(183,28,28,.45)}
+.btn.sm{height:32px;padding:0 10px;font-size:12.5px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.filters label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mut)}
+.filters input,.filters select{width:auto;min-width:0;height:36px;min-height:36px}
+.tw{overflow:auto;border:1px solid var(--grid);-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-size:12px;font-weight:650;color:var(--mut);background:var(--pn2);padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--grid);vertical-align:top}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.muted, .muted{color:var(--mut)}
+td.reason{max-width:220px;white-space:pre-wrap;word-break:break-word}
+tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;font-size:12px;font-weight:650;white-space:nowrap}
+.badge.pending{color:var(--acc);background:rgba(26,58,107,.08);border:1px solid rgba(26,58,107,.25)}
+.badge.approved{color:#1A1A1A;background:#EFEDE6;border:1px solid var(--bd)}
+.badge.rejected{color:var(--danger);background:rgba(183,28,28,.08);border:1px solid rgba(183,28,28,.25)}
+.badge.cancelled{color:var(--mut);background:#F4F2EC;border:1px solid var(--bd)}
+.cards{display:none}
+.card{border:1px solid var(--bd);padding:12px 12px 10px;margin-bottom:8px;background:#fff}
+.card .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.card .id{font-family:var(--mono);font-size:12.5px;font-weight:650}
+.card .meta{font-size:12.5px;color:var(--mut);display:flex;flex-wrap:wrap;gap:2px 10px;margin:4px 0}
+.card .why{font-size:13px;margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.empty{padding:28px 12px;text-align:center;color:var(--mut);background:var(--pn2);border:1px dashed var(--bd);font-size:13.5px;line-height:1.65}
+.banner{margin-bottom:16px;padding:10px 12px;border:1px solid var(--bd);background:rgba(26,58,107,.08);color:var(--ttl);font-size:13.5px}
+.banner.err{background:rgba(183,28,28,.08);border-color:rgba(183,28,28,.35);color:var(--danger)}
+.banner.ok{background:#EFEDE6}
+.agenda li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--grid);font-size:13.5px}
+.agenda li:last-child{border-bottom:0}
+.agenda b{font-weight:650}
+.tag{font-size:11.5px;color:var(--mut);letter-spacing:.04em}
+#dlg{border:1px solid var(--bd);padding:0;max-width:420px;width:calc(100% - 24px);background:#fff}
+#dlg::backdrop{background:rgba(26,26,26,.45)}
+.dlg-bd{padding:20px 20px 16px}
+.dlg-bd h3{margin:0 0 8px;font-size:16px;color:var(--ttl)}
+.dlg-ft{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--bd);background:var(--pn2)}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line-height:1.7}
+[hidden]{display:none !important}
+@media (max-width:759px){
+  .wrap{padding:0 12px 32px}
+  .top{margin:0 -12px 16px;padding:14px 12px 12px}
+  .panel,.gate{padding:16px 14px}
+  .form{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpi .v{font-size:24px}
+  .tw{display:none}
+  .cards{display:block}
+  .who-t{text-align:left}
+  .brand h1{font-size:18px}
+}
+@media (min-width:760px){
+  body{font-size:14.5px}
+  .top{margin:0 0 20px;border-top:1px solid var(--bd)}
+}
+</style>
+</head>
+<body>
+<!--SITE_NAV--><style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pages/ai-evo/">研究</a><a href="./" class="on">办公</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="./" class="on" aria-current="page">请假审批</a></div></nav>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">朔元</div>
+      <div>
+        <h1>请假审批</h1>
+        <div class="sub">内部审批工作台 · 时区 Asia/Shanghai</div>
+      </div>
+    </div>
+    <div class="who" id="who" hidden>
+      <div class="who-t"><b id="whoName"></b><span id="whoMail"></span></div>
+      <button type="button" class="btn ghost sm" id="btnOut">退出</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section class="panel gate" id="viewSetup" hidden>
+    <h2>待完成接入</h2>
+    <p class="lead">请假数据存放在公司私有表格中。本页尚未配置 Google 登录与审批后端，因此不会加载任何单据，也不会向表格发送请求。</p>
+    <ol class="steps">
+      <li>按 <code>leave/apps-script/README.md</code> 部署 Apps Script Web App（执行者 = 脚本所有者，访问者 = 任何人）。</li>
+      <li>创建 Web 应用类型的 OAuth 客户端 ID，授权 JavaScript 来源包含 <code>https://bibrady.github.io</code>。</li>
+      <li>将客户端 ID 与 Web App 地址写入 <code>leave/config.js</code> 后重新发布站点。</li>
+    </ol>
+    <p class="note">在完成上述步骤前，此页只作占位。请勿把服务账号密钥、可写 webhook 或表格内容提交进仓库。</p>
+  </section>
+
+  <section class="panel gate" id="viewLogin" hidden>
+    <h2>请使用公司 Google 账号登录</h2>
+    <p class="lead">朔元请假审批仅对授权邮箱开放。未登录时不会展示任何请假记录、统计或草稿。</p>
+    <div class="gsi" id="gsiBtn"></div>
+    <p class="note">登录后系统将校验 Google 身份令牌与邮箱白名单。非授权账号无法查看单据。</p>
+  </section>
+
+  <section class="panel gate" id="viewDenied" hidden>
+    <h2>账号未授权</h2>
+    <p class="lead" id="deniedLead">此 Google 账号不在请假系统授权名单中，无法查看或提交单据。</p>
+    <div class="actions"><button type="button" class="btn ghost" id="btnDeniedOut">更换账号</button></div>
+  </section>
+
+  <div id="viewApp" hidden>
+    <section class="kpis" aria-label="审批总览">
+      <div class="kpi"><div class="l">待审批</div><div class="v" id="kPending">0</div></div>
+      <div class="kpi"><div class="l">已通过</div><div class="v" id="kApproved">0</div></div>
+      <div class="kpi"><div class="l">已驳回</div><div class="v" id="kRejected">0</div></div>
+      <div class="kpi"><div class="l">进行中</div><div class="v" id="kOngoing">0</div></div>
+    </section>
+
+    <section class="panel" id="secAgenda">
+      <h2>即将开始 / 进行中 <small>仅统计已通过且尚未结束的假期</small></h2>
+      <ul class="agenda" id="agenda"></ul>
+      <div class="empty" id="agendaEmpty">目前没有即将开始或正在进行的已通过假期。</div>
+    </section>
+
+    <section class="panel">
+      <h2>提交请假 <small>天数按自然日（含周末）预填，可改为 0.5 的倍数</small></h2>
+      <form id="form" class="form" novalidate>
+        <label class="fld"><span class="req">请假类型</span>
+          <select id="fType" required></select>
+        </label>
+        <label class="fld"><span>申请人</span>
+          <input id="fApplicant" type="text" readonly>
+        </label>
+        <label class="fld"><span class="req">开始日期</span>
+          <input id="fStart" type="date" required>
+        </label>
+        <label class="fld"><span class="req">结束日期</span>
+          <input id="fEnd" type="date" required>
+        </label>
+        <label class="fld"><span class="req">天数</span>
+          <input id="fDays" type="number" min="0.5" step="0.5" required>
+          <span class="hint" id="fDaysHint"></span>
+        </label>
+        <label class="fld full"><span class="req">事由</span>
+          <textarea id="fReason" maxlength="500" placeholder="请说明请假原因，便于审批留档。" required></textarea>
+        </label>
+        <div class="full actions">
+          <button type="submit" class="btn" id="btnSubmit">提交申请</button>
+          <span class="hint" id="formMsg"></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>请假单据 <small id="listMeta"></small></h2>
+      <div class="filters">
+        <label>状态
+          <select id="qStatus">
+            <option value="">全部</option>
+            <option value="待审批">待审批</option>
+            <option value="已通过">已通过</option>
+            <option value="已驳回">已驳回</option>
+            <option value="已撤销">已撤销</option>
+          </select>
+        </label>
+        <label>从 <input id="qFrom" type="date"></label>
+        <label>至 <input id="qTo" type="date"></label>
+        <button type="button" class="btn quiet sm" id="btnReset">重置筛选</button>
+        <button type="button" class="btn ghost sm" id="btnReload">刷新</button>
+      </div>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr>
+              <th>单号</th>
+              <th>申请人</th>
+              <th>类型</th>
+              <th>期间</th>
+              <th class="num">天数</th>
+              <th>事由</th>
+              <th>状态</th>
+              <th>审批</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="empty" id="listEmpty" hidden>没有符合条件的请假单。</div>
+    </section>
+  </div>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <form method="dialog" id="dlgForm">
+    <div class="dlg-bd">
+      <h3 id="dlgTitle">审批请假单</h3>
+      <p class="lead" id="dlgLead"></p>
+      <label class="fld"><span id="dlgCommentLabel">审批意见</span>
+        <textarea id="dlgComment" maxlength="200" placeholder="选填；驳回时请写明原因。"></textarea>
+      </label>
+    </div>
+    <div class="dlg-ft">
+      <button type="button" class="btn quiet" id="dlgCancel">取消</button>
+      <button type="submit" class="btn" id="dlgOk">确认</button>
+    </div>
+  </form>
+</dialog>
+
+<footer>朔元内部 · 请假记录不入库、不随站点公开</footer>
+<script src="config.js"></script>
+<script>
+(function () {
+  var TZ = 'Asia/Shanghai';
+  var TOKEN_KEY = 'shuoyuan_leave_id_token';
+  var state = {
+    token: '',
+    me: null,
+    types: [],
+    requests: [],
+    summary: null,
+    decision: null
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var viewSetup = $('viewSetup'), viewLogin = $('viewLogin'), viewDenied = $('viewDenied'), viewApp = $('viewApp');
+  var banner = $('banner');
+
+  function cfg() { return window.LEAVE_CONFIG || {}; }
+
+  function isConfigured() {
+    var c = cfg();
+    var id = String(c.googleClientId || '').trim();
+    var url = String(c.appsScriptUrl || '').trim();
+    if (!id || !url) return false;
+    if (/YOUR_|PLACEHOLDER|示例|xxxx/i.test(id + url)) return false;
+    if (id.indexOf('.apps.googleusercontent.com') === -1) return false;
+    if (!/^https:\/\/script\.google\.com\/macros\/s\//.test(url)) return false;
+    return true;
+  }
+
+  function todayYmd() {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(new Date());
+  }
+
+  function naturalDays(start, end) {
+    if (!start || !end) return 0;
+    var a = start.split('-').map(Number);
+    var b = end.split('-').map(Number);
+    if (a.length !== 3 || b.length !== 3) return 0;
+    var da = Date.UTC(a[0], a[1] - 1, a[2]);
+    var db = Date.UTC(b[0], b[1] - 1, b[2]);
+    return Math.round((db - da) / 86400000) + 1;
+  }
+
+  function fmtDays(n) {
+    if (n == null || n === '') return '—';
+    var x = Number(n);
+    if (!isFinite(x)) return String(n);
+    return (Math.round(x * 2) / 2).toString();
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  function decodeJwt(token) {
+    try {
+      var part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      var json = decodeURIComponent(atob(part).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(json);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function tokenValid(token) {
+    var p = decodeJwt(token);
+    if (!p || !p.email) return false;
+    if (p.exp && (p.exp * 1000) < Date.now() + 15000) return false;
+    return true;
+  }
+
+  function showBanner(msg, kind) {
+    if (!msg) { banner.hidden = true; banner.textContent = ''; return; }
+    banner.hidden = false;
+    banner.className = 'banner' + (kind ? ' ' + kind : '');
+    banner.textContent = msg;
+  }
+
+  function showOnly(el) {
+    viewSetup.hidden = el !== viewSetup;
+    viewLogin.hidden = el !== viewLogin;
+    viewDenied.hidden = el !== viewDenied;
+    viewApp.hidden = el !== viewApp;
+  }
+
+  function setWho(me) {
+    var box = $('who');
+    if (!me) { box.hidden = true; return; }
+    box.hidden = false;
+    $('whoName').textContent = me.name || '已登录';
+    $('whoMail').textContent = me.email || '';
+  }
+
+  function loadGis(cb) {
+    if (window.google && google.accounts && google.accounts.id) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.async = true;
+    s.defer = true;
+    s.onload = cb;
+    s.onerror = function () {
+      showBanner('无法加载 Google 登录组件。请检查网络后刷新本页。', 'err');
+    };
+    document.head.appendChild(s);
+  }
+
+  function renderButton() {
+    var host = $('gsiBtn');
+    host.innerHTML = '';
+    google.accounts.id.initialize({
+      client_id: cfg().googleClientId,
+      callback: onCredential,
+      auto_select: false,
+      ux_mode: 'popup',
+      itp_support: true
+    });
+    google.accounts.id.renderButton(host, {
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      locale: 'zh-CN',
+      width: 280
+    });
+  }
+
+  function onCredential(resp) {
+    if (!resp || !resp.credential) {
+      showBanner('未取得 Google 登录凭证，请重试。', 'err');
+      return;
+    }
+    state.token = resp.credential;
+    try { sessionStorage.setItem(TOKEN_KEY, resp.credential); } catch (e) {}
+    bootstrap();
+  }
+
+  function logout(next) {
+    state.token = '';
+    state.me = null;
+    state.requests = [];
+    state.summary = null;
+    try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    try { if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); } catch (e) {}
+    setWho(null);
+    showBanner('');
+    showOnly(viewLogin);
+    if (typeof google !== 'undefined' && google.accounts) renderButton();
+    if (next) next();
+  }
+
+  function api(action, payload) {
+    var body = Object.assign({ action: action, idToken: state.token }, payload || {});
+    return fetch(cfg().appsScriptUrl, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    }).then(function (res) {
+      return res.text().then(function (text) {
+        var data;
+        try { data = JSON.parse(text); }
+        catch (e) {
+          throw new Error('审批服务未返回有效结果。请确认 Web App 已部署，且访问者设置为「任何人」。');
+        }
+        if (!res.ok && !data) throw new Error('网络请求失败（' + res.status + '）。');
+        if (!data.ok) {
+          var err = new Error(data.message || '请求未能完成。');
+          err.code = data.error;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+
+  function applyPayload(data) {
+    state.me = data.me;
+    state.types = data.types || [];
+    state.requests = data.requests || [];
+    state.summary = data.summary || {};
+    setWho(state.me);
+    fillTypes();
+    $('fApplicant').value = (state.me.name || '') + '  ·  ' + (state.me.email || '');
+    renderSummary();
+    renderList();
+  }
+
+  function bootstrap() {
+    showBanner('正在核验身份并载入审批数据…');
+    return api('bootstrap').then(function (data) {
+      showOnly(viewApp);
+      showBanner('');
+      applyPayload(data);
+    }).catch(function (err) {
+      if (err.code === 'forbidden') {
+        state.requests = [];
+        $('deniedLead').textContent = err.message || '此 Google 账号不在请假系统授权名单中，无法查看或提交单据。';
+        var payload = decodeJwt(state.token);
+        setWho({ name: payload && payload.name || '未授权账号', email: payload && payload.email || '' });
+        showBanner('');
+        showOnly(viewDenied);
+        return;
+      }
+      if (err.code === 'unauthenticated') {
+        logout();
+        showBanner(err.message || '登录已过期，请重新登录。', 'err');
+        return;
+      }
+      showBanner(err.message || '载入失败。', 'err');
+      if (!state.me) showOnly(viewLogin);
+    });
+  }
+
+  function fillTypes() {
+    var sel = $('fType');
+    var cur = sel.value;
+    sel.innerHTML = state.types.map(function (t) {
+      return '<option value="' + esc(t) + '">' + esc(t) + '</option>';
+    }).join('');
+    if (cur && state.types.indexOf(cur) !== -1) sel.value = cur;
+  }
+
+  function syncDays(fromDates) {
+    var start = $('fStart').value;
+    var end = $('fEnd').value;
+    var n = naturalDays(start, end);
+    $('fDaysHint').textContent = n > 0
+      ? '起止共 ' + n + ' 个自然日（含周末）。可改为 0.5 的倍数，且不超过该自然日数。'
+      : '请先选择开始与结束日期。';
+    if (fromDates && n > 0) $('fDays').value = String(n);
+    if (start) $('fEnd').min = start;
+  }
+
+  function renderSummary() {
+    var s = state.summary || {};
+    $('kPending').textContent = s.pending || 0;
+    $('kApproved').textContent = s.approved || 0;
+    $('kRejected').textContent = s.rejected || 0;
+    var agenda = s.agenda || [];
+    var ongoing = agenda.filter(function (x) { return x.kind === 'ongoing'; }).length;
+    $('kOngoing').textContent = ongoing;
+    var ul = $('agenda');
+    if (!agenda.length) {
+      ul.innerHTML = '';
+      $('agendaEmpty').hidden = false;
+      return;
+    }
+    $('agendaEmpty').hidden = true;
+    ul.innerHTML = agenda.map(function (x) {
+      var tag = x.kind === 'ongoing' ? '进行中' : '即将开始';
+      return '<li><div><b>' + esc(x.applicantName) + '</b> · ' + esc(x.type) +
+        ' · ' + fmtDays(x.days) + ' 天<div class="muted">' + esc(x.startDate) + ' 至 ' + esc(x.endDate) +
+        '</div></div><span class="tag">' + tag + '</span></li>';
+    }).join('');
+  }
+
+  function badge(status) {
+    var cls = status === '待审批' ? 'pending'
+      : status === '已通过' ? 'approved'
+      : status === '已驳回' ? 'rejected'
+      : 'cancelled';
+    return '<span class="badge ' + cls + '">' + esc(status) + '</span>';
+  }
+
+  function filtered() {
+    var st = $('qStatus').value;
+    var from = $('qFrom').value;
+    var to = $('qTo').value;
+    return state.requests.filter(function (r) {
+      if (st && r.status !== st) return false;
+      var start = r.startDate || '';
+      var end = r.endDate || '';
+      if (from && end && end < from) return false;
+      if (to && start && start > to) return false;
+      return true;
+    });
+  }
+
+  function rowActions(r) {
+    var html = '';
+    if (r.status === '待审批' && state.me && state.me.canApprove) {
+      html += '<button type="button" class="btn sm" data-act="approve" data-id="' + esc(r.id) + '">通过</button> ';
+      html += '<button type="button" class="btn warn sm" data-act="reject" data-id="' + esc(r.id) + '">驳回</button> ';
+    }
+    if (r.status === '待审批' && state.me && r.applicantEmail === state.me.email) {
+      html += '<button type="button" class="btn quiet sm" data-act="cancel" data-id="' + esc(r.id) + '">撤销</button>';
+    }
+    return html || '<span class="muted">—</span>';
+  }
+
+  function reviewCell(r) {
+    if (!r.reviewerName && !r.comment && !r.reviewedAt) return '<span class="muted">—</span>';
+    var bits = [];
+    if (r.reviewerName) bits.push(esc(r.reviewerName));
+    if (r.reviewedAt) bits.push(esc(r.reviewedAt));
+    var s = bits.join('<br>');
+    if (r.comment) s += '<div class="muted">' + esc(r.comment) + '</div>';
+    return s;
+  }
+
+  function renderList() {
+    var rows = filtered();
+    $('listMeta').textContent = '共 ' + state.requests.length + ' 张' + (rows.length !== state.requests.length ? '，筛选后 ' + rows.length + ' 张' : '');
+    var empty = $('listEmpty');
+    var tb = $('tb');
+    var cards = $('cards');
+    if (!rows.length) {
+      tb.innerHTML = '';
+      cards.innerHTML = '';
+      empty.hidden = false;
+      empty.textContent = state.requests.length
+        ? '没有符合当前筛选条件的请假单。可重置筛选或扩大日期范围。'
+        : '尚无请假记录。提交申请后将出现在此列表。';
+      return;
+    }
+    empty.hidden = true;
+    tb.innerHTML = rows.map(function (r) {
+      return '<tr>' +
+        '<td>' + esc(r.id) + '</td>' +
+        '<td>' + esc(r.applicantName) + '<div class="muted">' + esc(r.applicantEmail) + '</div></td>' +
+        '<td>' + esc(r.type) + '</td>' +
+        '<td>' + esc(r.startDate) + '<div class="muted">至 ' + esc(r.endDate) + '</div></td>' +
+        '<td class="num">' + fmtDays(r.days) + '</td>' +
+        '<td class="reason">' + esc(r.reason) + '</td>' +
+        '<td>' + badge(r.status) + '</td>' +
+        '<td>' + reviewCell(r) + '</td>' +
+        '<td>' + rowActions(r) + '</td>' +
+        '</tr>';
+    }).join('');
+    cards.innerHTML = rows.map(function (r) {
+      return '<article class="card">' +
+        '<div class="hd"><span class="id">' + esc(r.id) + '</span>' + badge(r.status) + '</div>' +
+        '<div class="meta"><span>' + esc(r.applicantName) + '</span><span>' + esc(r.type) + ' · ' + fmtDays(r.days) + ' 天</span>' +
+        '<span>' + esc(r.startDate) + ' 至 ' + esc(r.endDate) + '</span></div>' +
+        '<div class="why">' + esc(r.reason) + '</div>' +
+        (r.comment ? '<div class="muted">审批意见：' + esc(r.comment) + '</div>' : '') +
+        '<div class="actions" style="margin-top:8px">' + rowActions(r) + '</div></article>';
+    }).join('');
+  }
+
+  function openDecide(id, decision) {
+    var r = state.requests.filter(function (x) { return x.id === id; })[0];
+    if (!r) return;
+    state.decision = { id: id, decision: decision };
+    var titles = { approve: '通过请假单', reject: '驳回请假单', cancel: '撤销请假单' };
+    $('dlgTitle').textContent = titles[decision] || '处理请假单';
+    $('dlgLead').textContent = r.id + ' · ' + r.applicantName + ' · ' + r.type + ' · ' + fmtDays(r.days) + ' 天（' + r.startDate + ' 至 ' + r.endDate + '）';
+    if (decision === 'cancel') {
+      $('dlgCommentLabel').textContent = '说明';
+      $('dlgLead').textContent += '。撤销后不可恢复为待审批，如需请假请重新提交。';
+    } else {
+      $('dlgCommentLabel').textContent = decision === 'reject' ? '审批意见（必填）' : '审批意见（选填）';
+    }
+    $('dlgComment').value = decision === 'cancel' ? '申请人撤销' : '';
+    $('dlgComment').required = decision === 'reject';
+    $('dlgComment').parentElement.hidden = decision === 'cancel';
+    $('dlgOk').textContent = decision === 'approve' ? '确认通过' : decision === 'reject' ? '确认驳回' : '确认撤销';
+    $('dlgOk').className = 'btn' + (decision === 'approve' ? '' : ' warn');
+    $('dlg').showModal();
+  }
+
+  function busy(btn, on, label) {
+    if (!btn) return;
+    if (on) {
+      btn.dataset.prev = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = label || '处理中…';
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.prev || btn.textContent;
+    }
+  }
+
+  $('btnOut').addEventListener('click', function () { logout(); });
+  $('btnDeniedOut').addEventListener('click', function () { logout(); });
+  $('fStart').addEventListener('change', function () {
+    if ($('fEnd').value && $('fEnd').value < $('fStart').value) $('fEnd').value = $('fStart').value;
+    syncDays(true);
+  });
+  $('fEnd').addEventListener('change', function () { syncDays(true); });
+  $('qStatus').addEventListener('change', renderList);
+  $('qFrom').addEventListener('change', renderList);
+  $('qTo').addEventListener('change', renderList);
+  $('btnReset').addEventListener('click', function () {
+    $('qStatus').value = '';
+    $('qFrom').value = '';
+    $('qTo').value = '';
+    renderList();
+  });
+  $('btnReload').addEventListener('click', function () {
+    var btn = $('btnReload');
+    busy(btn, true, '刷新中…');
+    bootstrap().then(function () { busy(btn, false); }, function () { busy(btn, false); });
+  });
+
+  $('form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var type = $('fType').value;
+    var start = $('fStart').value;
+    var end = $('fEnd').value;
+    var days = Number($('fDays').value);
+    var reason = $('fReason').value.trim();
+    var n = naturalDays(start, end);
+    var msg = $('formMsg');
+    msg.textContent = '';
+    if (!type) { msg.textContent = '请选择请假类型。'; return; }
+    if (!start || !end) { msg.textContent = '请填写开始与结束日期。'; return; }
+    if (start > end) { msg.textContent = '结束日期不能早于开始日期。'; return; }
+    if (!reason) { msg.textContent = '请填写请假事由。'; return; }
+    if (!isFinite(days) || days < 0.5 || Math.round(days * 2) !== days * 2) {
+      msg.textContent = '天数须为不小于 0.5 的 0.5 倍数。'; return;
+    }
+    if (n > 0 && days > n) {
+      msg.textContent = '天数不能超过自然日数（' + n + ' 天）。排除周末请下调天数。'; return;
+    }
+    var btn = $('btnSubmit');
+    busy(btn, true, '提交中…');
+    api('create', { type: type, startDate: start, endDate: end, days: days, reason: reason })
+      .then(function (data) {
+        applyPayload(data);
+        $('fReason').value = '';
+        syncDays(true);
+        showBanner('请假单已提交，状态为待审批。', 'ok');
+      })
+      .catch(function (err) {
+        if (err.code === 'unauthenticated') { logout(); showBanner(err.message, 'err'); return; }
+        showBanner(err.message || '提交失败。', 'err');
+      })
+      .then(function () { busy(btn, false); });
+  });
+
+  document.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-act]');
+    if (!t) return;
+    var id = t.getAttribute('data-id');
+    var act = t.getAttribute('data-act');
+    if (act === 'approve' || act === 'reject') {
+      openDecide(id, act);
+      return;
+    }
+    if (act === 'cancel') {
+      openDecide(id, 'cancel');
+    }
+  });
+
+  $('dlgCancel').addEventListener('click', function () { $('dlg').close(); });
+  $('dlgForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (!state.decision) return;
+    var comment = $('dlgComment').value.trim();
+    var kind = state.decision.decision;
+    if (kind === 'reject' && !comment) {
+      showBanner('驳回时请填写审批意见。', 'err');
+      return;
+    }
+    var btn = $('dlgOk');
+    busy(btn, true);
+    var req = kind === 'cancel'
+      ? api('cancel', { id: state.decision.id })
+      : api('decide', { id: state.decision.id, decision: kind, comment: comment });
+    req.then(function (data) {
+        applyPayload(data);
+        $('dlg').close();
+        showBanner(kind === 'approve' ? '已通过该请假单。' : kind === 'reject' ? '已驳回该请假单。' : '已撤销该请假单。', 'ok');
+      })
+      .catch(function (err) {
+        showBanner(err.message || '操作未能完成。', 'err');
+      })
+      .then(function () { busy(btn, false); });
+  });
+
+  function initFormDates() {
+    var t = todayYmd();
+    $('fStart').value = t;
+    $('fEnd').value = t;
+    syncDays(true);
+  }
+
+  function start() {
+    initFormDates();
+    if (!isConfigured()) {
+      showOnly(viewSetup);
+      return;
+    }
+    var saved = '';
+    try { saved = sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
+    loadGis(function () {
+      renderButton();
+      if (saved && tokenValid(saved)) {
+        state.token = saved;
+        bootstrap();
+      } else {
+        if (saved) { try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+        showOnly(viewLogin);
+      }
+    });
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>
