@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>朔元 · 内部聊天</title>
+<meta name="description" content="朔元内部讨论">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/a-share-board/favicon.ico?v=5" sizes="any"><link rel="icon" type="image/svg+xml" href="/a-share-board/favicon.svg?v=5"><link rel="icon" type="image/png" sizes="32x32" href="/a-share-board/favicon-32.png?v=5"><link rel="apple-touch-icon" sizes="180x180" href="/a-share-board/apple-touch-icon.png?v=5"><link rel="manifest" href="/a-share-board/manifest.webmanifest?v=5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="朔元"><meta name="application-name" content="朔元"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{color-scheme:light;--bd:#E5E2DA;--bg:#F7F5F0;--fg:#333333;--mut:#666666;--acc:#1A3A6B;--ttl:#1A3A6B;--pn:#FFFFFF;--pn2:#FBF9F4;--grid:#E5E2DA;--dim:#888888;--mine:#1A3A6B;--mono:"IBM Plex Mono","SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100%}
+a{color:var(--acc)}
+.wrap{flex:1;display:flex;flex-direction:column;max-width:1180px;width:100%;margin:0 auto;padding:0 16px 16px;min-height:0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;background:var(--pn);border:1px solid var(--bd);border-top:0;padding:18px 20px 16px;margin:0 -16px 0}
+.brand{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.mark{flex:none;background:var(--acc);color:#fff;font-size:13px;font-weight:700;letter-spacing:.18em;padding:7px 9px;line-height:1}
+.brand h1{margin:0;font-size:20px;font-weight:650;color:var(--ttl);letter-spacing:.02em}
+.who{display:flex;align-items:center;gap:10px;flex:none}
+.who-t{text-align:right;white-space:nowrap}
+.who-t b{display:block;font-size:13.5px;font-weight:650}
+.who-t span{display:block;font-size:12px;color:var(--mut)}
+.desk{flex:1;display:flex;min-height:0;border:1px solid var(--bd);border-top:0;background:var(--pn);margin:0 -16px}
+.side{width:240px;flex:none;border-right:1px solid var(--bd);background:var(--pn2);display:flex;flex-direction:column;min-height:0}
+.side h2{margin:0;padding:14px 16px 10px;font-size:12px;font-weight:650;color:var(--mut);letter-spacing:.06em}
+.ch{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--grid);background:transparent;padding:12px 16px;cursor:pointer;color:inherit}
+.ch:hover{background:#fff}
+.ch.on{background:#fff;box-shadow:inset 3px 0 0 var(--acc)}
+.ch .n{display:block;font-size:14px;font-weight:650;color:var(--ttl)}
+.ch .p{display:block;margin-top:3px;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.room{padding:14px 18px 12px;border-bottom:1px solid var(--bd);background:#fff}
+.room b{display:block;font-size:15px;font-weight:650;color:var(--ttl)}
+.room span{display:block;margin-top:2px;font-size:12.5px;color:var(--mut)}
+.log{flex:1;overflow:auto;padding:16px 18px 8px;-webkit-overflow-scrolling:touch;background:var(--bg)}
+.day{display:flex;align-items:center;gap:10px;margin:14px 0 12px;color:var(--mut);font-size:12px}
+.day:before,.day:after{content:"";flex:1;height:1px;background:var(--grid)}
+.row{display:flex;margin:0 0 12px;gap:10px}
+.row.mine{flex-direction:row-reverse}
+.bubble{max-width:min(520px,78%);background:#fff;border:1px solid var(--bd);padding:8px 12px 9px}
+.row.mine .bubble{background:var(--acc);color:#fff;border-color:var(--acc)}
+.bubble .from{font-size:12px;font-weight:650;color:var(--ttl);margin-bottom:2px}
+.row.mine .bubble .from{color:rgba(255,255,255,.85)}
+.bubble .tx{font-size:14px;white-space:pre-wrap;word-break:break-word}
+.bubble .tm{margin-top:4px;font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+.row.mine .bubble .tm{color:rgba(255,255,255,.7)}
+.composer{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--bd);background:#fff}
+.composer textarea{flex:1;min-height:44px;max-height:120px;resize:none;border:1px solid var(--bd);padding:10px 12px;font:inherit}
+.composer textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.btn{height:44px;padding:0 16px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;border-radius:0;flex:none}
+.btn:disabled{background:#C8C4BA;border-color:#C8C4BA;color:#666;cursor:default}
+[hidden]{display:none !important}
+@media (max-width:759px){
+  .wrap{padding:0 0 0}
+  .top{margin:0;padding:14px 12px 12px}
+  .desk{flex-direction:column;margin:0;border-left:0;border-right:0;flex:1}
+  .side{width:100%;border-right:0;border-bottom:1px solid var(--bd);flex-direction:row;overflow-x:auto}
+  .side h2{display:none}
+  .ch{min-width:148px;border-bottom:0;border-right:1px solid var(--grid)}
+  .ch.on{box-shadow:inset 0 -3px 0 var(--acc)}
+  .brand h1{font-size:18px}
+  .who-t span{display:none}
+  .log{padding:12px}
+}
+@media (min-width:760px){
+  body{font-size:14.5px}
+  .top{margin:0;border-top:1px solid var(--bd)}
+  .desk{margin:0;border:1px solid var(--bd);border-top:0}
+}
+</style>
+</head>
+<body>
+<!--SITE_NAV--><style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pages/ai-evo/">研究</a><a href="../leave/" class="on">办公</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="../leave/">请假审批</a><a href="./" class="on" aria-current="page">内部聊天</a></div></nav>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">朔元</div>
+      <div><h1>内部聊天</h1></div>
+    </div>
+    <div class="who">
+      <div class="who-t"><b>卓炀</b><span>当前账号</span></div>
+    </div>
+  </header>
+  <div class="desk">
+    <aside class="side" id="side" aria-label="讨论组"></aside>
+    <section class="main">
+      <div class="room"><b id="roomName"></b><span id="roomHint"></span></div>
+      <div class="log" id="log" role="log" aria-live="polite"></div>
+      <form class="composer" id="form">
+        <textarea id="input" rows="1" maxlength="500" placeholder="写一条消息，Enter 发送" required></textarea>
+        <button class="btn" type="submit">发送</button>
+      </form>
+    </section>
+  </div>
+</div>
+<script>
+(function () {
+  var TZ = 'Asia/Shanghai';
+  var STORE_KEY = 'shuoyuan_chat_v1';
+  var ME = '卓炀';
+  var GROUPS = [
+    { id: 'general', name: '综合讨论', hint: '日常沟通与例会' },
+    { id: 'board', name: '看板项目', hint: '站点迭代与发版' },
+    { id: 'admin', name: '行政通知', hint: '请假与值班安排' }
+  ];
+  function msg(id, group, name, at, text) {
+    return { id: id, group: group, from: name, at: at, text: text };
+  }
+  var SEED = [
+    msg('C-20260311-01', 'general', '周晏清', '2026-03-11 09:18:00', '下周例会改到周四下午两点，会议室还是 3 楼。'),
+    msg('C-20260311-02', 'general', '卓炀', '2026-03-11 09:26:00', '可以。纪要模板我放进文档柜了，会前十分钟打开即可。'),
+    msg('C-20260310-01', 'admin', '卓炀', '2026-03-10 14:20:00', '陈予白 3 月 12 日事假一天，已通过。'),
+    msg('C-20260408-01', 'board', '卓炀', '2026-04-08 10:14:00', '请假台这一版先做提交和审批，导航挂在办公下面。'),
+    msg('C-20260408-02', 'board', '林知夏', '2026-04-08 10:31:00', '顶栏配色跟大盘页对齐，纸色那套不要改。'),
+    msg('C-20260609-01', 'admin', '卓炀', '2026-06-09 09:40:00', '周晏清 6 月 18 日调休一天，已通过。'),
+    msg('C-20260617-01', 'general', '林知夏', '2026-06-17 16:08:00', '端午那两天我调休，群里有事直接找周晏清。'),
+    msg('C-20260617-02', 'general', '周晏清', '2026-06-17 16:12:00', '收到，值班我来盯。'),
+    msg('C-20260714-01', 'board', '陈予白', '2026-07-14 11:05:00', 'EMA50 那页文案改了一版，请周晏清过一下空状态。'),
+    msg('C-20260714-02', 'board', '周晏清', '2026-07-14 14:22:00', '看过了。空状态那句再短一点就行。'),
+    msg('C-20260814-01', 'admin', '卓炀', '2026-08-14 11:20:00', '周晏清 8 月 16 日事假一天，已通过。'),
+    msg('C-20260916-01', 'admin', '卓炀', '2026-09-16 17:10:00', '林知夏 9 月 18 日上午病假半天，已通过。'),
+    msg('C-20260928-01', 'general', '陈予白', '2026-09-28 09:44:00', '国庆前把值班表发一下，我月底请假回家。'),
+    msg('C-20260928-02', 'general', '卓炀', '2026-09-28 09:51:00', '表今天下午发行政通知。'),
+    msg('C-20261021-01', 'admin', '卓炀', '2026-10-21 10:22:00', '陈予白 10 月 26 日至 27 日年假，已通过。'),
+    msg('C-20261022-01', 'board', '林知夏', '2026-10-22 09:16:00', '陈予白年假那两天，看板发版先暂停，等他回来再合。'),
+    msg('C-20261022-02', 'board', '卓炀', '2026-10-22 09:28:00', '同意，发版窗口挪到 28 号。'),
+    msg('C-20261124-01', 'board', '陈予白', '2026-11-24 15:36:00', '办公页空状态我收了一下，今晚可以看。'),
+    msg('C-20261125-01', 'admin', '卓炀', '2026-11-25 19:12:00', '林知夏明天事假全天。我 26、27 日病假，群里有事找周晏清。'),
+    msg('C-20261125-02', 'general', '周晏清', '2026-11-25 19:20:00', '明天林知夏请假。综合群有事找我。'),
+    msg('C-20261126-01', 'admin', '周晏清', '2026-11-26 08:41:00', '知夏今天请假。卓炀今天和明天病假。值班我来接。'),
+    msg('C-20261126-02', 'board', '周晏清', '2026-11-26 09:05:00', '知夏今天不在，发版检查我来做。有问题先记在这里。'),
+    msg('C-20261126-03', 'general', '陈予白', '2026-11-26 09:18:00', '知夏今天不在，周报草稿我先放到看板项目群。')
+  ];
+  var state = { group: 'general', extra: [] };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function loadExtra() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return [];
+      var data = JSON.parse(raw);
+      var rows = data && data.created ? data.created : [];
+      return rows.filter(function (m) {
+        return m && m.id && m.group && m.from && m.at && m.text;
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+  function saveExtra() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ created: state.extra }));
+    } catch (e) {}
+  }
+  function allMsgs() {
+    return SEED.concat(state.extra).slice().sort(function (a, b) {
+      if (a.at === b.at) return a.id < b.id ? -1 : 1;
+      return a.at < b.at ? -1 : 1;
+    });
+  }
+  function lastOf(gid) {
+    var rows = allMsgs().filter(function (m) { return m.group === gid; });
+    return rows.length ? rows[rows.length - 1] : null;
+  }
+  function dayLabel(at) {
+    var p = at.slice(0, 10).split('-');
+    return p[0] + '年' + Number(p[1]) + '月' + Number(p[2]) + '日';
+  }
+  function hm(at) { return at.slice(11, 16); }
+  function renderSide() {
+    $('side').innerHTML = '<h2>讨论组</h2>' + GROUPS.map(function (g) {
+      var last = lastOf(g.id);
+      return '<button type="button" class="ch' + (g.id === state.group ? ' on' : '') + '" data-g="' + g.id + '">' +
+        '<span class="n">' + esc(g.name) + '</span>' +
+        '<span class="p">' + esc(last ? last.from + '：' + last.text : '暂无消息') + '</span></button>';
+    }).join('');
+  }
+  function renderLog() {
+    var g = GROUPS.filter(function (x) { return x.id === state.group; })[0];
+    $('roomName').textContent = g.name;
+    $('roomHint').textContent = g.hint;
+    var rows = allMsgs().filter(function (m) { return m.group === state.group; });
+    var html = '';
+    var lastDay = '';
+    rows.forEach(function (m) {
+      var d = dayLabel(m.at);
+      if (d !== lastDay) {
+        html += '<div class="day">' + esc(d) + '</div>';
+        lastDay = d;
+      }
+      var mine = m.from === ME;
+      html += '<div class="row' + (mine ? ' mine' : '') + '"><div class="bubble">' +
+        '<div class="from">' + esc(m.from) + '</div>' +
+        '<div class="tx">' + esc(m.text) + '</div>' +
+        '<div class="tm">' + esc(hm(m.at)) + '</div></div></div>';
+    });
+    $('log').innerHTML = html;
+    $('log').scrollTop = $('log').scrollHeight;
+  }
+  function refresh() {
+    renderSide();
+    renderLog();
+  }
+  function todayYmd() {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(new Date());
+  }
+  function nowText() {
+    var t = new Intl.DateTimeFormat('en-GB', {
+      timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(new Date());
+    return todayYmd() + ' ' + t;
+  }
+  function nextId() {
+    return 'C-L-' + Date.now();
+  }
+  $('side').addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-g]');
+    if (!t) return;
+    state.group = t.getAttribute('data-g');
+    refresh();
+  });
+  $('form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var text = $('input').value.trim();
+    if (!text) return;
+    state.extra.push(msg(nextId(), state.group, ME, nowText(), text));
+    saveExtra();
+    $('input').value = '';
+    refresh();
+    $('input').focus();
+  });
+  $('input').addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter' && !ev.shiftKey) {
+      ev.preventDefault();
+      $('form').requestSubmit();
+    }
+  });
+  state.extra = loadExtra();
+  refresh();
+})();
+</script>
+</body>
+</html>
