@@ -9,6 +9,11 @@ below, then run::
 
 Relative hrefs are computed from each HTML file so the same GROUPS list
 works at the repo root, one level down (``us/``), or two (``pages/ai-evo/``).
+
+Pages with ``hidden: True`` stay listed so the path is not forgotten, but
+they are not rendered in the tab bar and their files are not rewritten.
+「题材」is kept hidden this way — do not resurrect it into visible nav.
+Do not restore retired groups such as 「仓位管理」 or 「生活」.
 """
 from __future__ import annotations
 
@@ -18,7 +23,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# (label, path-to-index.html, optional show_sub)
+# (label, path-to-index.html, optional show_sub / hidden)
 # A group with a single page and show_sub=False renders only the top row
 # (current A股 / 大盘 style). show_sub=True always shows the child row
 # so a one-page group can still name the board (研究 / 模型/AI探索).
@@ -45,7 +50,8 @@ GROUPS = [
             {"label": "10日新高", "path": "index.html"},
             {"label": "上穿EMA", "path": "ema-x/index.html"},
             {"label": "EMA上方", "path": "ema-up/index.html"},
-            {"label": "题材", "path": "theme/index.html"},
+            {"label": "突破EMA50", "path": "ema-50/index.html"},
+            {"label": "题材", "path": "theme/index.html", "hidden": True},
         ],
     },
     {
@@ -53,6 +59,13 @@ GROUPS = [
         "show_sub": True,
         "pages": [
             {"label": "模型/AI探索", "path": "pages/ai-evo/index.html"},
+        ],
+    },
+    {
+        "label": "办公",
+        "show_sub": True,
+        "pages": [
+            {"label": "请假审批", "path": "leave/index.html"},
         ],
     },
 ]
@@ -82,6 +95,10 @@ NAV_RE = re.compile(
 BARE_MARK = "<!--SITE_NAV-->"
 
 
+def visible_pages(g: dict) -> list:
+    return [p for p in g["pages"] if not p.get("hidden")]
+
+
 def href_to(from_html: str, to_html: str) -> str:
     from_dir = os.path.dirname(from_html) or "."
     to_dir = os.path.dirname(to_html) or "."
@@ -95,6 +112,8 @@ def find_current(rel_html: str):
     rel_html = rel_html.replace("\\", "/")
     for gi, g in enumerate(GROUPS):
         for pi, p in enumerate(g["pages"]):
+            if p.get("hidden"):
+                continue
             if p["path"] == rel_html:
                 return gi, pi
     return None, None
@@ -104,7 +123,10 @@ def render_nav(rel_html: str) -> str:
     gi, pi = find_current(rel_html)
     g_parts = []
     for i, g in enumerate(GROUPS):
-        href = href_to(rel_html, g["pages"][0]["path"])
+        vis = visible_pages(g)
+        if not vis:
+            continue
+        href = href_to(rel_html, vis[0]["path"])
         on = i == gi
         cls = ' class="on"' if on else ""
         ac = ' aria-current="page"' if on and not g["show_sub"] else ""
@@ -118,9 +140,11 @@ def render_nav(rel_html: str) -> str:
     s_html = ""
     if gi is not None and GROUPS[gi]["show_sub"]:
         s_parts = []
-        for j, p in enumerate(GROUPS[gi]["pages"]):
+        vis = visible_pages(GROUPS[gi])
+        current = GROUPS[gi]["pages"][pi] if pi is not None else None
+        for p in vis:
             href = href_to(rel_html, p["path"])
-            on = j == pi
+            on = p is current
             cls = ' class="on"' if on else ""
             ac = ' aria-current="page"' if on else ""
             s_parts.append(f'<a href="{href}"{cls}{ac}>{p["label"]}</a>')
@@ -140,7 +164,7 @@ def render_nav(rel_html: str) -> str:
 def iter_pages():
     seen = set()
     for g in GROUPS:
-        for p in g["pages"]:
+        for p in visible_pages(g):
             if p["path"] not in seen:
                 seen.add(p["path"])
                 yield p["path"]
@@ -173,14 +197,22 @@ def check() -> int:
             continue
         with open(path, "r", encoding="utf-8") as f:
             text = f.read()
-        for label in ("A股", "美股", "选股", "研究"):
+        for label in ("A股", "美股", "选股", "研究", "办公"):
             if f">{label}<" not in text:
                 errors.append(f"{rel}: missing group {label}")
+        if ">题材<" in text:
+            errors.append(f"{rel}: 题材 must stay hidden from visible nav")
+        if "仓位管理" in text or ">生活<" in text:
+            errors.append(f"{rel}: retired nav items must not return")
         gi, _ = find_current(rel)
         if gi is None:
             errors.append(f"{rel}: not in GROUPS")
         elif GROUPS[gi]["label"] == "研究" and "模型/AI探索" not in text:
             errors.append(f"{rel}: missing 模型/AI探索")
+        elif GROUPS[gi]["label"] == "办公" and "请假审批" not in text:
+            errors.append(f"{rel}: missing 请假审批")
+        elif GROUPS[gi]["label"] == "选股" and "突破EMA50" not in text:
+            errors.append(f"{rel}: missing 突破EMA50")
     # path sanity
     cases = [
         ("index.html", "market/index.html", "market/"),
@@ -189,11 +221,20 @@ def check() -> int:
         ("pages/ai-evo/index.html", "market/index.html", "../../market/"),
         ("pages/ai-evo/index.html", "index.html", "../../"),
         ("pages/ai-evo/index.html", "pages/ai-evo/index.html", "./"),
+        ("leave/index.html", "market/index.html", "../market/"),
+        ("leave/index.html", "index.html", "../"),
+        ("pages/ai-evo/index.html", "leave/index.html", "../../leave/"),
+        ("index.html", "leave/index.html", "leave/"),
     ]
     for src, dst, want in cases:
         got = href_to(src, dst)
         if got != want:
             errors.append(f"href_to({src},{dst})={got!r} want {want!r}")
+    hidden_nav = render_nav("index.html")
+    if ">题材<" in hidden_nav:
+        errors.append("render_nav(index.html) leaked 题材")
+    if "请假审批" not in render_nav("leave/index.html"):
+        errors.append("render_nav(leave/index.html) missing 请假审批")
     if errors:
         print("FAIL")
         for e in errors:
