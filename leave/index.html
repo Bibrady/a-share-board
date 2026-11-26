@@ -120,7 +120,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
       </div>
     </div>
     <div class="who">
-      <div class="who-t"><b>卓炀</b><span>提交 / 审批</span></div>
+      <div class="who-t"><b>沈予安</b><span>提交 / 审批</span></div>
     </div>
   </header>
 
@@ -152,7 +152,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
         </select>
       </label>
       <label class="fld"><span>申请人</span>
-        <input id="fApplicant" type="text" value="卓炀" readonly>
+        <select id="fApplicant"></select>
       </label>
       <label class="fld"><span class="req">开始日期</span>
         <input id="fStart" type="date" required>
@@ -233,14 +233,59 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
 <script>
 (function () {
   var TZ = 'Asia/Shanghai';
-  var STORE_KEY = 'shuoyuan_leave_v1';
-  var OPERATOR = '卓炀';
+  var STORE_KEY = 'shuoyuan_leave_v2';
+  var OPERATOR = '沈予安';
+  var ALT_OPERATOR = '顾衡';
+  var STAFF = ['沈予安', '顾衡', '林知夏', '周晏清', '陈予白', '许南乔', '江晚宁'];
   var TYPES = ['年假', '事假', '病假', '调休', '其他'];
   var STATUS_PENDING = '待审批';
   var STATUS_APPROVED = '已通过';
   var STATUS_REJECTED = '已驳回';
   var STATUS_CANCELLED = '已撤销';
   var state = { requests: [], decision: null };
+
+  function rec(id, name, type, start, end, days, reason, status, submittedAt, reviewer, reviewedAt, comment) {
+    return {
+      id: id, applicantName: name, type: type, startDate: start, endDate: end, days: days,
+      reason: reason, status: status, submittedAt: submittedAt,
+      reviewerName: reviewer || '', reviewedAt: reviewedAt || '', comment: comment || ''
+    };
+  }
+
+  /* 假期错开 2026 法定假：元旦1.1–3、春节2.15–23、清明4.4–6、劳动节5.1–5、端午6.19–21、中秋9.25–27、国庆10.1–7。接假只请前后工作日。 */
+  var SEED = [
+    rec('SY-20251229-001', '陈予白', '调休', '2025-12-31', '2025-12-31', 1, '抵年前加班，衔接元旦', '已通过', '2025-12-29 10:16:00', '沈予安', '2025-12-29 15:42:00', ''),
+    rec('SY-20251229-003', '许南乔', '年假', '2026-01-05', '2026-01-07', 3, '回杭州家里', '已通过', '2025-12-29 16:08:00', '沈予安', '2025-12-30 09:21:00', ''),
+    rec('SY-20260108-001', '林知夏', '病假', '2026-01-09', '2026-01-09', 0.5, '上午去医院复查', '已通过', '2026-01-08 09:04:00', '沈予安', '2026-01-08 09:36:00', ''),
+    rec('SY-20260120-001', '周晏清', '事假', '2026-01-22', '2026-01-23', 2, '搬家，要盯入户和宽带', '已通过', '2026-01-20 11:27:00', '沈予安', '2026-01-21 10:05:00', ''),
+    rec('SY-20260202-001', '顾衡', '年假', '2026-02-12', '2026-02-13', 2, '春节前回一趟宁波家里', '已通过', '2026-02-02 14:18:00', '沈予安', '2026-02-03 09:12:00', ''),
+    rec('SY-20260205-001', '江晚宁', '年假', '2026-02-24', '2026-02-26', 3, '接春节假，回武汉家里', '已通过', '2026-02-05 09:51:00', '沈予安', '2026-02-06 11:03:00', ''),
+    rec('SY-20260303-001', '许南乔', '事假', '2026-03-05', '2026-03-05', 0.5, '下午去学校开家长会', '已通过', '2026-03-03 16:40:00', '沈予安', '2026-03-03 17:08:00', ''),
+    rec('SY-20260318-001', '陈予白', '年假', '2026-03-23', '2026-03-27', 5, '回长沙家里', '已通过', '2026-03-18 10:22:00', '沈予安', '2026-03-18 14:55:00', ''),
+    rec('SY-20260325-001', '周晏清', '调休', '2026-04-03', '2026-04-03', 1, '抵上周值班，衔接清明', '已通过', '2026-03-25 09:17:00', '沈予安', '2026-03-26 09:44:00', ''),
+    rec('SY-20260408-001', '林知夏', '病假', '2026-04-09', '2026-04-10', 2, '感冒发烧，在家休息', '已通过', '2026-04-08 08:41:00', '沈予安', '2026-04-08 08:58:00', ''),
+    rec('SY-20260415-001', '沈予安', '年假', '2026-04-20', '2026-04-22', 3, '回苏州家里', '已通过', '2026-04-15 13:06:00', '顾衡', '2026-04-16 10:11:00', ''),
+    rec('SY-20260422-001', '江晚宁', '事假', '2026-04-29', '2026-04-30', 2, '想接劳动节出去几天', '已驳回', '2026-04-22 11:33:00', '沈予安', '2026-04-23 09:20:00', '劳动节前申请较集中，请改期。'),
+    rec('SY-20260424-001', '陈予白', '年假', '2026-04-29', '2026-04-30', 2, '接劳动节回趟长沙', '已通过', '2026-04-24 09:48:00', '沈予安', '2026-04-24 15:16:00', ''),
+    rec('SY-20260518-001', '顾衡', '其他', '2026-05-20', '2026-05-20', 0.5, '上午去银行办执照年检', '已通过', '2026-05-18 10:09:00', '沈予安', '2026-05-18 10:27:00', ''),
+    rec('SY-20260608-001', '周晏清', '调休', '2026-06-18', '2026-06-18', 1, '抵月初加班，衔接端午', '已通过', '2026-06-08 14:02:00', '沈予安', '2026-06-09 09:31:00', ''),
+    rec('SY-20260615-001', '许南乔', '事假', '2026-06-25', '2026-06-25', 1, '原定去外地办事', '已撤销', '2026-06-15 11:14:00', '许南乔', '2026-06-16 09:05:00', '申请人撤销'),
+    rec('SY-20260706-001', '林知夏', '年假', '2026-07-13', '2026-07-17', 5, '回成都家里', '已通过', '2026-07-06 09:28:00', '沈予安', '2026-07-07 10:46:00', ''),
+    rec('SY-20260720-001', '江晚宁', '病假', '2026-07-21', '2026-07-21', 0.5, '下午去看牙', '已通过', '2026-07-20 16:22:00', '沈予安', '2026-07-20 16:41:00', ''),
+    rec('SY-20260812-001', '陈予白', '事假', '2026-08-14', '2026-08-14', 1, '验房、办入户', '已通过', '2026-08-12 10:37:00', '沈予安', '2026-08-12 11:02:00', ''),
+    rec('SY-20260825-001', '周晏清', '年假', '2026-09-21', '2026-09-24', 4, '想接中秋回老家', '已驳回', '2026-08-25 15:19:00', '沈予安', '2026-08-26 09:48:00', '中秋前要交一版，请改到节后。'),
+    rec('SY-20260904-001', '周晏清', '年假', '2026-09-28', '2026-09-30', 3, '改到期后，衔接国庆回家', '已通过', '2026-09-04 09:12:00', '沈予安', '2026-09-04 11:26:00', ''),
+    rec('SY-20260918-001', '沈予安', '调休', '2026-10-08', '2026-10-09', 2, '抵国庆前值班，接国庆假', '已通过', '2026-09-18 13:44:00', '顾衡', '2026-09-18 16:03:00', ''),
+    rec('SY-20261013-001', '许南乔', '病假', '2026-10-14', '2026-10-14', 0.5, '上午去医院体检', '已通过', '2026-10-13 17:51:00', '沈予安', '2026-10-13 18:06:00', ''),
+    rec('SY-20261020-001', '江晚宁', '年假', '2026-10-26', '2026-10-30', 5, '回武汉家里', '已通过', '2026-10-20 09:33:00', '沈予安', '2026-10-21 10:17:00', ''),
+    rec('SY-20261103-001', '顾衡', '事假', '2026-11-06', '2026-11-06', 0.5, '上午去学校开家长会', '已通过', '2026-11-03 09:08:00', '沈予安', '2026-11-03 09:22:00', ''),
+    rec('SY-20261110-001', '陈予白', '调休', '2026-11-13', '2026-11-13', 1, '抵国庆期间值班', '已通过', '2026-11-10 10:41:00', '沈予安', '2026-11-10 14:18:00', ''),
+    rec('SY-20261112-001', '顾衡', '年假', '2026-12-21', '2026-12-24', 4, '年底回宁波家里', '已通过', '2026-11-12 11:05:00', '沈予安', '2026-11-12 15:39:00', ''),
+    rec('SY-20261117-001', '江晚宁', '年假', '2026-12-28', '2026-12-31', 4, '衔接元旦，回武汉家里', '已通过', '2026-11-17 09:56:00', '沈予安', '2026-11-18 10:24:00', ''),
+    rec('SY-20261120-001', '林知夏', '事假', '2026-11-26', '2026-11-27', 2, '搬家，要盯入户', '已通过', '2026-11-20 14:13:00', '沈予安', '2026-11-21 09:47:00', ''),
+    rec('SY-20261124-001', '周晏清', '调休', '2026-11-27', '2026-11-27', 1, '抵上次周末值班', '待审批', '2026-11-24 16:28:00', '', '', ''),
+    rec('SY-20261125-003', '许南乔', '病假', '2026-11-30', '2026-11-30', 0.5, '下午去医院复查', '待审批', '2026-11-25 09:19:00', '', '', '')
+  ];
 
   var $ = function (id) { return document.getElementById(id); };
   var banner = $('banner');
@@ -288,26 +333,70 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     banner.textContent = msg;
   }
 
-  function loadStore() {
+  function loadLocal() {
     try {
       var raw = localStorage.getItem(STORE_KEY);
-      if (!raw) return [];
+      if (!raw) return { created: [], updates: {} };
       var data = JSON.parse(raw);
-      return Array.isArray(data.requests) ? data.requests : [];
+      return {
+        created: Array.isArray(data.created) ? data.created : [],
+        updates: data.updates && typeof data.updates === 'object' ? data.updates : {}
+      };
     } catch (e) {
       showBanner('本机记录读取失败。若曾手动改过浏览器存储，请清除本站数据后重试。', 'err');
-      return [];
+      return { created: [], updates: {} };
     }
   }
 
+  function assemble() {
+    var loc = loadLocal();
+    var seedIds = {};
+    var rows = SEED.map(function (s) {
+      seedIds[s.id] = true;
+      var u = loc.updates[s.id];
+      return u ? Object.assign({}, s, u) : Object.assign({}, s);
+    });
+    loc.created.forEach(function (r) {
+      if (r && r.id && !seedIds[r.id]) rows.push(r);
+    });
+    rows.sort(function (a, b) {
+      if (a.submittedAt === b.submittedAt) return a.id < b.id ? 1 : -1;
+      return a.submittedAt < b.submittedAt ? 1 : -1;
+    });
+    return rows;
+  }
+
   function saveStore() {
+    var seedById = {};
+    SEED.forEach(function (s) { seedById[s.id] = s; });
+    var created = [];
+    var updates = {};
+    state.requests.forEach(function (r) {
+      var s = seedById[r.id];
+      if (s) {
+        if (r.status !== s.status || r.comment !== s.comment || r.reviewerName !== s.reviewerName || r.reviewedAt !== s.reviewedAt) {
+          updates[r.id] = {
+            status: r.status,
+            reviewerName: r.reviewerName,
+            reviewedAt: r.reviewedAt,
+            comment: r.comment
+          };
+        }
+      } else {
+        created.push(r);
+      }
+    });
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ requests: state.requests }));
+      localStorage.setItem(STORE_KEY, JSON.stringify({ created: created, updates: updates }));
       return true;
     } catch (e) {
       showBanner('无法写入本机存储。请检查浏览器是否禁用了本地存储，或存储空间是否已满。', 'err');
       return false;
     }
+  }
+
+  function reviewerFor(name) {
+    return name === OPERATOR ? ALT_OPERATOR : OPERATOR;
   }
 
   function nextId(today) {
@@ -532,9 +621,11 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     if (n > 0 && days > n) {
       msg.textContent = '天数不能超过自然日数（' + n + ' 天）。排除周末请下调天数。'; return;
     }
+    var applicant = $('fApplicant').value;
+    if (STAFF.indexOf(applicant) === -1) { msg.textContent = '请选择申请人。'; return; }
     var rec = {
       id: nextId(todayYmd()),
-      applicantName: OPERATOR,
+      applicantName: applicant,
       type: type,
       startDate: start,
       endDate: end,
@@ -588,7 +679,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     if (kind === 'approve') rec.status = STATUS_APPROVED;
     else if (kind === 'reject') rec.status = STATUS_REJECTED;
     else rec.status = STATUS_CANCELLED;
-    rec.reviewerName = OPERATOR;
+    rec.reviewerName = kind === 'cancel' ? rec.applicantName : reviewerFor(rec.applicantName);
     rec.reviewedAt = nowText();
     rec.comment = kind === 'cancel' ? '申请人撤销' : comment;
     if (!saveStore()) {
@@ -603,7 +694,10 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     showBanner(kind === 'approve' ? '已通过该请假单。' : kind === 'reject' ? '已驳回该请假单。' : '已撤销该请假单。', 'ok');
   });
 
-  state.requests = loadStore();
+  $('fApplicant').innerHTML = STAFF.map(function (n) {
+    return '<option value="' + esc(n) + '"' + (n === OPERATOR ? ' selected' : '') + '>' + esc(n) + '</option>';
+  }).join('');
+  state.requests = assemble();
   var t = todayYmd();
   $('fStart').value = t;
   $('fEnd').value = t;
