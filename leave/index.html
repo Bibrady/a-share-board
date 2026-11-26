@@ -39,6 +39,7 @@ label.fld{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(
 label.fld span.req::after{content:" *";color:var(--danger)}
 input,select,textarea,button{font:inherit}
 input,select,textarea{width:100%;border:1px solid var(--bd);background:#fff;color:var(--fg);border-radius:0;padding:0 10px;min-height:40px}
+input[readonly]{background:var(--pn2);color:var(--fg)}
 textarea{padding:8px 10px;min-height:88px;resize:vertical;line-height:1.5}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .hint{font-size:12px;color:var(--mut);margin-top:2px}
@@ -107,7 +108,7 @@ tr:last-child td{border-bottom:0}
 </style>
 </head>
 <body>
-<!--SITE_NAV--><style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pages/ai-evo/">研究</a><a href="./" class="on">办公</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="./" class="on" aria-current="page">请假审批</a><a href="../chat/">内部聊天</a></div></nav>
+<!--SITE_NAV--><style>.stab{background:#FFFFFF;border-top:2px solid #1A3A6B;border-bottom:1px solid #E5E2DA;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}.stab .stab-g,.stab .stab-s{max-width:1180px;margin:0 auto;display:flex;gap:4px}.stab .stab-g a,.stab .stab-s a{flex:0 1 auto;display:block;padding:0 16px;height:44px;line-height:44px;font-size:15.5px;font-weight:600;color:#666666;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent}.stab .stab-g a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}.stab .stab-s{border-top:1px solid #E5E2DA;background:#FBF9F4}.stab .stab-s a{height:38px;line-height:38px;font-size:14px;font-weight:600;color:#666666}.stab .stab-s a.on{color:#1A3A6B;border-bottom-color:#1A3A6B}@media (max-width:759px){.stab .stab-g a,.stab .stab-s a{flex:1;text-align:center;padding:0 2px;font-size:13px}.stab .stab-s a{font-size:12.5px;height:36px;line-height:36px}}@media (max-width:420px){.stab .stab-g,.stab .stab-s{gap:0}.stab .stab-g a{font-size:13px;padding:0 1px}.stab .stab-s a{font-size:12px;padding:0 1px}}@media (max-width:350px){.stab .stab-g a,.stab .stab-s a{font-size:11px}}</style><nav class="stab" aria-label="看板分类"><div class="stab-g" role="navigation" aria-label="大类"><a href="../market/">A股</a><a href="../us/">美股</a><a href="../">选股</a><a href="../pages/ai-evo/">研究</a><a href="./" class="on">办公</a></div><div class="stab-s" role="navigation" aria-label="子看板"><a href="./" class="on" aria-current="page">请假审批</a><a href="../chat/">对话</a></div></nav>
 <div class="wrap">
   <header class="top">
     <div class="brand">
@@ -149,7 +150,7 @@ tr:last-child td{border-bottom:0}
         </select>
       </label>
       <label class="fld"><span>申请人</span>
-        <select id="fApplicant"></select>
+        <input id="fApplicant" type="text" readonly>
       </label>
       <label class="fld"><span class="req">开始日期</span>
         <input id="fStart" type="date" required>
@@ -229,9 +230,9 @@ tr:last-child td{border-bottom:0}
 <script>
 (function () {
   var TZ = 'Asia/Shanghai';
-  var STORE_KEY = 'shuoyuan_leave_v4';
+  var STORE_KEY = 'shuoyuan_leave_v5';
   var OPERATOR = '卓炀';
-  var STAFF = ['林知夏', '周晏清', '陈予白'];
+  var SELF_APPLICANT = '师卓炀';
   var TYPES = ['年假', '事假', '病假', '调休', '其他'];
   var STATUS_PENDING = '待审批';
   var STATUS_APPROVED = '已通过';
@@ -254,7 +255,7 @@ tr:last-child td{border-bottom:0}
     rec('SY-20260916-001', '林知夏', '病假', '2026-09-18', '2026-09-18', 0.5, '上午去医院复查', '已通过', '2026-09-16 16:40:00', '卓炀', '2026-09-16 17:05:00', ''),
     rec('SY-20261020-001', '陈予白', '年假', '2026-10-26', '2026-10-27', 2, '回长沙家里', '已通过', '2026-10-20 09:33:00', '卓炀', '2026-10-21 10:17:00', ''),
     rec('SY-20261124-001', '林知夏', '事假', '2026-11-26', '2026-11-26', 1, '家里有事，请全天', '已通过', '2026-11-24 16:28:00', '卓炀', '2026-11-25 09:12:00', ''),
-    rec('SY-20261125-001', '卓炀', '病假', '2026-11-26', '2026-11-27', 2, '身体不适', '已通过', '2026-11-25 18:41:00', '卓炀', '2026-11-25 19:06:00', '')
+    rec('SY-20261125-001', '师卓炀', '病假', '2026-11-26', '2026-11-27', 2, '身体不适', '已通过', '2026-11-25 18:41:00', '卓炀', '2026-11-25 19:06:00', '')
   ];
 
   var $ = function (id) { return document.getElementById(id); };
@@ -592,7 +593,7 @@ tr:last-child td{border-bottom:0}
       msg.textContent = '天数不能超过自然日数（' + n + ' 天）。排除周末请下调天数。'; return;
     }
     var applicant = $('fApplicant').value;
-    if (STAFF.indexOf(applicant) === -1) { msg.textContent = '请选择申请人。'; return; }
+    if (applicant !== SELF_APPLICANT) { msg.textContent = '申请人须为本人。'; return; }
     var rec = {
       id: nextId(todayYmd()),
       applicantName: applicant,
@@ -664,9 +665,7 @@ tr:last-child td{border-bottom:0}
     showBanner(kind === 'approve' ? '已通过该请假单。' : kind === 'reject' ? '已驳回该请假单。' : '已撤销该请假单。', 'ok');
   });
 
-  $('fApplicant').innerHTML = STAFF.map(function (n) {
-    return '<option value="' + esc(n) + '">' + esc(n) + '</option>';
-  }).join('');
+  $('fApplicant').value = SELF_APPLICANT;
   state.requests = assemble();
   var t = todayYmd();
   $('fStart').value = t;
