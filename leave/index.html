@@ -84,7 +84,6 @@ tr:last-child td{border-bottom:0}
 .dlg-bd{padding:20px 20px 16px}
 .dlg-bd h3{margin:0 0 8px;font-size:16px;color:var(--ttl)}
 .dlg-ft{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--bd);background:var(--pn2)}
-footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line-height:1.7}
 [hidden]{display:none !important}
 @media (max-width:759px){
   .wrap{padding:0 12px 32px}
@@ -227,11 +226,10 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
   </form>
 </dialog>
 
-<footer>朔元内部 · 请假记录只存在本机浏览器，不写入仓库、不随站点公开</footer>
 <script>
 (function () {
   var TZ = 'Asia/Shanghai';
-  var STORE_KEY = 'shuoyuan_leave_v3';
+  var STORE_KEY = 'shuoyuan_leave_v4';
   var OPERATOR = '卓炀';
   var STAFF = ['林知夏', '周晏清', '陈予白'];
   var TYPES = ['年假', '事假', '病假', '调休', '其他'];
@@ -255,7 +253,8 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     rec('SY-20260814-001', '周晏清', '事假', '2026-08-16', '2026-08-16', 1, '回老家办事', '已通过', '2026-08-14 09:47:00', '卓炀', '2026-08-14 11:16:00', ''),
     rec('SY-20260916-001', '林知夏', '病假', '2026-09-18', '2026-09-18', 0.5, '上午去医院复查', '已通过', '2026-09-16 16:40:00', '卓炀', '2026-09-16 17:05:00', ''),
     rec('SY-20261020-001', '陈予白', '年假', '2026-10-26', '2026-10-27', 2, '回长沙家里', '已通过', '2026-10-20 09:33:00', '卓炀', '2026-10-21 10:17:00', ''),
-    rec('SY-20261124-001', '林知夏', '事假', '2026-11-26', '2026-11-26', 1, '家里有事，请全天', '已通过', '2026-11-24 16:28:00', '卓炀', '2026-11-25 09:12:00', '')
+    rec('SY-20261124-001', '林知夏', '事假', '2026-11-26', '2026-11-26', 1, '家里有事，请全天', '已通过', '2026-11-24 16:28:00', '卓炀', '2026-11-25 09:12:00', ''),
+    rec('SY-20261125-001', '卓炀', '病假', '2026-11-26', '2026-11-27', 2, '身体不适', '已通过', '2026-11-25 18:41:00', '卓炀', '2026-11-25 19:06:00', '')
   ];
 
   var $ = function (id) { return document.getElementById(id); };
