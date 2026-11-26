@@ -21,20 +21,15 @@ a{color:var(--acc)}
 .mark{flex:none;background:var(--acc);color:#fff;font-size:13px;font-weight:700;letter-spacing:.18em;padding:7px 9px;line-height:1}
 .brand h1{margin:0;font-size:20px;font-weight:650;color:var(--ttl);letter-spacing:.02em}
 .sub{margin-top:3px;font-size:12.5px;color:var(--mut)}
-.who{display:flex;align-items:center;gap:10px}
-.who-t{text-align:right;min-width:0}
+.who{display:flex;align-items:center;gap:10px;flex:none}
+.who-t{text-align:right;white-space:nowrap}
 .who-t b{display:block;font-size:13.5px;font-weight:650}
-.who-t span{display:block;font-size:12px;color:var(--mut);word-break:break-all}
+.who-t span{display:block;font-size:12px;color:var(--mut)}
 .panel{background:var(--pn);border:1px solid var(--bd);padding:22px 22px 20px;margin-bottom:16px}
-.panel h2{margin:0 0 14px;font-size:15px;font-weight:650;color:var(--ttl);letter-spacing:.02em;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.panel h2 small{font-weight:400;color:var(--mut);font-size:12.5px}
-.gate{padding:28px 24px}
-.gate h2{font-size:18px;margin:0 0 8px}
-.lead{margin:0 0 16px;color:var(--mut);font-size:13.5px;line-height:1.65;max-width:46em}
-.steps{margin:0;padding-left:1.2em;color:var(--fg);font-size:13.5px;line-height:1.7}
-.steps li{margin:0 0 6px}
-.note{margin:16px 0 0;font-size:12.5px;color:var(--mut);line-height:1.6;background:var(--pn2);border:1px solid var(--bd);padding:10px 12px}
-.gsi{display:flex;justify-content:center;margin:18px 0 8px;min-height:44px}
+.panel h2{margin:0 0 14px;font-size:15px;font-weight:650;color:var(--ttl);letter-spacing:.02em;display:flex;justify-content:space-between;align-items:baseline;gap:8px 16px;flex-wrap:wrap}
+.panel h2 .ttl{flex:none;white-space:nowrap}
+.panel h2 small{font-weight:400;color:var(--mut);font-size:12.5px;line-height:1.45}
+.lead{margin:0 0 16px;color:var(--mut);font-size:13.5px;line-height:1.65;max-width:46em;overflow-wrap:anywhere}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .kpi{background:var(--pn);border:1px solid var(--bd);padding:14px 16px}
 .kpi .l{font-size:12px;color:var(--mut);letter-spacing:.04em}
@@ -95,14 +90,17 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
 @media (max-width:759px){
   .wrap{padding:0 12px 32px}
   .top{margin:0 -12px 16px;padding:14px 12px 12px}
-  .panel,.gate{padding:16px 14px}
+  .panel{padding:16px 14px}
   .form{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr}
   .kpi .v{font-size:24px}
   .tw{display:none}
   .cards{display:block}
-  .who-t{text-align:left}
+  .who-t{text-align:right}
+  .who-t span{display:none}
   .brand h1{font-size:18px}
+  .panel h2{display:block}
+  .panel h2 small{display:block;margin-top:4px}
 }
 @media (min-width:760px){
   body{font-size:14.5px}
@@ -118,123 +116,101 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
       <div class="mark" aria-hidden="true">朔元</div>
       <div>
         <h1>请假审批</h1>
-        <div class="sub">内部审批工作台 · 时区 Asia/Shanghai</div>
+        <div class="sub">内部审批工作台 · 时区 Asia/Shanghai · 单据仅保存在本机浏览器</div>
       </div>
     </div>
-    <div class="who" id="who" hidden>
-      <div class="who-t"><b id="whoName"></b><span id="whoMail"></span></div>
-      <button type="button" class="btn ghost sm" id="btnOut">退出</button>
+    <div class="who">
+      <div class="who-t"><b>卓炀</b><span>提交 / 审批</span></div>
     </div>
   </header>
 
   <div id="banner" class="banner" hidden></div>
 
-  <section class="panel gate" id="viewSetup" hidden>
-    <h2>待完成接入</h2>
-    <p class="lead">请假数据存放在公司私有表格中。本页尚未配置 Google 登录与审批后端，因此不会加载任何单据，也不会向表格发送请求。</p>
-    <ol class="steps">
-      <li>按 <code>leave/apps-script/README.md</code> 部署 Apps Script Web App（执行者 = 脚本所有者，访问者 = 任何人）。</li>
-      <li>创建 Web 应用类型的 OAuth 客户端 ID，授权 JavaScript 来源包含 <code>https://bibrady.github.io</code>。</li>
-      <li>将客户端 ID 与 Web App 地址写入 <code>leave/config.js</code> 后重新发布站点。</li>
-    </ol>
-    <p class="note">在完成上述步骤前，此页只作占位。请勿把服务账号密钥、可写 webhook 或表格内容提交进仓库。</p>
+  <section class="kpis" aria-label="审批总览">
+    <div class="kpi"><div class="l">待审批</div><div class="v" id="kPending">0</div></div>
+    <div class="kpi"><div class="l">已通过</div><div class="v" id="kApproved">0</div></div>
+    <div class="kpi"><div class="l">已驳回</div><div class="v" id="kRejected">0</div></div>
+    <div class="kpi"><div class="l">进行中</div><div class="v" id="kOngoing">0</div></div>
   </section>
 
-  <section class="panel gate" id="viewLogin" hidden>
-    <h2>请使用公司 Google 账号登录</h2>
-    <p class="lead">朔元请假审批仅对授权邮箱开放。未登录时不会展示任何请假记录、统计或草稿。</p>
-    <div class="gsi" id="gsiBtn"></div>
-    <p class="note">登录后系统将校验 Google 身份令牌与邮箱白名单。非授权账号无法查看单据。</p>
+  <section class="panel" id="secAgenda">
+    <h2><span class="ttl">即将开始 / 进行中</span> <small>仅统计已通过且尚未结束的假期</small></h2>
+    <ul class="agenda" id="agenda"></ul>
+    <div class="empty" id="agendaEmpty">目前没有即将开始或正在进行的已通过假期。</div>
   </section>
 
-  <section class="panel gate" id="viewDenied" hidden>
-    <h2>账号未授权</h2>
-    <p class="lead" id="deniedLead">此 Google 账号不在请假系统授权名单中，无法查看或提交单据。</p>
-    <div class="actions"><button type="button" class="btn ghost" id="btnDeniedOut">更换账号</button></div>
-  </section>
-
-  <div id="viewApp" hidden>
-    <section class="kpis" aria-label="审批总览">
-      <div class="kpi"><div class="l">待审批</div><div class="v" id="kPending">0</div></div>
-      <div class="kpi"><div class="l">已通过</div><div class="v" id="kApproved">0</div></div>
-      <div class="kpi"><div class="l">已驳回</div><div class="v" id="kRejected">0</div></div>
-      <div class="kpi"><div class="l">进行中</div><div class="v" id="kOngoing">0</div></div>
-    </section>
-
-    <section class="panel" id="secAgenda">
-      <h2>即将开始 / 进行中 <small>仅统计已通过且尚未结束的假期</small></h2>
-      <ul class="agenda" id="agenda"></ul>
-      <div class="empty" id="agendaEmpty">目前没有即将开始或正在进行的已通过假期。</div>
-    </section>
-
-    <section class="panel">
-      <h2>提交请假 <small>天数按自然日（含周末）预填，可改为 0.5 的倍数</small></h2>
-      <form id="form" class="form" novalidate>
-        <label class="fld"><span class="req">请假类型</span>
-          <select id="fType" required></select>
-        </label>
-        <label class="fld"><span>申请人</span>
-          <input id="fApplicant" type="text" readonly>
-        </label>
-        <label class="fld"><span class="req">开始日期</span>
-          <input id="fStart" type="date" required>
-        </label>
-        <label class="fld"><span class="req">结束日期</span>
-          <input id="fEnd" type="date" required>
-        </label>
-        <label class="fld"><span class="req">天数</span>
-          <input id="fDays" type="number" min="0.5" step="0.5" required>
-          <span class="hint" id="fDaysHint"></span>
-        </label>
-        <label class="fld full"><span class="req">事由</span>
-          <textarea id="fReason" maxlength="500" placeholder="请说明请假原因，便于审批留档。" required></textarea>
-        </label>
-        <div class="full actions">
-          <button type="submit" class="btn" id="btnSubmit">提交申请</button>
-          <span class="hint" id="formMsg"></span>
-        </div>
-      </form>
-    </section>
-
-    <section class="panel">
-      <h2>请假单据 <small id="listMeta"></small></h2>
-      <div class="filters">
-        <label>状态
-          <select id="qStatus">
-            <option value="">全部</option>
-            <option value="待审批">待审批</option>
-            <option value="已通过">已通过</option>
-            <option value="已驳回">已驳回</option>
-            <option value="已撤销">已撤销</option>
-          </select>
-        </label>
-        <label>从 <input id="qFrom" type="date"></label>
-        <label>至 <input id="qTo" type="date"></label>
-        <button type="button" class="btn quiet sm" id="btnReset">重置筛选</button>
-        <button type="button" class="btn ghost sm" id="btnReload">刷新</button>
+  <section class="panel">
+    <h2><span class="ttl">提交请假</span> <small>天数按自然日（含周末）预填，可改为 0.5 的倍数</small></h2>
+    <form id="form" class="form" novalidate>
+      <label class="fld"><span class="req">请假类型</span>
+        <select id="fType" required>
+          <option value="年假">年假</option>
+          <option value="事假">事假</option>
+          <option value="病假">病假</option>
+          <option value="调休">调休</option>
+          <option value="其他">其他</option>
+        </select>
+      </label>
+      <label class="fld"><span>申请人</span>
+        <input id="fApplicant" type="text" value="卓炀" readonly>
+      </label>
+      <label class="fld"><span class="req">开始日期</span>
+        <input id="fStart" type="date" required>
+      </label>
+      <label class="fld"><span class="req">结束日期</span>
+        <input id="fEnd" type="date" required>
+      </label>
+      <label class="fld"><span class="req">天数</span>
+        <input id="fDays" type="number" min="0.5" step="0.5" required>
+        <span class="hint" id="fDaysHint"></span>
+      </label>
+      <label class="fld full"><span class="req">事由</span>
+        <textarea id="fReason" maxlength="500" placeholder="请说明请假原因，便于审批留档。" required></textarea>
+      </label>
+      <div class="full actions">
+        <button type="submit" class="btn" id="btnSubmit">提交申请</button>
+        <span class="hint" id="formMsg"></span>
       </div>
-      <div class="tw">
-        <table>
-          <thead>
-            <tr>
-              <th>单号</th>
-              <th>申请人</th>
-              <th>类型</th>
-              <th>期间</th>
-              <th class="num">天数</th>
-              <th>事由</th>
-              <th>状态</th>
-              <th>审批</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tb"></tbody>
-        </table>
-      </div>
-      <div class="cards" id="cards"></div>
-      <div class="empty" id="listEmpty" hidden>没有符合条件的请假单。</div>
-    </section>
-  </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2><span class="ttl">请假单据</span> <small id="listMeta"></small></h2>
+    <div class="filters">
+      <label>状态
+        <select id="qStatus">
+          <option value="">全部</option>
+          <option value="待审批">待审批</option>
+          <option value="已通过">已通过</option>
+          <option value="已驳回">已驳回</option>
+          <option value="已撤销">已撤销</option>
+        </select>
+      </label>
+      <label>从 <input id="qFrom" type="date"></label>
+      <label>至 <input id="qTo" type="date"></label>
+      <button type="button" class="btn quiet sm" id="btnReset">重置筛选</button>
+    </div>
+    <div class="tw" id="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>单号</th>
+            <th>申请人</th>
+            <th>类型</th>
+            <th>期间</th>
+            <th class="num">天数</th>
+            <th>事由</th>
+            <th>状态</th>
+            <th>审批</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+    <div class="cards" id="cards"></div>
+    <div class="empty" id="listEmpty" hidden>没有符合条件的请假单。</div>
+  </section>
 </div>
 
 <dialog id="dlg" aria-labelledby="dlgTitle">
@@ -242,7 +218,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     <div class="dlg-bd">
       <h3 id="dlgTitle">审批请假单</h3>
       <p class="lead" id="dlgLead"></p>
-      <label class="fld"><span id="dlgCommentLabel">审批意见</span>
+      <label class="fld" id="dlgCommentWrap"><span id="dlgCommentLabel">审批意见</span>
         <textarea id="dlgComment" maxlength="200" placeholder="选填；驳回时请写明原因。"></textarea>
       </label>
     </div>
@@ -253,42 +229,33 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
   </form>
 </dialog>
 
-<footer>朔元内部 · 请假记录不入库、不随站点公开</footer>
-<script src="config.js"></script>
+<footer>朔元内部 · 请假记录只存在本机浏览器，不写入仓库、不随站点公开</footer>
 <script>
 (function () {
   var TZ = 'Asia/Shanghai';
-  var TOKEN_KEY = 'shuoyuan_leave_id_token';
-  var state = {
-    token: '',
-    me: null,
-    types: [],
-    requests: [],
-    summary: null,
-    decision: null
-  };
+  var STORE_KEY = 'shuoyuan_leave_v1';
+  var OPERATOR = '卓炀';
+  var TYPES = ['年假', '事假', '病假', '调休', '其他'];
+  var STATUS_PENDING = '待审批';
+  var STATUS_APPROVED = '已通过';
+  var STATUS_REJECTED = '已驳回';
+  var STATUS_CANCELLED = '已撤销';
+  var state = { requests: [], decision: null };
 
   var $ = function (id) { return document.getElementById(id); };
-  var viewSetup = $('viewSetup'), viewLogin = $('viewLogin'), viewDenied = $('viewDenied'), viewApp = $('viewApp');
   var banner = $('banner');
-
-  function cfg() { return window.LEAVE_CONFIG || {}; }
-
-  function isConfigured() {
-    var c = cfg();
-    var id = String(c.googleClientId || '').trim();
-    var url = String(c.appsScriptUrl || '').trim();
-    if (!id || !url) return false;
-    if (/YOUR_|PLACEHOLDER|示例|xxxx/i.test(id + url)) return false;
-    if (id.indexOf('.apps.googleusercontent.com') === -1) return false;
-    if (!/^https:\/\/script\.google\.com\/macros\/s\//.test(url)) return false;
-    return true;
-  }
 
   function todayYmd() {
     return new Intl.DateTimeFormat('en-CA', {
       timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit'
     }).format(new Date());
+  }
+
+  function nowText() {
+    var t = new Intl.DateTimeFormat('en-GB', {
+      timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(new Date());
+    return todayYmd() + ' ' + t;
   }
 
   function naturalDays(start, end) {
@@ -314,25 +281,6 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     });
   }
 
-  function decodeJwt(token) {
-    try {
-      var part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-      var json = decodeURIComponent(atob(part).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(json);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function tokenValid(token) {
-    var p = decodeJwt(token);
-    if (!p || !p.email) return false;
-    if (p.exp && (p.exp * 1000) < Date.now() + 15000) return false;
-    return true;
-  }
-
   function showBanner(msg, kind) {
     if (!msg) { banner.hidden = true; banner.textContent = ''; return; }
     banner.hidden = false;
@@ -340,187 +288,96 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     banner.textContent = msg;
   }
 
-  function showOnly(el) {
-    viewSetup.hidden = el !== viewSetup;
-    viewLogin.hidden = el !== viewLogin;
-    viewDenied.hidden = el !== viewDenied;
-    viewApp.hidden = el !== viewApp;
-  }
-
-  function setWho(me) {
-    var box = $('who');
-    if (!me) { box.hidden = true; return; }
-    box.hidden = false;
-    $('whoName').textContent = me.name || '已登录';
-    $('whoMail').textContent = me.email || '';
-  }
-
-  function loadGis(cb) {
-    if (window.google && google.accounts && google.accounts.id) { cb(); return; }
-    var s = document.createElement('script');
-    s.src = 'https://accounts.google.com/gsi/client';
-    s.async = true;
-    s.defer = true;
-    s.onload = cb;
-    s.onerror = function () {
-      showBanner('无法加载 Google 登录组件。请检查网络后刷新本页。', 'err');
-    };
-    document.head.appendChild(s);
-  }
-
-  function renderButton() {
-    var host = $('gsiBtn');
-    host.innerHTML = '';
-    google.accounts.id.initialize({
-      client_id: cfg().googleClientId,
-      callback: onCredential,
-      auto_select: false,
-      ux_mode: 'popup',
-      itp_support: true
-    });
-    google.accounts.id.renderButton(host, {
-      theme: 'outline',
-      size: 'large',
-      text: 'signin_with',
-      locale: 'zh-CN',
-      width: 280
-    });
-  }
-
-  function onCredential(resp) {
-    if (!resp || !resp.credential) {
-      showBanner('未取得 Google 登录凭证，请重试。', 'err');
-      return;
+  function loadStore() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return [];
+      var data = JSON.parse(raw);
+      return Array.isArray(data.requests) ? data.requests : [];
+    } catch (e) {
+      showBanner('本机记录读取失败。若曾手动改过浏览器存储，请清除本站数据后重试。', 'err');
+      return [];
     }
-    state.token = resp.credential;
-    try { sessionStorage.setItem(TOKEN_KEY, resp.credential); } catch (e) {}
-    bootstrap();
   }
 
-  function logout(next) {
-    state.token = '';
-    state.me = null;
-    state.requests = [];
-    state.summary = null;
-    try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
-    try { if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); } catch (e) {}
-    setWho(null);
-    showBanner('');
-    showOnly(viewLogin);
-    if (typeof google !== 'undefined' && google.accounts) renderButton();
-    if (next) next();
+  function saveStore() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ requests: state.requests }));
+      return true;
+    } catch (e) {
+      showBanner('无法写入本机存储。请检查浏览器是否禁用了本地存储，或存储空间是否已满。', 'err');
+      return false;
+    }
   }
 
-  function api(action, payload) {
-    var body = Object.assign({ action: action, idToken: state.token }, payload || {});
-    return fetch(cfg().appsScriptUrl, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
-    }).then(function (res) {
-      return res.text().then(function (text) {
-        var data;
-        try { data = JSON.parse(text); }
-        catch (e) {
-          throw new Error('审批服务未返回有效结果。请确认 Web App 已部署，且访问者设置为「任何人」。');
-        }
-        if (!res.ok && !data) throw new Error('网络请求失败（' + res.status + '）。');
-        if (!data.ok) {
-          var err = new Error(data.message || '请求未能完成。');
-          err.code = data.error;
-          throw err;
-        }
-        return data;
-      });
+  function nextId(today) {
+    var prefix = 'SY-' + today.replace(/-/g, '') + '-';
+    var maxn = 0;
+    state.requests.forEach(function (r) {
+      if (r.id && r.id.indexOf(prefix) === 0) {
+        var n = parseInt(r.id.slice(prefix.length), 10);
+        if (n > maxn) maxn = n;
+      }
     });
+    var next = String(maxn + 1);
+    while (next.length < 3) next = '0' + next;
+    return prefix + next;
   }
 
-  function applyPayload(data) {
-    state.me = data.me;
-    state.types = data.types || [];
-    state.requests = data.requests || [];
-    state.summary = data.summary || {};
-    setWho(state.me);
-    fillTypes();
-    $('fApplicant').value = (state.me.name || '') + '  ·  ' + (state.me.email || '');
-    renderSummary();
+  function summarize() {
+    var today = todayYmd();
+    var pending = 0, approved = 0, rejected = 0;
+    var agenda = [];
+    state.requests.forEach(function (r) {
+      if (r.status === STATUS_PENDING) pending++;
+      else if (r.status === STATUS_APPROVED) approved++;
+      else if (r.status === STATUS_REJECTED) rejected++;
+      if (r.status === STATUS_APPROVED && r.startDate && r.endDate) {
+        var kind = '';
+        if (r.startDate <= today && today <= r.endDate) kind = 'ongoing';
+        else if (r.startDate > today) kind = 'upcoming';
+        if (kind) {
+          agenda.push({
+            id: r.id, kind: kind, applicantName: r.applicantName, type: r.type,
+            startDate: r.startDate, endDate: r.endDate, days: r.days
+          });
+        }
+      }
+    });
+    agenda.sort(function (a, b) {
+      if (a.startDate === b.startDate) return a.id < b.id ? -1 : 1;
+      return a.startDate < b.startDate ? -1 : 1;
+    });
+    return { pending: pending, approved: approved, rejected: rejected, agenda: agenda };
+  }
+
+  function refresh() {
+    var s = summarize();
+    $('kPending').textContent = s.pending;
+    $('kApproved').textContent = s.approved;
+    $('kRejected').textContent = s.rejected;
+    var ongoing = s.agenda.filter(function (x) { return x.kind === 'ongoing'; }).length;
+    $('kOngoing').textContent = ongoing;
+    var ul = $('agenda');
+    if (!s.agenda.length) {
+      ul.innerHTML = '';
+      $('agendaEmpty').hidden = false;
+    } else {
+      $('agendaEmpty').hidden = true;
+      ul.innerHTML = s.agenda.map(function (x) {
+        var tag = x.kind === 'ongoing' ? '进行中' : '即将开始';
+        return '<li><div><b>' + esc(x.applicantName) + '</b> · ' + esc(x.type) +
+          ' · ' + fmtDays(x.days) + ' 天<div class="muted">' + esc(x.startDate) + ' 至 ' + esc(x.endDate) +
+          '</div></div><span class="tag">' + tag + '</span></li>';
+      }).join('');
+    }
     renderList();
   }
 
-  function bootstrap() {
-    showBanner('正在核验身份并载入审批数据…');
-    return api('bootstrap').then(function (data) {
-      showOnly(viewApp);
-      showBanner('');
-      applyPayload(data);
-    }).catch(function (err) {
-      if (err.code === 'forbidden') {
-        state.requests = [];
-        $('deniedLead').textContent = err.message || '此 Google 账号不在请假系统授权名单中，无法查看或提交单据。';
-        var payload = decodeJwt(state.token);
-        setWho({ name: payload && payload.name || '未授权账号', email: payload && payload.email || '' });
-        showBanner('');
-        showOnly(viewDenied);
-        return;
-      }
-      if (err.code === 'unauthenticated') {
-        logout();
-        showBanner(err.message || '登录已过期，请重新登录。', 'err');
-        return;
-      }
-      showBanner(err.message || '载入失败。', 'err');
-      if (!state.me) showOnly(viewLogin);
-    });
-  }
-
-  function fillTypes() {
-    var sel = $('fType');
-    var cur = sel.value;
-    sel.innerHTML = state.types.map(function (t) {
-      return '<option value="' + esc(t) + '">' + esc(t) + '</option>';
-    }).join('');
-    if (cur && state.types.indexOf(cur) !== -1) sel.value = cur;
-  }
-
-  function syncDays(fromDates) {
-    var start = $('fStart').value;
-    var end = $('fEnd').value;
-    var n = naturalDays(start, end);
-    $('fDaysHint').textContent = n > 0
-      ? '起止共 ' + n + ' 个自然日（含周末）。可改为 0.5 的倍数，且不超过该自然日数。'
-      : '请先选择开始与结束日期。';
-    if (fromDates && n > 0) $('fDays').value = String(n);
-    if (start) $('fEnd').min = start;
-  }
-
-  function renderSummary() {
-    var s = state.summary || {};
-    $('kPending').textContent = s.pending || 0;
-    $('kApproved').textContent = s.approved || 0;
-    $('kRejected').textContent = s.rejected || 0;
-    var agenda = s.agenda || [];
-    var ongoing = agenda.filter(function (x) { return x.kind === 'ongoing'; }).length;
-    $('kOngoing').textContent = ongoing;
-    var ul = $('agenda');
-    if (!agenda.length) {
-      ul.innerHTML = '';
-      $('agendaEmpty').hidden = false;
-      return;
-    }
-    $('agendaEmpty').hidden = true;
-    ul.innerHTML = agenda.map(function (x) {
-      var tag = x.kind === 'ongoing' ? '进行中' : '即将开始';
-      return '<li><div><b>' + esc(x.applicantName) + '</b> · ' + esc(x.type) +
-        ' · ' + fmtDays(x.days) + ' 天<div class="muted">' + esc(x.startDate) + ' 至 ' + esc(x.endDate) +
-        '</div></div><span class="tag">' + tag + '</span></li>';
-    }).join('');
-  }
-
   function badge(status) {
-    var cls = status === '待审批' ? 'pending'
-      : status === '已通过' ? 'approved'
-      : status === '已驳回' ? 'rejected'
+    var cls = status === STATUS_PENDING ? 'pending'
+      : status === STATUS_APPROVED ? 'approved'
+      : status === STATUS_REJECTED ? 'rejected'
       : 'cancelled';
     return '<span class="badge ' + cls + '">' + esc(status) + '</span>';
   }
@@ -540,15 +397,10 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
   }
 
   function rowActions(r) {
-    var html = '';
-    if (r.status === '待审批' && state.me && state.me.canApprove) {
-      html += '<button type="button" class="btn sm" data-act="approve" data-id="' + esc(r.id) + '">通过</button> ';
-      html += '<button type="button" class="btn warn sm" data-act="reject" data-id="' + esc(r.id) + '">驳回</button> ';
-    }
-    if (r.status === '待审批' && state.me && r.applicantEmail === state.me.email) {
-      html += '<button type="button" class="btn quiet sm" data-act="cancel" data-id="' + esc(r.id) + '">撤销</button>';
-    }
-    return html || '<span class="muted">—</span>';
+    if (r.status !== STATUS_PENDING) return '';
+    return '<button type="button" class="btn sm" data-act="approve" data-id="' + esc(r.id) + '">通过</button> ' +
+      '<button type="button" class="btn warn sm" data-act="reject" data-id="' + esc(r.id) + '">驳回</button> ' +
+      '<button type="button" class="btn quiet sm" data-act="cancel" data-id="' + esc(r.id) + '">撤销</button>';
   }
 
   function reviewCell(r) {
@@ -570,6 +422,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     if (!rows.length) {
       tb.innerHTML = '';
       cards.innerHTML = '';
+      $('tw').hidden = true;
       empty.hidden = false;
       empty.textContent = state.requests.length
         ? '没有符合当前筛选条件的请假单。可重置筛选或扩大日期范围。'
@@ -577,17 +430,18 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
       return;
     }
     empty.hidden = true;
+    $('tw').hidden = false;
     tb.innerHTML = rows.map(function (r) {
       return '<tr>' +
         '<td>' + esc(r.id) + '</td>' +
-        '<td>' + esc(r.applicantName) + '<div class="muted">' + esc(r.applicantEmail) + '</div></td>' +
+        '<td>' + esc(r.applicantName) + '</td>' +
         '<td>' + esc(r.type) + '</td>' +
         '<td>' + esc(r.startDate) + '<div class="muted">至 ' + esc(r.endDate) + '</div></td>' +
         '<td class="num">' + fmtDays(r.days) + '</td>' +
         '<td class="reason">' + esc(r.reason) + '</td>' +
         '<td>' + badge(r.status) + '</td>' +
         '<td>' + reviewCell(r) + '</td>' +
-        '<td>' + rowActions(r) + '</td>' +
+        '<td>' + (rowActions(r) || '<span class="muted">—</span>') + '</td>' +
         '</tr>';
     }).join('');
     cards.innerHTML = rows.map(function (r) {
@@ -597,12 +451,20 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
         '<span>' + esc(r.startDate) + ' 至 ' + esc(r.endDate) + '</span></div>' +
         '<div class="why">' + esc(r.reason) + '</div>' +
         (r.comment ? '<div class="muted">审批意见：' + esc(r.comment) + '</div>' : '') +
-        '<div class="actions" style="margin-top:8px">' + rowActions(r) + '</div></article>';
+        (r.status === STATUS_PENDING ? '<div class="actions" style="margin-top:8px">' + rowActions(r) + '</div>' : '') +
+        '</article>';
     }).join('');
   }
 
+  function findById(id) {
+    for (var i = 0; i < state.requests.length; i++) {
+      if (state.requests[i].id === id) return state.requests[i];
+    }
+    return null;
+  }
+
   function openDecide(id, decision) {
-    var r = state.requests.filter(function (x) { return x.id === id; })[0];
+    var r = findById(id);
     if (!r) return;
     state.decision = { id: id, decision: decision };
     var titles = { approve: '通过请假单', reject: '驳回请假单', cancel: '撤销请假单' };
@@ -611,31 +473,30 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     if (decision === 'cancel') {
       $('dlgCommentLabel').textContent = '说明';
       $('dlgLead').textContent += '。撤销后不可恢复为待审批，如需请假请重新提交。';
+      $('dlgCommentWrap').hidden = true;
     } else {
       $('dlgCommentLabel').textContent = decision === 'reject' ? '审批意见（必填）' : '审批意见（选填）';
+      $('dlgCommentWrap').hidden = false;
     }
-    $('dlgComment').value = decision === 'cancel' ? '申请人撤销' : '';
+    $('dlgComment').value = '';
     $('dlgComment').required = decision === 'reject';
-    $('dlgComment').parentElement.hidden = decision === 'cancel';
+    $('dlgComment').placeholder = decision === 'reject' ? '请写明驳回原因。' : '选填。';
     $('dlgOk').textContent = decision === 'approve' ? '确认通过' : decision === 'reject' ? '确认驳回' : '确认撤销';
     $('dlgOk').className = 'btn' + (decision === 'approve' ? '' : ' warn');
     $('dlg').showModal();
   }
 
-  function busy(btn, on, label) {
-    if (!btn) return;
-    if (on) {
-      btn.dataset.prev = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = label || '处理中…';
-    } else {
-      btn.disabled = false;
-      btn.textContent = btn.dataset.prev || btn.textContent;
-    }
+  function syncDays(fromDates) {
+    var start = $('fStart').value;
+    var end = $('fEnd').value;
+    var n = naturalDays(start, end);
+    $('fDaysHint').textContent = n > 0
+      ? '起止共 ' + n + ' 个自然日（含周末）。可改为 0.5 的倍数，且不超过该自然日数。'
+      : '请先选择开始与结束日期。';
+    if (fromDates && n > 0) $('fDays').value = String(n);
+    if (start) $('fEnd').min = start;
   }
 
-  $('btnOut').addEventListener('click', function () { logout(); });
-  $('btnDeniedOut').addEventListener('click', function () { logout(); });
   $('fStart').addEventListener('change', function () {
     if ($('fEnd').value && $('fEnd').value < $('fStart').value) $('fEnd').value = $('fStart').value;
     syncDays(true);
@@ -650,11 +511,6 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     $('qTo').value = '';
     renderList();
   });
-  $('btnReload').addEventListener('click', function () {
-    var btn = $('btnReload');
-    busy(btn, true, '刷新中…');
-    bootstrap().then(function () { busy(btn, false); }, function () { busy(btn, false); });
-  });
 
   $('form').addEventListener('submit', function (ev) {
     ev.preventDefault();
@@ -666,7 +522,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     var n = naturalDays(start, end);
     var msg = $('formMsg');
     msg.textContent = '';
-    if (!type) { msg.textContent = '请选择请假类型。'; return; }
+    if (TYPES.indexOf(type) === -1) { msg.textContent = '请选择请假类型。'; return; }
     if (!start || !end) { msg.textContent = '请填写开始与结束日期。'; return; }
     if (start > end) { msg.textContent = '结束日期不能早于开始日期。'; return; }
     if (!reason) { msg.textContent = '请填写请假事由。'; return; }
@@ -676,20 +532,29 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     if (n > 0 && days > n) {
       msg.textContent = '天数不能超过自然日数（' + n + ' 天）。排除周末请下调天数。'; return;
     }
-    var btn = $('btnSubmit');
-    busy(btn, true, '提交中…');
-    api('create', { type: type, startDate: start, endDate: end, days: days, reason: reason })
-      .then(function (data) {
-        applyPayload(data);
-        $('fReason').value = '';
-        syncDays(true);
-        showBanner('请假单已提交，状态为待审批。', 'ok');
-      })
-      .catch(function (err) {
-        if (err.code === 'unauthenticated') { logout(); showBanner(err.message, 'err'); return; }
-        showBanner(err.message || '提交失败。', 'err');
-      })
-      .then(function () { busy(btn, false); });
+    var rec = {
+      id: nextId(todayYmd()),
+      applicantName: OPERATOR,
+      type: type,
+      startDate: start,
+      endDate: end,
+      days: days,
+      reason: reason,
+      status: STATUS_PENDING,
+      submittedAt: nowText(),
+      reviewerName: '',
+      reviewedAt: '',
+      comment: ''
+    };
+    state.requests.unshift(rec);
+    if (!saveStore()) {
+      state.requests.shift();
+      return;
+    }
+    $('fReason').value = '';
+    syncDays(true);
+    refresh();
+    showBanner('请假单已提交，状态为待审批。', 'ok');
   });
 
   document.addEventListener('click', function (ev) {
@@ -697,13 +562,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
     if (!t) return;
     var id = t.getAttribute('data-id');
     var act = t.getAttribute('data-act');
-    if (act === 'approve' || act === 'reject') {
-      openDecide(id, act);
-      return;
-    }
-    if (act === 'cancel') {
-      openDecide(id, 'cancel');
-    }
+    if (act === 'approve' || act === 'reject' || act === 'cancel') openDecide(id, act);
   });
 
   $('dlgCancel').addEventListener('click', function () { $('dlg').close(); });
@@ -716,50 +575,40 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:18px 0 8px;line
       showBanner('驳回时请填写审批意见。', 'err');
       return;
     }
-    var btn = $('dlgOk');
-    busy(btn, true);
-    var req = kind === 'cancel'
-      ? api('cancel', { id: state.decision.id })
-      : api('decide', { id: state.decision.id, decision: kind, comment: comment });
-    req.then(function (data) {
-        applyPayload(data);
-        $('dlg').close();
-        showBanner(kind === 'approve' ? '已通过该请假单。' : kind === 'reject' ? '已驳回该请假单。' : '已撤销该请假单。', 'ok');
-      })
-      .catch(function (err) {
-        showBanner(err.message || '操作未能完成。', 'err');
-      })
-      .then(function () { busy(btn, false); });
-  });
-
-  function initFormDates() {
-    var t = todayYmd();
-    $('fStart').value = t;
-    $('fEnd').value = t;
-    syncDays(true);
-  }
-
-  function start() {
-    initFormDates();
-    if (!isConfigured()) {
-      showOnly(viewSetup);
+    var rec = findById(state.decision.id);
+    if (!rec) {
+      showBanner('未找到该请假单。', 'err');
       return;
     }
-    var saved = '';
-    try { saved = sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
-    loadGis(function () {
-      renderButton();
-      if (saved && tokenValid(saved)) {
-        state.token = saved;
-        bootstrap();
-      } else {
-        if (saved) { try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {} }
-        showOnly(viewLogin);
-      }
-    });
-  }
+    if (rec.status !== STATUS_PENDING) {
+      showBanner('该单据已处理，当前状态为「' + rec.status + '」。', 'err');
+      return;
+    }
+    var prev = { status: rec.status, reviewerName: rec.reviewerName, reviewedAt: rec.reviewedAt, comment: rec.comment };
+    if (kind === 'approve') rec.status = STATUS_APPROVED;
+    else if (kind === 'reject') rec.status = STATUS_REJECTED;
+    else rec.status = STATUS_CANCELLED;
+    rec.reviewerName = OPERATOR;
+    rec.reviewedAt = nowText();
+    rec.comment = kind === 'cancel' ? '申请人撤销' : comment;
+    if (!saveStore()) {
+      rec.status = prev.status;
+      rec.reviewerName = prev.reviewerName;
+      rec.reviewedAt = prev.reviewedAt;
+      rec.comment = prev.comment;
+      return;
+    }
+    $('dlg').close();
+    refresh();
+    showBanner(kind === 'approve' ? '已通过该请假单。' : kind === 'reject' ? '已驳回该请假单。' : '已撤销该请假单。', 'ok');
+  });
 
-  start();
+  state.requests = loadStore();
+  var t = todayYmd();
+  $('fStart').value = t;
+  $('fEnd').value = t;
+  syncDays(true);
+  refresh();
 })();
 </script>
 </body>

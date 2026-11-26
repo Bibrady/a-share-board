@@ -26,4 +26,4 @@ python3 site_nav.py
 页面：<https://bibrady.github.io/a-share-board/leave/>  
 导航：顶栏「办公」→「请假审批」
 
-内部审批工作台：Google 账号登录后，经 Apps Script 校验邮箱白名单，再读写私有 Google 表。请假记录不进入本仓库。接入步骤见 `leave/apps-script/README.md`；前端把 Web App URL 与 OAuth Client ID 写在 `leave/config.js`（未配置时页面只显示「待完成接入」）。
+内部审批工作台：打开即可提交、通过、驳回、撤销。单据只存在访问者浏览器的 localStorage，不写入本仓库，也不依赖 Google 登录或 Apps Script。`leave/apps-script/` 仅为旧稿留存，页面不使用。
