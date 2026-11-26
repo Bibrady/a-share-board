@@ -66,7 +66,7 @@ GROUPS = [
         "show_sub": True,
         "pages": [
             {"label": "请假审批", "path": "leave/index.html"},
-            {"label": "内部聊天", "path": "chat/index.html"},
+            {"label": "对话", "path": "chat/index.html"},
         ],
     },
 ]
@@ -210,7 +210,7 @@ def check() -> int:
             errors.append(f"{rel}: not in GROUPS")
         elif GROUPS[gi]["label"] == "研究" and "模型/AI探索" not in text:
             errors.append(f"{rel}: missing 模型/AI探索")
-        elif GROUPS[gi]["label"] == "办公" and ("请假审批" not in text or "内部聊天" not in text):
+        elif GROUPS[gi]["label"] == "办公" and ("请假审批" not in text or "对话" not in text):
             errors.append(f"{rel}: missing 办公子页")
         elif GROUPS[gi]["label"] == "选股" and "突破EMA50" not in text:
             errors.append(f"{rel}: missing 突破EMA50")
@@ -239,10 +239,10 @@ def check() -> int:
         errors.append("render_nav(index.html) leaked 题材")
     if "请假审批" not in render_nav("leave/index.html"):
         errors.append("render_nav(leave/index.html) missing 请假审批")
-    if "内部聊天" not in render_nav("chat/index.html"):
-        errors.append("render_nav(chat/index.html) missing 内部聊天")
-    if "内部聊天" not in render_nav("leave/index.html"):
-        errors.append("render_nav(leave/index.html) missing 内部聊天")
+    if "对话" not in render_nav("chat/index.html"):
+        errors.append("render_nav(chat/index.html) missing 对话")
+    if "对话" not in render_nav("leave/index.html"):
+        errors.append("render_nav(leave/index.html) missing 对话")
     if errors:
         print("FAIL")
         for e in errors:
