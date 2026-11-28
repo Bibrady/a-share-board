@@ -54,6 +54,8 @@ a{color:var(--acc)}
 .composer textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .btn{height:44px;padding:0 16px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;border-radius:0;flex:none}
 .btn:disabled{background:#C8C4BA;border-color:#C8C4BA;color:#666;cursor:default}
+.row.typing .bubble{background:var(--pn2)}
+.row.typing .tx{color:var(--mut);font-size:13px}
 [hidden]{display:none !important}
 @media (max-width:759px){
   .wrap{padding:0 0 0}
@@ -179,7 +181,19 @@ a{color:var(--acc)}
     msg('C-20261126-45', 'general', '陈予白', '2026-11-26 19:51:00', '行，我把图丢文档柜，不进主线'),
     msg('C-20261126-46', 'general', '周晏清', '2026-11-26 20:06:00', '今日盘面就那样了，别熬')
   ];
-  var state = { group: 'general', extra: [] };
+  var ZHOU = '周晏清';
+  var CHEN = '陈予白';
+  var LIN = '林知夏';
+  var BANK = {
+    zhou: ['收到', '我先看', '行', '这事我记着', '先放着别发版', '先冻着', '别急', '记下了', '值班我盯', '先别动'],
+    zhouLeave: ['记下了', '值班我盯', '排班先别动', '行，我这边接', '这事我记着', '病假那条我看到了'],
+    chen: ['我先看', '行', '这块我跟一下', '等会回你', '我先改一版', '我丢文档柜'],
+    chenBoard: ['我先看一眼', '草稿我来改', '这块我等会回', '空状态那句我收一下', '过滤别当天改', '发版窗口先空着', '回测我晚上跑'],
+    lin: ['我晚点看', '配色别动', '文案短一点就行', '这版先别发', '收到', '行'],
+    ack: ['收到', '行', '嗯', '记下了'],
+    add: ['行', '收到', '先这样', '我跟上', '记下了', '别发版', '同意', '先冻着']
+  };
+  var state = { group: 'general', extra: [], typing: null, pendingToken: 0, pendingTimers: [], pickN: {} };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -247,6 +261,11 @@ a{color:var(--acc)}
         '<div class="tx">' + esc(m.text) + '</div>' +
         '<div class="tm">' + esc(hm(m.at)) + '</div></div></div>';
     });
+    if (state.typing && state.typing.group === state.group) {
+      html += '<div class="row typing"><div class="bubble">' +
+        '<div class="from">' + esc(state.typing.name) + '</div>' +
+        '<div class="tx">' + esc(state.typing.name) + ' 正在输入…</div></div></div>';
+    }
     $('log').innerHTML = html;
     $('log').scrollTop = $('log').scrollHeight;
   }
@@ -265,8 +284,95 @@ a{color:var(--acc)}
     }).format(new Date());
     return todayYmd() + ' ' + t;
   }
-  function nextId() {
-    return 'C-L-' + Date.now();
+  function nextId(prefix) {
+    return (prefix || 'C-L-') + Date.now() + '-' + Math.floor(Math.random() * 1000);
+  }
+  function hashStr(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+  function hasAny(text, words) {
+    return words.some(function (w) { return text.indexOf(w) !== -1; });
+  }
+  function pick(arr, key) {
+    var n = state.pickN[key] || 0;
+    state.pickN[key] = n + 1;
+    return arr[(hashStr(key) + n) % arr.length];
+  }
+  function cancelPending() {
+    state.pendingTimers.forEach(function (id) { clearTimeout(id); });
+    state.pendingTimers = [];
+    state.pendingToken += 1;
+    state.typing = null;
+  }
+  function later(ms, fn) {
+    var id = setTimeout(fn, ms);
+    state.pendingTimers.push(id);
+    return id;
+  }
+  function insertReply(group, name, text) {
+    state.extra.push(msg(nextId('C-R-'), group, name, nowText(), text));
+    saveExtra();
+    refresh();
+  }
+  function lineFor(name, group, text, flags, which) {
+    var key = name + '|' + group + '|' + which + '|' + text;
+    if (which === 1) return pick(BANK.add, key);
+    if (flags.ack) return pick(BANK.ack, key);
+    if (name === ZHOU) return pick(flags.leave ? BANK.zhouLeave : BANK.zhou, key);
+    if (name === CHEN) return pick(flags.ship || group === 'board' ? BANK.chenBoard : BANK.chen, key);
+    return pick(BANK.lin, key);
+  }
+  function planReplies(group, text) {
+    var flags = {
+      leave: hasAny(text, ['请假', '调休', '病假', '值班']),
+      ship: hasAny(text, ['发版', '合并', '空状态', '看板', 'EMA', 'ema', '回测', '过滤']),
+      ack: /^(收到|同意|好的|好|行|嗯|可以)([。.!！]?)$/.test(text)
+    };
+    var first;
+    var second = null;
+    if (flags.leave) first = ZHOU;
+    else if (flags.ship) first = CHEN;
+    else if (group === 'admin') first = ZHOU;
+    else if (group === 'board') first = (hashStr(text) % 2 === 0) ? CHEN : LIN;
+    else {
+      var r = hashStr(text) % 10;
+      first = r < 5 ? ZHOU : (r < 9 ? CHEN : LIN);
+    }
+    var p2 = group === 'admin' ? 0.22 : (flags.ack ? 0.15 : 0.5);
+    if (Math.random() < p2) {
+      if (flags.leave) second = CHEN;
+      else if (flags.ship) second = (hashStr(text + 'x') % 2) ? ZHOU : LIN;
+      else if (group === 'admin') second = CHEN;
+      else if (group === 'board') second = first === CHEN ? LIN : CHEN;
+      else second = first === ZHOU ? CHEN : ZHOU;
+    }
+    if (second === first) second = null;
+    var out = [{ name: first, text: lineFor(first, group, text, flags, 0) }];
+    if (second) out.push({ name: second, text: lineFor(second, group, text, flags, 1) });
+    return out;
+  }
+  function scheduleReplies(group, text) {
+    cancelPending();
+    var token = state.pendingToken;
+    var plan = planReplies(group, text);
+    if (!plan.length) return;
+    state.typing = { group: group, name: plan[0].name };
+    refresh();
+    later(1200 + Math.floor(Math.random() * 2300), function () {
+      if (token !== state.pendingToken) return;
+      state.typing = null;
+      insertReply(group, plan[0].name, plan[0].text);
+      if (!plan[1]) return;
+      state.typing = { group: group, name: plan[1].name };
+      refresh();
+      later(1000 + Math.floor(Math.random() * 2000), function () {
+        if (token !== state.pendingToken) return;
+        state.typing = null;
+        insertReply(group, plan[1].name, plan[1].text);
+      });
+    });
   }
   $('side').addEventListener('click', function (ev) {
     var t = ev.target.closest('[data-g]');
@@ -278,11 +384,13 @@ a{color:var(--acc)}
     ev.preventDefault();
     var text = $('input').value.trim();
     if (!text) return;
-    state.extra.push(msg(nextId(), state.group, ME, nowText(), text));
+    var gid = state.group;
+    state.extra.push(msg(nextId('C-L-'), gid, ME, nowText(), text));
     saveExtra();
     $('input').value = '';
     refresh();
     $('input').focus();
+    scheduleReplies(gid, text);
   });
   $('input').addEventListener('keydown', function (ev) {
     if (ev.key === 'Enter' && !ev.shiftKey) {
