@@ -8,7 +8,7 @@
  */
 var SPREADSHEET_ID = '1ua6Nj0EVhY3mMQ83khLwOTjkaNKz_fzZdxAKFoZwm7I';
 var TZ = 'Asia/Shanghai';
-var DEFAULT_ADMIN_NAME = '卓炀';
+var DEFAULT_ADMIN_NAME = '师卓炀';
 var DEFAULT_ADMIN_EMAIL = 'zhuoyang.shi@gmail.com';
 var DEFAULT_TYPES = ['年假', '事假', '病假', '调休', '其他'];
 var LEAVE_HEADERS = [
