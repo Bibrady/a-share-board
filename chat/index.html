@@ -103,47 +103,55 @@ a{color:var(--acc)}
 <script>
 (function () {
   var TZ = 'Asia/Shanghai';
-  var STORE_KEY = 'shuoyuan_chat_v4';
+  var STORE_KEY = 'shuoyuan_chat_v5';
   var ME = '师卓炀';
   var GROUPS = [
     { id: 'general', name: '综合对话', hint: '盘面、研究与交易节奏' },
-    { id: 'board', name: '看板项目', hint: '朔元看板与内部工具' },
+    { id: 'board', name: '看板项目', hint: '朔元看板与盘中工具' },
     { id: 'admin', name: '行政通知', hint: '请假与交易时段值班' }
   ];
   function msg(id, group, name, at, text) {
     return { id: id, group: group, from: name, at: at, text: text };
   }
   var SEED = [
-    msg('C-20260311-01', 'general', '郑艳萍', '2026-03-11 09:18:00', '下周例会改到周四下午两点，会议室还是 3 楼。'),
-    msg('C-20260311-02', 'general', '师卓炀', '2026-03-11 09:26:00', '可以。纪要模板我放进文档柜了，会前十分钟打开即可。'),
-    msg('C-20260310-01', 'admin', '师卓炀', '2026-03-10 14:20:00', '李宇涛 3 月 12 日事假一天，已通过。'),
-    msg('C-20260408-01', 'board', '师卓炀', '2026-04-08 10:14:00', '请假入口先做提交和审批，挂在办公下面。看板主线别动。'),
-    msg('C-20260408-02', 'board', '聂晗', '2026-04-08 10:31:00', '工具页配色跟大盘页对齐，纸色那套不要改。'),
+    msg('C-20260311-01', 'general', '郑艳萍', '2026-03-11 09:18:00', '下周复盘会改到周四下午两点，还是 3 楼。盘中别开会。'),
+    msg('C-20260311-02', 'general', '师卓炀', '2026-03-11 09:26:00', '可以。复盘纪要模板我放文档柜了，会前打开即可。'),
+    msg('C-20260310-01', 'admin', '师卓炀', '2026-03-10 14:20:00', '李宇涛 3 月 12 日事假一天，已通过。开盘覆盖按原表。'),
+    msg('C-20260408-01', 'board', '师卓炀', '2026-04-08 10:14:00', '盘中看板别跟请假入口抢刷新。筛选主线先冻着。'),
+    msg('C-20260408-02', 'board', '聂晗', '2026-04-08 10:31:00', '大盘页配色别改，盘中盯着累。纸色那套留着。'),
+    msg('C-20260507-01', 'admin', '师卓炀', '2026-05-07 16:02:00', '杨典 5 月 8 日调休一天，已通过。'),
+    msg('C-20260507-02', 'admin', '黄盛', '2026-05-07 16:18:00', '单子我批过了。交易时段值班别跟调休抢人。'),
     msg('C-20260609-01', 'admin', '师卓炀', '2026-06-09 09:40:00', '郑艳萍 6 月 18 日调休一天，已通过。'),
     msg('C-20260617-01', 'general', '聂晗', '2026-06-17 16:08:00', '端午那两天我调休，盘中有事直接找郑艳萍。'),
-    msg('C-20260617-02', 'general', '郑艳萍', '2026-06-17 16:12:00', '收到，开盘覆盖我来盯。'),
-    msg('C-20260714-01', 'board', '李宇涛', '2026-07-14 11:05:00', 'EMA50 筛选那页说明改了一版，请郑艳萍过一下空状态。'),
-    msg('C-20260714-02', 'board', '郑艳萍', '2026-07-14 14:22:00', '看过了。空状态那句再短一点就行。'),
+    msg('C-20260617-02', 'general', '郑艳萍', '2026-06-17 16:12:00', '开盘覆盖我来盯。'),
+    msg('C-20260702-01', 'admin', '师卓炀', '2026-07-02 11:20:00', '李乔峰 7 月 3 日事假一天，已通过。'),
+    msg('C-20260714-01', 'board', '李宇涛', '2026-07-14 11:05:00', 'EMA50 那列说明改了一版。没票的时候那句请艳萍过一下。'),
+    msg('C-20260714-02', 'board', '郑艳萍', '2026-07-14 14:22:00', '看过了。没票那句再短，别写成功能介绍。'),
     msg('C-20260814-01', 'admin', '师卓炀', '2026-08-14 11:20:00', '郑艳萍 8 月 16 日事假一天，已通过。'),
     msg('C-20260916-01', 'admin', '师卓炀', '2026-09-16 17:10:00', '聂晗 9 月 18 日上午病假半天，已通过。'),
     msg('C-20260928-01', 'general', '李宇涛', '2026-09-28 09:44:00', '国庆前把交易时段值班表发一下，我月底请假回家。'),
     msg('C-20260928-02', 'general', '师卓炀', '2026-09-28 09:51:00', '表今天下午发行政通知。开盘覆盖别空档。'),
+    msg('C-20260928-03', 'general', '李乔峰', '2026-09-28 10:06:00', '值班表我填了，国庆那周开盘我在。'),
+    msg('C-20260928-04', 'general', '杨典', '2026-09-28 10:11:00', '我也可以顶一天覆盖，表定了发行政通知。'),
     msg('C-20261021-01', 'admin', '师卓炀', '2026-10-21 10:22:00', '李宇涛 10 月 26 日至 27 日年假，已通过。'),
-    msg('C-20261022-01', 'board', '聂晗', '2026-10-22 09:16:00', '李宇涛年假那两天，看板工具先别动，等他回来再改筛选。'),
-    msg('C-20261022-02', 'board', '师卓炀', '2026-10-22 09:28:00', '同意，工具改动挪到 28 号。盘中覆盖按原排班。'),
-    msg('C-20261124-01', 'board', '李宇涛', '2026-11-24 15:36:00', '请假页空状态我收了一下，今晚可以看。不影响盘中用看板。'),
+    msg('C-20261022-01', 'board', '聂晗', '2026-10-22 09:16:00', '李宇涛年假那两天，筛选别改，看板先冻。'),
+    msg('C-20261022-02', 'board', '师卓炀', '2026-10-22 09:28:00', '同意。筛选改动挪到 28 号。盘中覆盖按原排班。'),
+    msg('C-20261022-03', 'board', '李乔峰', '2026-10-22 09:40:00', '那两天盘面我帮盯。筛选别动。'),
+    msg('C-20261124-01', 'board', '李宇涛', '2026-11-24 15:36:00', '没票空池那句我收了。盘中刷新别卡。'),
     msg('C-20261125-01', 'admin', '师卓炀', '2026-11-25 19:12:00', '聂晗明天事假全天。我 26、27 日病假，盘中有事找郑艳萍。'),
     msg('C-20261125-02', 'general', '郑艳萍', '2026-11-25 19:20:00', '明天聂晗请假。盘面有事找我。'),
-    msg('C-20261126-01', 'admin', '郑艳萍', '2026-11-26 08:41:00', '聂晗今天请假。师卓炀今天和明天病假。开盘覆盖我来接。'),
-    msg('C-20261126-02', 'board', '郑艳萍', '2026-11-26 09:05:00', '聂晗今天不在，看板先别动。有问题先记在这里。'),
-    msg('C-20261126-03', 'general', '李宇涛', '2026-11-26 09:18:00', '聂晗今天不在，周报草稿我盘后再丢文档柜。'),
     msg('C-20261126-04', 'general', '聂晗', '2026-11-26 08:22:00', '电脑我关了，今天不看盘。有事找郑艳萍。'),
     msg('C-20261126-05', 'general', '郑艳萍', '2026-11-26 08:24:00', '行，你休息。'),
+    msg('C-20261126-01', 'admin', '郑艳萍', '2026-11-26 08:41:00', '聂晗今天请假。师卓炀今天和明天病假。开盘覆盖我来接。'),
+    msg('C-20261126-49', 'admin', '黄盛', '2026-11-26 08:50:00', '病假那两张我批了。盘中有事找郑艳萍。'),
+    msg('C-20261126-02', 'board', '郑艳萍', '2026-11-26 09:05:00', '聂晗今天不在，筛选先别动。有问题先记这里。'),
+    msg('C-20261126-03', 'general', '李宇涛', '2026-11-26 09:18:00', '聂晗今天不在，盘后纪要我写，不进筛选。'),
     msg('C-20261126-06', 'general', '郑艳萍', '2026-11-26 09:28:00', '开了。高开一点。'),
     msg('C-20261126-07', 'general', '李宇涛', '2026-11-26 09:48:00', '这高开要吐回去了'),
     msg('C-20261126-08', 'general', '郑艳萍', '2026-11-26 09:51:00', '冲高回落这套路了'),
     msg('C-20261126-09', 'general', '李宇涛', '2026-11-26 10:06:00', '10日新高那边回了一截，我看筛选'),
     msg('C-20261126-10', 'general', '郑艳萍', '2026-11-26 10:08:00', '回是回了，别当反转'),
+    msg('C-20261126-47', 'general', '李乔峰', '2026-11-26 10:12:00', '筛选我帮李宇涛看一眼，先不改参数'),
     msg('C-20261126-11', 'general', '师卓炀', '2026-11-26 10:22:00', '看了眼竞价，就这样。你们盯。'),
     msg('C-20261126-12', 'general', '李宇涛', '2026-11-26 10:41:00', '洗了一下又有人抄'),
     msg('C-20261126-13', 'general', '郑艳萍', '2026-11-26 10:43:00', '修复而已'),
@@ -165,6 +173,8 @@ a{color:var(--acc)}
     msg('C-20261126-29', 'general', '郑艳萍', '2026-11-26 15:04:00', '不是反转。纪要里就写修复反弹'),
     msg('C-20261126-30', 'general', '李宇涛', '2026-11-26 15:06:00', '成交额我就写约1.33万亿'),
     msg('C-20261126-31', 'general', '郑艳萍', '2026-11-26 15:07:00', '美股休市那句也带上，免得有人问晚上怎么没跟'),
+    msg('C-20261126-48', 'general', '杨典', '2026-11-26 15:12:00', '纪要按郑艳萍那句，写修复就行'),
+    msg('C-20261126-50', 'general', '杨典', '2026-11-26 18:40:00', '宏观日历我贴文档柜了，今晚复盘用，别当新闻转发。'),
     msg('C-20261126-32', 'general', '李宇涛', '2026-11-26 19:12:00', '晚上那版回测我跑完了'),
     msg('C-20261126-33', 'general', '李宇涛', '2026-11-26 19:14:00', 'ema突破再加10日新高过滤，样本更干净'),
     msg('C-20261126-34', 'general', '郑艳萍', '2026-11-26 19:16:00', '干净还是嵌进去了'),
@@ -179,35 +189,85 @@ a{color:var(--acc)}
     msg('C-20261126-43', 'general', '李宇涛', '2026-11-26 19:48:00', '那下一步是把趋势段切短一点？还是先放着'),
     msg('C-20261126-44', 'general', '郑艳萍', '2026-11-26 19:50:00', '先放着。短切更容易编故事'),
     msg('C-20261126-45', 'general', '李宇涛', '2026-11-26 19:51:00', '行，我把图丢文档柜，不进主线'),
-    msg('C-20261126-46', 'general', '郑艳萍', '2026-11-26 20:06:00', '今日盘面就那样了，别熬'),
-    msg('C-20260507-01', 'admin', '师卓炀', '2026-05-07 16:02:00', '杨典 5 月 8 日调休一天，已通过。'),
-    msg('C-20260507-02', 'admin', '黄盛', '2026-05-07 16:18:00', '单子我批过了。交易时段值班别跟调休抢人。'),
-    msg('C-20260702-01', 'admin', '师卓炀', '2026-07-02 11:20:00', '李乔峰 7 月 3 日事假一天，已通过。'),
-    msg('C-20260928-03', 'general', '李乔峰', '2026-09-28 10:06:00', '值班表我填了，国庆那周开盘我在。'),
-    msg('C-20260928-04', 'general', '杨典', '2026-09-28 10:11:00', '我也可以顶一天覆盖，表定了发行政通知。'),
-    msg('C-20261022-03', 'board', '李乔峰', '2026-10-22 09:40:00', '那两天盘面我帮李宇涛盯，看板先冻着。'),
-    msg('C-20261126-47', 'general', '李乔峰', '2026-11-26 10:12:00', '筛选我帮李宇涛看一眼，先不改参数'),
-    msg('C-20261126-48', 'general', '杨典', '2026-11-26 15:12:00', '纪要按郑艳萍那句，写修复就行'),
-    msg('C-20261126-49', 'admin', '黄盛', '2026-11-26 08:50:00', '病假那两张我批了。盘中有事找郑艳萍。'),
-    msg('C-20261126-50', 'general', '杨典', '2026-11-26 18:40:00', '宏观日历我贴文档柜了，今晚复盘用，别当新闻转发。')
+    msg('C-20261126-46', 'general', '郑艳萍', '2026-11-26 20:06:00', '今日盘面就那样了，别熬')
   ];
   var ZHENG = '郑艳萍';
   var LIYU = '李宇涛';
   var NIE = '聂晗';
   var QIAO = '李乔峰';
   var YANG = '杨典';
-  var BANK = {
-    zheng: ['收到', '我先看', '行', '这事我记着', '先看下午', '先冻着', '别急', '记下了', '盘中我盯', '先别动'],
-    zhengLeave: ['记下了', '开盘覆盖我盯', '排班先别动', '行，盘中我这边接', '这事我记着', '病假那条我看到了'],
-    zhengTape: ['先看下午', '别当反转', '先当修复', '今晚复盘', '这事我先记着', '别急着下结论', '覆盖我来'],
-    liyu: ['我先看', '行', '这块我跟一下', '等会回你', '今晚复盘', '我丢文档柜'],
-    liyuBoard: ['看板我先看一眼', '筛选先别改', '这块我等会回', '工具页我收一下', '过滤别当天改', '看板先冻着', '回测我晚上跑'],
-    liyuTape: ['我先看筛选', '先不当反转', '今晚把复盘写了', '仓位这块我记着', '先看下午', '观点先放着'],
-    nie: ['我晚点看', '看板别大改', '文案短一点就行', '工具先别动', '收到', '行'],
-    qiao: ['盘面我看一眼', '行', '仓位先不动', '先这样', '收到', '开盘我盯着'],
-    yang: ['收到', '行', '我先看', '记下了', '今晚复盘', '观点先放着'],
-    ack: ['收到', '行', '嗯', '记下了'],
-    add: ['行', '收到', '先这样', '我跟上', '记下了', '先看下午', '同意', '先冻着', '今晚复盘']
+  var TOPICS = ['加仓', '减仓', '仓位', '复盘', '纪要', '开盘', '收盘', '竞价', '筛选', '过滤器', '过滤', '看板', '空池', '回测', '值班', '请假', '病假', '调休', '美股', 'A股', '财报', '宏观', '风险', '高开', '修复', '反转', '覆盖', '参数', 'EMA', 'ema'];
+  var VOICE = {
+    ask: {
+      '郑艳萍': ['还没。开盘我盯着。', '写了？我这边没看到。', '$t？你先给一句结论。', '我让宇涛回你这条。', '等会，覆盖先稳住。'],
+      '李宇涛': ['还没写完。盘后贴文档柜。', '$t我翻一下再回。', '写了一半，结论还没落。', '还没。今晚写。', '等会回你，先把结论落下来。'],
+      '聂晗': ['我晚点看。', '看板那句看到了，盘后回。', '$t先放着吧，我现在不跟。'],
+      '李乔峰': ['写了没我不管，仓位先别动。', '$t？先放着。', '问这干嘛，盘中看着就行。'],
+      '杨典': ['日历贴了，正文还没动。', '$t我记下，不一定回。', '复盘用文档柜那份，别在群里催。']
+    },
+    hold: {
+      '郑艳萍': ['别动。', '下午先冻着，别抢。', '$t听你的。', '按你说的，盘中别动手。', '覆盖我来，别加一层。', '这判断先落纪要，别发散。'],
+      '李宇涛': ['仓位这块我按你说的冻。', '$t这事记下了，筛选也不动。', '加仓就算了，看着就行。', '过滤今天不改。', '我把这句写进纪要，执行按冻。'],
+      '聂晗': ['工具先别动。', '$t先放着吧。', '看板别大改。'],
+      '李乔峰': ['本来也没想加。', '先看着，别手痒。', '仓位动什么。', '加什么仓。', '$t？先放着。'],
+      '杨典': ['观点先放着。', '$t我附议，不补充。', '这判断先冻着，别写成新闻。']
+    },
+    leave: {
+      '郑艳萍': ['看到了。开盘覆盖我接。', '排班先别动。', '病假那条我记下了。', '盘中有事喊我。', '$t排班我来调，别在群里绕。'],
+      '李宇涛': ['覆盖我按艳萍那表。', '请假这事我看到了，筛选先不改。', '盘中我不空档。'],
+      '聂晗': ['我这边请假的话电脑会关。有事找艳萍。', '看到了。'],
+      '李乔峰': ['覆盖我可以顶一截。', '请假别跟开盘抢人。'],
+      '杨典': ['记下了。我不排开盘。']
+    },
+    tool: {
+      '郑艳萍': ['筛选先别动。', '没票那句再短一点。', '工具改动挪盘后，盘中别动。'],
+      '李宇涛': ['看板主线不动。我先看那页。', '没票空池我再收短。', '筛选别当天改，这点我同意。', '回测晚上跑，先不上。', '$t我看一眼，不进主线。'],
+      '聂晗': ['配色别动。', '文案短一点就行。', '看板别大改。', '工具页我晚点看。'],
+      '李乔峰': ['看板先冻着，盘面我盯。', '别为改筛选误了开盘。'],
+      '杨典': ['工具那页我记下，不展开。']
+    },
+    tape: {
+      '郑艳萍': ['先看下午。', '别把修复写成反转。', '先当修复。', '覆盖我来。', '高开这套路别追。', '纪要里就写修复反弹。'],
+      '李宇涛': ['我先不当反转。', '筛选我看一眼，不改参数。', '冲高回落这套路了。', '这高开要吐回去了吧。', '复盘我按修复写。', '质量一般的话别写成趋势。'],
+      '聂晗': ['盘中这句我看到了。', '我不跟。'],
+      '李乔峰': ['高开这套路别追。', '盘面我盯着。', '别把修复当反转。', '先看着。', '又有人要抄的话喊停。'],
+      '杨典': ['宏观别当新闻转发。', '观点先放着。', '纪要按修复那句。']
+    },
+    ack: {
+      '郑艳萍': ['嗯。', '好。', '成。'],
+      '李宇涛': ['那我按这个做。', '成。', '嗯，筛选不动。'],
+      '聂晗': ['嗯。'],
+      '李乔峰': ['嗯。', '成。'],
+      '杨典': ['嗯。']
+    },
+    other: {
+      '郑艳萍': ['这事盘中不展开。', '你先给一句，我来盯。', '别急，先看下午。'],
+      '李宇涛': ['我先翻一下。', '这块我跟一下，有结果再丢。', '先放着，别当天改三遍。', '$t我记下。'],
+      '聂晗': ['我晚点看。', '这句看到了。'],
+      '李乔峰': ['看着就行。', '别手痒。'],
+      '杨典': ['我先看，不一定回。', '记下了，不展开。']
+    },
+    follow: {
+      '郑艳萍': ['有事直接喊。', '别在盘中改参数。', '我先不回长的。', '覆盖按这个盯。'],
+      '李宇涛': ['盘后贴文档柜。', '有结果我再丢一句。', '结论落了再说。', '纪要我按这句写。'],
+      '聂晗': ['别的我先不跟。', '文案别写长。'],
+      '李乔峰': ['我盯着。', '别问第二句。'],
+      '杨典': ['不补充了。', '文档柜那份为准。']
+    },
+    react: {
+      '郑艳萍': ['听他的。', '覆盖这边我按这个盯。', '别再加一层操作。', '先这样，盘后复盘。'],
+      '李宇涛': ['筛选我这边也不动。', '纪要我按这句写。', '那我就不改过滤了。', '仓位执行按冻。'],
+      '聂晗': ['看板我先不动。', '那页晚点看。'],
+      '李乔峰': ['仓位我也不动。', '别手痒就行。', '盘面还是那套路。'],
+      '杨典': ['我不补充。', '观点先搁着。']
+    },
+    clarify: {
+      '郑艳萍': ['是今天下午还是一直冻？', '覆盖还按原排班？'],
+      '李宇涛': ['是指新开还是加旧的？', '纪要里就写冻仓这句？'],
+      '聂晗': ['看板那页也先别动？'],
+      '李乔峰': ['全市场还是你盯的那批？'],
+      '杨典': ['复盘写短的还是带日历？']
+    }
   };
   var state = { group: 'general', extra: [], typing: null, pendingToken: 0, pendingTimers: [], pickN: {} };
 
@@ -280,7 +340,7 @@ a{color:var(--acc)}
     if (state.typing && state.typing.group === state.group) {
       html += '<div class="row typing"><div class="bubble">' +
         '<div class="from">' + esc(state.typing.name) + '</div>' +
-        '<div class="tx">' + esc(state.typing.name) + ' 正在输入…</div></div></div>';
+        '<div class="tx">正在输入…</div></div></div>';
     }
     $('log').innerHTML = html;
     $('log').scrollTop = $('log').scrollHeight;
@@ -311,11 +371,6 @@ a{color:var(--acc)}
   function hasAny(text, words) {
     return words.some(function (w) { return text.indexOf(w) !== -1; });
   }
-  function pick(arr, key) {
-    var n = state.pickN[key] || 0;
-    state.pickN[key] = n + 1;
-    return arr[(hashStr(key) + n) % arr.length];
-  }
   function cancelPending() {
     state.pendingTimers.forEach(function (id) { clearTimeout(id); });
     state.pendingTimers = [];
@@ -333,65 +388,143 @@ a{color:var(--acc)}
     saveExtra();
     refresh();
   }
-  function lineFor(name, group, text, flags, which) {
-    var key = name + '|' + group + '|' + which + '|' + text;
-    if (which === 1) return pick(BANK.add, key);
-    if (flags.ack) return pick(BANK.ack, key);
-    if (name === ZHENG) {
-      if (flags.leave) return pick(BANK.zhengLeave, key);
-      if (flags.tape) return pick(BANK.zhengTape, key);
-      return pick(BANK.zheng, key);
+  function topicOf(text) {
+    var i;
+    for (i = 0; i < TOPICS.length; i++) {
+      if (text.indexOf(TOPICS[i]) !== -1) return TOPICS[i];
     }
-    if (name === LIYU) {
-      if (flags.ship || group === 'board') return pick(BANK.liyuBoard, key);
-      if (flags.tape) return pick(BANK.liyuTape, key);
-      return pick(BANK.liyu, key);
-    }
-    if (name === NIE) return pick(BANK.nie, key);
-    if (name === QIAO) return pick(BANK.qiao, key);
-    return pick(BANK.yang, key);
+    return '';
   }
-  function planReplies(group, text) {
-    var flags = {
-      leave: hasAny(text, ['请假', '调休', '病假', '值班']),
-      ship: hasAny(text, ['发版', '合并', '空状态', '看板', 'EMA', 'ema', '回测', '过滤']),
-      tape: hasAny(text, ['盘面', '仓位', '开盘', '收盘', '复盘', '美股', 'A股', '财报', '宏观', '风险']),
-      ack: /^(收到|同意|好的|好|行|嗯|可以)([。.!！]?)$/.test(text)
-    };
-    var first;
-    var second = null;
-    if (flags.leave) first = ZHENG;
-    else if (flags.ship) first = LIYU;
-    else if (flags.tape) {
-      var t = hashStr(text) % 10;
-      first = t < 5 ? LIYU : (t < 8 ? ZHENG : QIAO);
-    } else if (group === 'admin') first = ZHENG;
-    else if (group === 'board') first = (hashStr(text) % 2 === 0) ? LIYU : NIE;
-    else {
-      var r = hashStr(text) % 20;
-      if (r < 8) first = ZHENG;
-      else if (r < 14) first = LIYU;
-      else if (r < 17) first = NIE;
-      else if (r < 19) first = QIAO;
-      else first = YANG;
+  function intentOf(text, group) {
+    if (/^(收到|同意|好的|好|行|嗯|可以|对)([。.!！]?)$/.test(text)) return 'ack';
+    if (hasAny(text, ['请假', '调休', '病假', '值班'])) return 'leave';
+    if (hasAny(text, ['发版', '合并', '空状态', '空池', '看板', 'EMA', 'ema', '回测', '过滤', '筛选'])) return 'tool';
+    if (/[吗么？?]$/.test(text) || hasAny(text, ['写了吗', '看了吗', '有没有', '谁盯'])) return 'ask';
+    if (hasAny(text, ['别加', '别动', '先别', '冻着', '不要', '别改', '别写', '别乱', '不动'])) return 'hold';
+    if (hasAny(text, ['盘面', '仓位', '开盘', '收盘', '复盘', '美股', 'A股', '财报', '宏观', '风险', '加仓', '减仓', '竞价', '高开', '修复', '反转'])) return 'tape';
+    if (group === 'board') return 'tool';
+    if (group === 'admin') return 'leave';
+    return 'other';
+  }
+  function pickLine(arr, key, topic) {
+    if (!arr || !arr.length) return topic ? (topic + '我记下。') : '这事盘中先记着。';
+    var n = arr.length;
+    var start = (hashStr(key) + (state.pickN[key] || 0)) % n;
+    state.pickN[key] = (state.pickN[key] || 0) + 1;
+    var i, s;
+    for (i = 0; i < n; i++) {
+      s = arr[(start + i) % n];
+      if (s.indexOf('$t') !== -1) {
+        if (!topic) continue;
+        return s.split('$t').join(topic);
+      }
+      return s;
     }
-    var p2 = group === 'admin' ? 0.22 : (flags.ack ? 0.15 : 0.5);
-    if (Math.random() < p2) {
-      if (flags.leave) second = LIYU;
-      else if (flags.ship) second = (hashStr(text + 'x') % 2) ? ZHENG : NIE;
-      else if (flags.tape) second = first === LIYU ? ZHENG : (first === ZHENG ? LIYU : YANG);
-      else if (group === 'admin') second = LIYU;
-      else if (group === 'board') second = first === LIYU ? NIE : LIYU;
-      else {
-        var extras = [ZHENG, LIYU, QIAO, YANG].filter(function (n) { return n !== first; });
-        second = extras[hashStr(text + '2') % extras.length];
+    s = arr[start];
+    return s.indexOf('$t') === -1 ? s : s.split('$t').join(topic || '这事');
+  }
+  function delayFor(text, kind) {
+    if (kind === 'late') return 10000 + Math.floor(Math.random() * 5001);
+    var n = (text || '').length;
+    if (kind === 'follow') return 1400 + Math.floor(Math.random() * 2200);
+    if (kind === 'ack' || n <= 4) return 2000 + Math.floor(Math.random() * 1500);
+    var scaled = 2200 + Math.min(28, n) * 160;
+    return Math.max(2000, Math.min(8000, scaled + Math.floor(Math.random() * 900)));
+  }
+  function pickSpeaker(group, intent, text) {
+    if (intent === 'leave' || group === 'admin') return ZHENG;
+    if (intent === 'tool' || group === 'board') return (hashStr(text) % 3 === 0) ? NIE : LIYU;
+    if (intent === 'tape' || intent === 'hold') {
+      var t = hashStr(text) % 10;
+      if (t < 4) return LIYU;
+      if (t < 7) return ZHENG;
+      if (t < 9) return QIAO;
+      return YANG;
+    }
+    if (intent === 'ask') {
+      if (topicOf(text) === '复盘' || topicOf(text) === '纪要') {
+        return (hashStr(text) % 3 === 0) ? YANG : LIYU;
+      }
+      var a = hashStr(text) % 10;
+      if (a < 4) return LIYU;
+      if (a < 7) return ZHENG;
+      if (a < 8) return YANG;
+      if (a < 9) return QIAO;
+      return NIE;
+    }
+    var r = hashStr(text) % 20;
+    if (r < 8) return ZHENG;
+    if (r < 14) return LIYU;
+    if (r < 16) return QIAO;
+    if (r < 18) return YANG;
+    return NIE;
+  }
+  function pickSecond(first, group, intent, text) {
+    if (intent === 'leave' || group === 'admin') return first === ZHENG ? LIYU : ZHENG;
+    if (intent === 'tool' || group === 'board') return first === LIYU ? NIE : LIYU;
+    if (intent === 'tape' || intent === 'hold') {
+      if (first === LIYU) return ZHENG;
+      if (first === ZHENG) return QIAO;
+      return LIYU;
+    }
+    var extras = [ZHENG, LIYU, QIAO, YANG].filter(function (n) { return n !== first; });
+    return extras[hashStr(text + '2') % extras.length];
+  }
+  function lineFor(name, group, text, intent, topic, role) {
+    var bucket = intent;
+    if (role === 'follow') bucket = 'follow';
+    else if (role === 'react') bucket = 'react';
+    else if (role === 'main' && intent !== 'ask' && intent !== 'ack' && Math.random() < 0.12) {
+      if (VOICE.clarify[name]) {
+        return pickLine(VOICE.clarify[name], name + '|clarify|' + text, topic);
       }
     }
-    if (second === first) second = null;
+    var arr = VOICE[bucket] && VOICE[bucket][name];
+    if (!arr) arr = VOICE.other[name];
+    return pickLine(arr, name + '|' + bucket + '|' + group + '|' + text, topic);
+  }
+  function planReplies(group, text) {
+    var intent = intentOf(text, group);
+    var topic = topicOf(text);
+    var first = pickSpeaker(group, intent, text);
     if (first === ME || first === '黄盛') first = ZHENG;
-    if (second === ME || second === '黄盛') second = null;
-    var out = [{ name: first, text: lineFor(first, group, text, flags, 0) }];
-    if (second) out.push({ name: second, text: lineFor(second, group, text, flags, 1) });
+    var late = Math.random() < 0.12;
+    var mode = 'single';
+    var roll = Math.random();
+    if (intent === 'ack') mode = roll < 0.1 ? 'double' : 'single';
+    else if (group === 'admin') mode = roll < 0.18 ? 'second' : (roll < 0.28 ? 'double' : 'single');
+    else if (roll < 0.25) mode = 'second';
+    else if (roll < 0.4) mode = 'double';
+    var line1 = lineFor(first, group, text, intent, topic, 'main');
+    var out = [];
+    if (late && Math.random() < 0.45) {
+      out.push({
+        name: first,
+        text: pickLine(['刚看到。', '刚翻到。', '刚看到这条。'], first + '|late|' + text, topic),
+        delay: delayFor('', 'late'),
+        late: true
+      });
+      out.push({ name: first, text: line1, delay: delayFor(line1, 'follow') });
+      return out;
+    }
+    if (late) line1 = (Math.random() < 0.5 ? '刚看到。' : '刚翻到。') + line1;
+    out.push({
+      name: first,
+      text: line1,
+      delay: delayFor(line1, late ? 'late' : (intent === 'ack' ? 'ack' : 'main')),
+      late: late
+    });
+    if (mode === 'double') {
+      var f2 = lineFor(first, group, text, intent, topic, 'follow');
+      if (f2 && f2 !== line1) out.push({ name: first, text: f2, delay: delayFor(f2, 'follow') });
+    } else if (mode === 'second') {
+      var second = pickSecond(first, group, intent, text);
+      if (second && second !== first && second !== ME && second !== '黄盛') {
+        var sRole = (intent === 'ask' || intent === 'hold') ? 'main' : 'react';
+        var s2 = lineFor(second, group, text, intent, topic, sRole);
+        if (s2 && s2 !== line1) out.push({ name: second, text: s2, delay: delayFor(s2, 'follow') });
+      }
+    }
     return out;
   }
   function scheduleReplies(group, text) {
@@ -399,21 +532,31 @@ a{color:var(--acc)}
     var token = state.pendingToken;
     var plan = planReplies(group, text);
     if (!plan.length) return;
-    state.typing = { group: group, name: plan[0].name };
-    refresh();
-    later(1200 + Math.floor(Math.random() * 2300), function () {
-      if (token !== state.pendingToken) return;
-      state.typing = null;
-      insertReply(group, plan[0].name, plan[0].text);
-      if (!plan[1]) return;
-      state.typing = { group: group, name: plan[1].name };
-      refresh();
-      later(1000 + Math.floor(Math.random() * 2000), function () {
-        if (token !== state.pendingToken) return;
-        state.typing = null;
-        insertReply(group, plan[1].name, plan[1].text);
-      });
-    });
+    function run(i) {
+      if (token !== state.pendingToken || i >= plan.length) return;
+      var step = plan[i];
+      function typeThenSend(wait) {
+        state.typing = { group: group, name: step.name };
+        refresh();
+        later(wait, function () {
+          if (token !== state.pendingToken) return;
+          state.typing = null;
+          insertReply(group, step.name, step.text);
+          run(i + 1);
+        });
+      }
+      if (step.late && i === 0) {
+        var typeMs = 2200 + Math.floor(Math.random() * 800);
+        var silent = Math.max(8000, step.delay - typeMs);
+        later(silent, function () {
+          if (token !== state.pendingToken) return;
+          typeThenSend(typeMs);
+        });
+      } else {
+        typeThenSend(step.delay);
+      }
+    }
+    run(0);
   }
   $('side').addEventListener('click', function (ev) {
     var t = ev.target.closest('[data-g]');
